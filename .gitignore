@@ -12,5 +12,6 @@ data/**/*.csv
 data/**/*.parquet
 data/**/*.zip
 data/**/*.jsonl
-data/raw/
 
+SPEC.md
+*.egg-info/
