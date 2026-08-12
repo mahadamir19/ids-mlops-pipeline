@@ -31,11 +31,14 @@ from sentinelml.training.evaluate import (
     evaluate_binary_classifier,
     feature_importance_table,
 )
-from sentinelml.training.models import build_baseline_model_specs
+from sentinelml.training.models import (
+    DEFAULT_TRAINING_CONFIG_PATH,
+    build_baseline_model_specs,
+    load_training_config,
+)
 
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "reports" / "models" / "phase2_baseline"
 SMOKE_OUTPUT_DIR = PROJECT_ROOT / "reports" / "models" / "phase2_smoke"
-DEFAULT_SEED = 42
 
 
 def file_fingerprint(path: Path) -> dict[str, Any]:
@@ -85,7 +88,7 @@ def run_phase2_baselines(
     train_sample_size: int = 20_000,
     validation_sample_size: int = 10_000,
     test_sample_size: int = 10_000,
-    seed: int = DEFAULT_SEED,
+    training_config_path: Path = DEFAULT_TRAINING_CONFIG_PATH,
 ) -> dict[str, Any]:
     """Train, evaluate, compare, and report the four Phase 2 baselines."""
 
@@ -102,6 +105,8 @@ def run_phase2_baselines(
         "test": file_fingerprint(test_path),
     }
     schema = load_feature_schema(feature_schema_path)
+    training_config = load_training_config(training_config_path)
+    seed = int(training_config["random_seed"])
     feature_columns = schema["feature_columns"]
     target_column = schema["target_column"]
     sizes = _sample_sizes(
@@ -126,7 +131,7 @@ def run_phase2_baselines(
         seed=seed + 10,
     )
 
-    model_specs = build_baseline_model_specs(train.target, seed=seed)
+    model_specs = build_baseline_model_specs(train.target, config=training_config)
     validation_results: dict[str, dict[str, Any]] = {}
     fitted_models: dict[str, Any] = {}
     parameters: dict[str, Any] = {}
@@ -183,6 +188,7 @@ def run_phase2_baselines(
     report = {
         "mode": mode,
         "seed": seed,
+        "training_config_path": str(training_config_path),
         "feature_schema_path": str(feature_schema_path),
         "feature_count": len(feature_columns),
         "sample_metadata": sample_metadata,

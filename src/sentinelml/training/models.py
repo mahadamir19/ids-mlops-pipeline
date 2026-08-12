@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -10,6 +11,10 @@ from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassif
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
+from sentinelml.data.config import PROJECT_ROOT
+
+DEFAULT_TRAINING_CONFIG_PATH = PROJECT_ROOT / "configs" / "training_config.yaml"
 
 
 @dataclass(frozen=True)
@@ -19,6 +24,68 @@ class ModelSpec:
     parameters: dict[str, Any]
 
 
+def _parse_scalar(value: str) -> int | float | str:
+    value = value.strip()
+    if value == "":
+        raise ValueError("empty scalar values are not supported in training config")
+    try:
+        return int(value)
+    except ValueError:
+        try:
+            return float(value)
+        except ValueError:
+            return value
+
+
+def load_training_config(path: Path = DEFAULT_TRAINING_CONFIG_PATH) -> dict[str, Any]:
+    """Load the simple Phase 2 YAML training configuration."""
+
+    config: dict[str, Any] = {}
+    stack: list[tuple[int, dict[str, Any]]] = [(-1, config)]
+    lines = path.read_text(encoding="utf-8").splitlines()
+    for line_number, raw_line in enumerate(lines, 1):
+        content = raw_line.split("#", 1)[0].rstrip()
+        if not content:
+            continue
+        indent = len(content) - len(content.lstrip(" "))
+        if indent % 2:
+            raise ValueError(f"invalid indentation on line {line_number}")
+        stripped = content.strip()
+        if ":" not in stripped:
+            raise ValueError(f"expected key/value pair on line {line_number}")
+        key, raw_value = stripped.split(":", 1)
+        key = key.strip()
+        while stack and indent <= stack[-1][0]:
+            stack.pop()
+        parent = stack[-1][1]
+        if raw_value.strip():
+            parent[key] = _parse_scalar(raw_value)
+        else:
+            child: dict[str, Any] = {}
+            parent[key] = child
+            stack.append((indent, child))
+
+    _validate_training_config(config)
+    return config
+
+
+def _validate_training_config(config: dict[str, Any]) -> None:
+    required_models = {
+        "logistic_regression",
+        "random_forest",
+        "xgboost",
+        "hist_gradient_boosting",
+    }
+    if "random_seed" not in config:
+        raise ValueError("training config is missing random_seed")
+    baseline = config.get("baseline")
+    if not isinstance(baseline, dict):
+        raise ValueError("training config is missing baseline model settings")
+    missing_models = sorted(required_models - set(baseline))
+    if missing_models:
+        raise ValueError(f"training config is missing models: {missing_models}")
+
+
 def _class_balance_ratio(target: pd.Series) -> float:
     counts = target.value_counts().to_dict()
     positives = max(int(counts.get(1, 0)), 1)
@@ -26,9 +93,16 @@ def _class_balance_ratio(target: pd.Series) -> float:
     return negatives / positives
 
 
-def build_baseline_model_specs(target: pd.Series, *, seed: int = 42) -> list[ModelSpec]:
+def build_baseline_model_specs(
+    target: pd.Series,
+    *,
+    config: dict[str, Any] | None = None,
+) -> list[ModelSpec]:
     """Create the four required baseline model families with modest defaults."""
 
+    config = config or load_training_config()
+    seed = int(config["random_seed"])
+    baseline_config = config["baseline"]
     scale_pos_weight = _class_balance_ratio(target)
     try:
         from xgboost import XGBClassifier
@@ -43,41 +117,26 @@ def build_baseline_model_specs(target: pd.Series, *, seed: int = 42) -> list[Mod
             (
                 "classifier",
                 LogisticRegression(
-                    class_weight="balanced",
-                    max_iter=500,
+                    **baseline_config["logistic_regression"],
                     random_state=seed,
-                    solver="lbfgs",
                 ),
             ),
         ]
     )
     random_forest = RandomForestClassifier(
-        n_estimators=80,
-        max_depth=18,
-        min_samples_leaf=2,
-        class_weight="balanced_subsample",
-        n_jobs=1,
+        **baseline_config["random_forest"],
         random_state=seed,
     )
     xgboost = XGBClassifier(
-        n_estimators=200,
-        max_depth=6,
-        learning_rate=0.1,
-        subsample=0.8,
-        colsample_bytree=0.8,
+        **baseline_config["xgboost"],
         objective="binary:logistic",
         eval_metric="logloss",
-        tree_method="hist",
-        n_jobs=1,
         random_state=seed,
         scale_pos_weight=scale_pos_weight,
         verbosity=0,
     )
     hist_gradient_boosting = HistGradientBoostingClassifier(
-        max_iter=200,
-        learning_rate=0.1,
-        max_leaf_nodes=31,
-        class_weight="balanced",
+        **baseline_config["hist_gradient_boosting"],
         random_state=seed,
     )
     return [

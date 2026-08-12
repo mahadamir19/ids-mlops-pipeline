@@ -13,6 +13,7 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from sentinelml.training.baselines import run_phase2_baselines
+from sentinelml.training.models import DEFAULT_TRAINING_CONFIG_PATH
 
 
 def main() -> None:
@@ -34,7 +35,12 @@ def main() -> None:
         default=None,
         help="Optional report output directory.",
     )
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--training-config",
+        type=Path,
+        default=DEFAULT_TRAINING_CONFIG_PATH,
+        help="Path to the Phase 2 training configuration YAML.",
+    )
     parser.add_argument("--train-sample-size", type=int, default=20_000)
     parser.add_argument("--validation-sample-size", type=int, default=10_000)
     parser.add_argument("--test-sample-size", type=int, default=10_000)
@@ -46,7 +52,7 @@ def main() -> None:
         train_sample_size=args.train_sample_size,
         validation_sample_size=args.validation_sample_size,
         test_sample_size=args.test_sample_size,
-        seed=args.seed,
+        training_config_path=args.training_config,
     )
     selected = report["selected"]["recommended_baseline"]
     print(f"Phase 2 {args.mode} baseline workflow complete")
