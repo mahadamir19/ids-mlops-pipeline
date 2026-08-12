@@ -2,6 +2,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+tmp_tests/
+.tmp/
 
 .venv/
 venv/

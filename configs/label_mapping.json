@@ -1,0 +1,30 @@
+{
+  "target_name": "target",
+  "binary_mapping": {
+    "BENIGN": 0,
+    "non_benign_attack": 1
+  },
+  "known_original_labels": [
+    "BENIGN",
+    "Bot",
+    "DDoS",
+    "DoS GoldenEye",
+    "DoS Hulk",
+    "DoS Slowhttptest",
+    "DoS slowloris",
+    "FTP-Patator",
+    "Heartbleed",
+    "Infiltration",
+    "PortScan",
+    "SSH-Patator",
+    "Web Attack \ufffd Brute Force",
+    "Web Attack \ufffd Sql Injection",
+    "Web Attack \ufffd XSS"
+  ],
+  "unexpected_label_policy": "fail_validation",
+  "notes": [
+    "Original multiclass labels are retained in processed datasets as original_label for auditability.",
+    "Only BENIGN maps to 0. Every known non-BENIGN attack label maps to 1.",
+    "Unknown or unexpected labels must fail validation rather than being silently mapped."
+  ]
+}

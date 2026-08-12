@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "validation_scope": "raw",
+  "raw_files": [
+    "Monday-WorkingHours.pcap_ISCX.csv",
+    "Tuesday-WorkingHours.pcap_ISCX.csv",
+    "Wednesday-workingHours.pcap_ISCX.csv",
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv"
+  ],
+  "observed_labels": {
+    "BENIGN": 2273097,
+    "FTP-Patator": 7938,
+    "SSH-Patator": 5897,
+    "DoS slowloris": 5796,
+    "DoS Slowhttptest": 5499,
+    "DoS Hulk": 231073,
+    "DoS GoldenEye": 10293,
+    "Heartbleed": 11,
+    "Infiltration": 36,
+    "Web Attack \ufffd Brute Force": 1507,
+    "Web Attack \ufffd XSS": 652,
+    "Web Attack \ufffd Sql Injection": 21,
+    "DDoS": 128027,
+    "PortScan": 158930,
+    "Bot": 1966
+  },
+  "row_length_mismatches": {
+    "Monday-WorkingHours.pcap_ISCX.csv": 0,
+    "Tuesday-WorkingHours.pcap_ISCX.csv": 0,
+    "Wednesday-workingHours.pcap_ISCX.csv": 0,
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv": 0,
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv": 0,
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv": 0,
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": 0,
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv": 0
+  },
+  "duplicate_header_names": [
+    " Fwd Header Length"
+  ],
+  "duplicate_trimmed_header_names": [
+    "Fwd Header Length"
+  ],
+  "duplicate_column_equivalence": {
+    "name": "Fwd Header Length",
+    "keep_original_index": 34,
+    "drop_original_index": 55,
+    "equivalent": true,
+    "mismatch_examples": []
+  },
+  "failures": [],
+  "warnings": [
+    "raw duplicate header names allowed for preprocessing: [' Fwd Header Length']",
+    "raw duplicate trimmed header names allowed only with explicit policy: ['Fwd Header Length']"
+  ]
+}

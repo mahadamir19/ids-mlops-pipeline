@@ -1,0 +1,54 @@
+{
+  "raw_data_dir": "data/raw/cicids2017",
+  "eda_summary_path": "reports/eda/summary.json",
+  "processed_dir": "tmp_tests/phase1_smoke/processed",
+  "reference_dir": "tmp_tests/phase1_smoke/reference",
+  "report_dir": "tmp_tests/phase1_smoke/reports",
+  "output_format": "parquet",
+  "chunk_rows": 10000,
+  "max_rows_per_file": 20000,
+  "reference_fraction": 0.1,
+  "reference_hash_modulus": 1000000,
+  "split_strategy": {
+    "name": "temporal_weekday_holdout",
+    "assignment": {
+      "train": ["Monday", "Tuesday", "Wednesday"],
+      "validation": ["Thursday"],
+      "test": ["Friday"]
+    },
+    "policy": "Partition membership is determined only from source file/day. No random row-level train/test splitting is used."
+  },
+  "duplicate_column_policy": {
+    "trimmed_name": "Fwd Header Length",
+    "keep_original_index": 34,
+    "drop_original_index": 55,
+    "require_value_equivalence_before_drop": true
+  },
+  "constant_feature_policy": {
+    "source": "reports/eda/summary.json overall.constant_features",
+    "action": "drop"
+  },
+  "near_constant_feature_policy": {
+    "source": "reports/eda/summary.json overall.near_constant_features",
+    "action": "retain_for_initial_baseline"
+  },
+  "destination_port_policy": {
+    "action": "retain_for_initial_baseline",
+    "warning": "Destination Port can encode service or scenario identity and should be reviewed in later leakage experiments."
+  },
+  "invalid_numeric_policy": {
+    "applies_to": "final model feature columns",
+    "missing_values": "drop_rows",
+    "positive_infinity": "drop_rows",
+    "negative_infinity": "drop_rows",
+    "reason": "Affected rows are a very small share of the dataset; no imputation model is introduced in Phase 1."
+  },
+  "provenance_columns": [
+    "source_file",
+    "source_day",
+    "source_partition",
+    "source_row_number",
+    "row_digest"
+  ],
+  "provenance_feature_policy": "exclude_from_model_feature_matrix"
+}

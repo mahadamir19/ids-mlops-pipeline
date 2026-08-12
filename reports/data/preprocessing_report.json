@@ -1,0 +1,294 @@
+{
+  "generated_at_utc": "2026-08-12T06:35:11.101126+00:00",
+  "status": "passed",
+  "config_path": "C:\\MLOps-Project\\project\\configs\\phase1_data_config.json",
+  "label_mapping_path": "C:\\MLOps-Project\\project\\configs\\label_mapping.json",
+  "eda_summary_path": "C:\\MLOps-Project\\project\\reports\\eda\\summary.json",
+  "output_format": "parquet",
+  "outputs": {
+    "train": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
+    "validation": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+    "test": "C:\\MLOps-Project\\project\\data\\processed\\test.parquet",
+    "reference": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet"
+  },
+  "split_strategy": {
+    "name": "temporal_weekday_holdout",
+    "assignment": {
+      "train": [
+        "Monday",
+        "Tuesday",
+        "Wednesday"
+      ],
+      "validation": [
+        "Thursday"
+      ],
+      "test": [
+        "Friday"
+      ]
+    },
+    "policy": "Partition membership is determined only from source file/day. No random row-level train/test splitting is used."
+  },
+  "raw_files_unchanged": true,
+  "raw_file_fingerprints_before": {
+    "Monday-WorkingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Monday-WorkingHours.pcap_ISCX.csv",
+      "size_bytes": 176927918,
+      "mtime_ns": 1786449432883152500
+    },
+    "Tuesday-WorkingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Tuesday-WorkingHours.pcap_ISCX.csv",
+      "size_bytes": 135078995,
+      "mtime_ns": 1786449428594901200
+    },
+    "Wednesday-workingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Wednesday-workingHours.pcap_ISCX.csv",
+      "size_bytes": 225166395,
+      "mtime_ns": 1786449426474607200
+    },
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+      "size_bytes": 83102436,
+      "mtime_ns": 1786449430247307100
+    },
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+      "size_bytes": 52023263,
+      "mtime_ns": 1786449429275854800
+    },
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+      "size_bytes": 77123859,
+      "mtime_ns": 1786449435292909900
+    },
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+      "size_bytes": 76906168,
+      "mtime_ns": 1786449434412463800
+    },
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Morning.pcap_ISCX.csv",
+      "size_bytes": 58316725,
+      "mtime_ns": 1786449433666751000
+    }
+  },
+  "raw_file_fingerprints_after": {
+    "Monday-WorkingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Monday-WorkingHours.pcap_ISCX.csv",
+      "size_bytes": 176927918,
+      "mtime_ns": 1786449432883152500
+    },
+    "Tuesday-WorkingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Tuesday-WorkingHours.pcap_ISCX.csv",
+      "size_bytes": 135078995,
+      "mtime_ns": 1786449428594901200
+    },
+    "Wednesday-workingHours.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Wednesday-workingHours.pcap_ISCX.csv",
+      "size_bytes": 225166395,
+      "mtime_ns": 1786449426474607200
+    },
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+      "size_bytes": 83102436,
+      "mtime_ns": 1786449430247307100
+    },
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+      "size_bytes": 52023263,
+      "mtime_ns": 1786449429275854800
+    },
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+      "size_bytes": 77123859,
+      "mtime_ns": 1786449435292909900
+    },
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+      "size_bytes": 76906168,
+      "mtime_ns": 1786449434412463800
+    },
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv": {
+      "path": "C:\\MLOps-Project\\project\\data\\raw\\cicids2017\\Friday-WorkingHours-Morning.pcap_ISCX.csv",
+      "size_bytes": 58316725,
+      "mtime_ns": 1786449433666751000
+    }
+  },
+  "row_removals": {
+    "duplicate_raw_observation": 308381,
+    "unexpected_label": 0,
+    "unresolved_missing_or_infinite_feature": 2867
+  },
+  "files": {
+    "Monday-WorkingHours.pcap_ISCX.csv": {
+      "source_day": "Monday",
+      "partition": "train",
+      "rows_seen": 529918,
+      "rows_written": 502650,
+      "rows_removed": {
+        "duplicate_raw_observation": 26935,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 437
+      }
+    },
+    "Tuesday-WorkingHours.pcap_ISCX.csv": {
+      "source_day": "Tuesday",
+      "partition": "train",
+      "rows_seen": 445909,
+      "rows_written": 421576,
+      "rows_removed": {
+        "duplicate_raw_observation": 24118,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 264
+      }
+    },
+    "Wednesday-workingHours.pcap_ISCX.csv": {
+      "source_day": "Wednesday",
+      "partition": "train",
+      "rows_seen": 692703,
+      "rows_written": 602278,
+      "rows_removed": {
+        "duplicate_raw_observation": 90138,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 1297
+      }
+    },
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv": {
+      "source_day": "Thursday",
+      "partition": "validation",
+      "rows_seen": 288602,
+      "rows_written": 243571,
+      "rows_removed": {
+        "duplicate_raw_observation": 44858,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 207
+      }
+    },
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv": {
+      "source_day": "Thursday",
+      "partition": "validation",
+      "rows_seen": 170366,
+      "rows_written": 154863,
+      "rows_removed": {
+        "duplicate_raw_observation": 15393,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 135
+      }
+    },
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv": {
+      "source_day": "Friday",
+      "partition": "test",
+      "rows_seen": 225745,
+      "rows_written": 218245,
+      "rows_removed": {
+        "duplicate_raw_observation": 7474,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 34
+      }
+    },
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": {
+      "source_day": "Friday",
+      "partition": "test",
+      "rows_seen": 286467,
+      "rows_written": 205461,
+      "rows_removed": {
+        "duplicate_raw_observation": 80678,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 371
+      }
+    },
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv": {
+      "source_day": "Friday",
+      "partition": "test",
+      "rows_seen": 191033,
+      "rows_written": 172154,
+      "rows_removed": {
+        "duplicate_raw_observation": 18787,
+        "unexpected_label": 0,
+        "unresolved_missing_or_infinite_feature": 122
+      }
+    }
+  },
+  "partitions": {
+    "train": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
+      "row_count": 1526504,
+      "target_distribution": {
+        "0": 1323598,
+        "1": 202906
+      },
+      "source_files": [
+        "Monday-WorkingHours.pcap_ISCX.csv",
+        "Tuesday-WorkingHours.pcap_ISCX.csv",
+        "Wednesday-workingHours.pcap_ISCX.csv"
+      ],
+      "missing_feature_values": 0,
+      "infinite_feature_values": 0,
+      "duplicate_raw_observation_rows": 0,
+      "duplicate_feature_target_rows": 0
+    },
+    "validation": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+      "row_count": 398434,
+      "target_distribution": {
+        "0": 396255,
+        "1": 2179
+      },
+      "source_files": [
+        "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+        "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv"
+      ],
+      "missing_feature_values": 0,
+      "infinite_feature_values": 0,
+      "duplicate_raw_observation_rows": 0,
+      "duplicate_feature_target_rows": 0
+    },
+    "test": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\test.parquet",
+      "row_count": 595860,
+      "target_distribution": {
+        "0": 375204,
+        "1": 220656
+      },
+      "source_files": [
+        "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+        "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+        "Friday-WorkingHours-Morning.pcap_ISCX.csv"
+      ],
+      "missing_feature_values": 0,
+      "infinite_feature_values": 0,
+      "duplicate_raw_observation_rows": 0,
+      "duplicate_feature_target_rows": 0
+    },
+    "reference": {
+      "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
+      "row_count": 152695,
+      "target_distribution": {
+        "0": 132459,
+        "1": 20236
+      },
+      "source_files": [
+        "Monday-WorkingHours.pcap_ISCX.csv",
+        "Tuesday-WorkingHours.pcap_ISCX.csv",
+        "Wednesday-workingHours.pcap_ISCX.csv"
+      ],
+      "missing_feature_values": 0,
+      "infinite_feature_values": 0,
+      "duplicate_raw_observation_rows": 0,
+      "duplicate_feature_target_rows": 0
+    }
+  },
+  "feature_schema_path": "C:\\MLOps-Project\\project\\reports\\data\\feature_schema.json",
+  "raw_validation_report": "C:\\MLOps-Project\\project\\reports\\data\\validation_raw.json",
+  "processed_validation_report": "C:\\MLOps-Project\\project\\reports\\data\\validation_processed.json",
+  "preprocessing_decisions": [
+    "Trimmed/canonicalized raw column names and stored original-to-canonical mapping.",
+    "Verified duplicated Fwd Header Length columns are equivalent before dropping original index 55.",
+    "Dropped globally constant features identified by Phase 1 EDA.",
+    "Retained near-constant features for initial baseline.",
+    "Retained Destination Port with documented leakage/scenario-identity warning.",
+    "Dropped rows with unresolved missing or positive/negative infinite feature values.",
+    "Removed exact duplicate raw observations globally before partition assignment.",
+    "Mapped BENIGN to 0 and every known non-BENIGN label to 1.",
+    "Preserved source-file/day provenance columns while excluding them from feature schema."
+  ]
+}
