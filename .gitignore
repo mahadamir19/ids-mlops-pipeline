@@ -17,3 +17,5 @@ data/**/*.jsonl
 
 SPEC.md
 *.egg-info/
+
+infra/mlflow/.env
