@@ -1,0 +1,94 @@
+{
+  "logistic_regression": {
+    "validation_metrics": {
+      "rows": 398434,
+      "accuracy": 0.9696587138647806,
+      "precision": 0.0026099176872114035,
+      "recall": 0.011932078935291418,
+      "attack_class_recall": 0.011932078935291418,
+      "f1": 0.004283007989457211,
+      "pr_auc": 0.023979031256493043,
+      "roc_auc": 0.8659783301935364,
+      "confusion_matrix": {
+        "tn": 386319,
+        "fp": 9936,
+        "fn": 2153,
+        "tp": 26
+      },
+      "false_positive_rate": 0.025074762463565128,
+      "false_negative_rate": 0.9880679210647085,
+      "inference_time_seconds": 0.14496919990051538,
+      "inference_latency_ms_per_row": 0.0003638474625672392
+    },
+    "training_time_seconds": 91.55206489993725
+  },
+  "random_forest": {
+    "validation_metrics": {
+      "rows": 398434,
+      "accuracy": 0.9971287590918446,
+      "precision": 0.8606271777003485,
+      "recall": 0.5667737494263424,
+      "attack_class_recall": 0.5667737494263424,
+      "f1": 0.6834532374100719,
+      "pr_auc": 0.72047281549832,
+      "roc_auc": 0.994744857354795,
+      "confusion_matrix": {
+        "tn": 396055,
+        "fp": 200,
+        "fn": 944,
+        "tp": 1235
+      },
+      "false_positive_rate": 0.0005047254924228085,
+      "false_negative_rate": 0.43322625057365766,
+      "inference_time_seconds": 5.280108399922028,
+      "inference_latency_ms_per_row": 0.013252153179502823
+    },
+    "training_time_seconds": 1123.6792753000045
+  },
+  "xgboost": {
+    "validation_metrics": {
+      "rows": 398434,
+      "accuracy": 0.9988128523168204,
+      "precision": 0.9347604485219164,
+      "recall": 0.8416704910509408,
+      "attack_class_recall": 0.8416704910509408,
+      "f1": 0.8857763825163004,
+      "pr_auc": 0.8961888595149323,
+      "roc_auc": 0.9937704256097716,
+      "confusion_matrix": {
+        "tn": 396127,
+        "fp": 128,
+        "fn": 345,
+        "tp": 1834
+      },
+      "false_positive_rate": 0.00032302431515059745,
+      "false_negative_rate": 0.1583295089490592,
+      "inference_time_seconds": 3.7303183999611065,
+      "inference_latency_ms_per_row": 0.009362449991619958
+    },
+    "training_time_seconds": 288.25476949999575
+  },
+  "hist_gradient_boosting": {
+    "validation_metrics": {
+      "rows": 398434,
+      "accuracy": 0.9958286692400748,
+      "precision": 0.5850608752879236,
+      "recall": 0.8159706287287747,
+      "attack_class_recall": 0.8159706287287747,
+      "f1": 0.681487159831353,
+      "pr_auc": 0.4987571949290947,
+      "roc_auc": 0.9923209137565139,
+      "confusion_matrix": {
+        "tn": 394994,
+        "fp": 1261,
+        "fn": 401,
+        "tp": 1778
+      },
+      "false_positive_rate": 0.003182294229725808,
+      "false_negative_rate": 0.18402937127122534,
+      "inference_time_seconds": 7.894625099957921,
+      "inference_latency_ms_per_row": 0.019814135088767323
+    },
+    "training_time_seconds": 127.60737410001457
+  }
+}

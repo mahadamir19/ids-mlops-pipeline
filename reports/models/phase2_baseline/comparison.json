@@ -1,0 +1,58 @@
+[
+  {
+    "model": "xgboost",
+    "selection_score": 0.8894368737208571,
+    "training_time_seconds": 288.25476949999575,
+    "precision": 0.9347604485219164,
+    "recall": 0.8416704910509408,
+    "attack_class_recall": 0.8416704910509408,
+    "f1": 0.8857763825163004,
+    "pr_auc": 0.8961888595149323,
+    "roc_auc": 0.9937704256097716,
+    "false_positive_rate": 0.00032302431515059745,
+    "false_negative_rate": 0.1583295089490592,
+    "inference_latency_ms_per_row": 0.009362449991619958
+  },
+  {
+    "model": "hist_gradient_boosting",
+    "selection_score": 0.7297237854093481,
+    "training_time_seconds": 127.60737410001457,
+    "precision": 0.5850608752879236,
+    "recall": 0.8159706287287747,
+    "attack_class_recall": 0.8159706287287747,
+    "f1": 0.681487159831353,
+    "pr_auc": 0.4987571949290947,
+    "roc_auc": 0.9923209137565139,
+    "false_positive_rate": 0.003182294229725808,
+    "false_negative_rate": 0.18402937127122534,
+    "inference_latency_ms_per_row": 0.019814135088767323
+  },
+  {
+    "model": "random_forest",
+    "selection_score": 0.6988015749871761,
+    "training_time_seconds": 1123.6792753000045,
+    "precision": 0.8606271777003485,
+    "recall": 0.5667737494263424,
+    "attack_class_recall": 0.5667737494263424,
+    "f1": 0.6834532374100719,
+    "pr_auc": 0.72047281549832,
+    "roc_auc": 0.994744857354795,
+    "false_positive_rate": 0.0005047254924228085,
+    "false_negative_rate": 0.43322625057365766,
+    "inference_latency_ms_per_row": 0.013252153179502823
+  },
+  {
+    "model": "logistic_regression",
+    "selection_score": 0.14658583233501496,
+    "training_time_seconds": 91.55206489993725,
+    "precision": 0.0026099176872114035,
+    "recall": 0.011932078935291418,
+    "attack_class_recall": 0.011932078935291418,
+    "f1": 0.004283007989457211,
+    "pr_auc": 0.023979031256493043,
+    "roc_auc": 0.8659783301935364,
+    "false_positive_rate": 0.025074762463565128,
+    "false_negative_rate": 0.9880679210647085,
+    "inference_latency_ms_per_row": 0.0003638474625672392
+  }
+]
