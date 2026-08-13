@@ -1,0 +1,59 @@
+{
+  "study_name": "optuna-study-hist_gradient_boosting",
+  "model_family": "hist_gradient_boosting",
+  "execution_mode": "smoke",
+  "requested_n_trials": 2,
+  "trial_state_counts": {
+    "COMPLETE": 2,
+    "PRUNED": 0,
+    "FAIL": 0
+  },
+  "objective_metric": "pr_auc",
+  "direction": "maximize",
+  "sampler": "TPESampler",
+  "seed": 42,
+  "pruning_enabled": false,
+  "pruning_strategy": "unsupported",
+  "search_space": {
+    "n_estimators": {
+      "type": "int",
+      "low": 80,
+      "high": 320,
+      "step": 40
+    },
+    "learning_rate": {
+      "type": "float",
+      "low": 0.02,
+      "high": 0.2,
+      "log": true
+    },
+    "max_leaves": {
+      "type": "int",
+      "low": 15,
+      "high": 63,
+      "step": 4
+    },
+    "min_child_weight": {
+      "type": "float",
+      "low": 1.0,
+      "high": 8.0
+    },
+    "reg_lambda": {
+      "type": "float",
+      "low": 0.1,
+      "high": 5.0,
+      "log": true
+    }
+  },
+  "best_trial_number": 0,
+  "best_objective_value": 0.19185714285714286,
+  "best_params": {
+    "n_estimators": 160,
+    "learning_rate": 0.1785436060870726,
+    "max_leaves": 51,
+    "min_child_weight": 5.190609389379256,
+    "reg_lambda": 0.18410729205738682
+  },
+  "best_mlflow_run_id": "748efa7859b44567a4df773e3815429e",
+  "best_effective_device": "cuda:0"
+}

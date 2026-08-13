@@ -1,0 +1,77 @@
+{
+  "study_name": "optuna-study-xgboost",
+  "model_family": "xgboost",
+  "execution_mode": "smoke",
+  "requested_n_trials": 2,
+  "trial_state_counts": {
+    "COMPLETE": 1,
+    "PRUNED": 1,
+    "FAIL": 0
+  },
+  "objective_metric": "pr_auc",
+  "direction": "maximize",
+  "sampler": "TPESampler",
+  "seed": 42,
+  "pruning_enabled": true,
+  "pruning_strategy": "MedianPruner + XGBoostPruningCallback",
+  "search_space": {
+    "n_estimators": {
+      "type": "int",
+      "low": 80,
+      "high": 320,
+      "step": 40
+    },
+    "max_depth": {
+      "type": "int",
+      "low": 3,
+      "high": 10
+    },
+    "learning_rate": {
+      "type": "float",
+      "low": 0.02,
+      "high": 0.2,
+      "log": true
+    },
+    "subsample": {
+      "type": "float",
+      "low": 0.6,
+      "high": 1.0
+    },
+    "colsample_bytree": {
+      "type": "float",
+      "low": 0.6,
+      "high": 1.0
+    },
+    "min_child_weight": {
+      "type": "float",
+      "low": 1.0,
+      "high": 8.0
+    },
+    "reg_alpha": {
+      "type": "float",
+      "low": 1e-06,
+      "high": 1.0,
+      "log": true
+    },
+    "reg_lambda": {
+      "type": "float",
+      "low": 0.1,
+      "high": 5.0,
+      "log": true
+    }
+  },
+  "best_trial_number": 0,
+  "best_objective_value": 0.23417043740573154,
+  "best_params": {
+    "n_estimators": 160,
+    "max_depth": 10,
+    "learning_rate": 0.10790061933340454,
+    "subsample": 0.8394633936788146,
+    "colsample_bytree": 0.6624074561769746,
+    "min_child_weight": 2.0919616423534184,
+    "reg_alpha": 2.231010801867921e-06,
+    "reg_lambda": 2.962151658830348
+  },
+  "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f",
+  "best_effective_device": "cuda:0"
+}

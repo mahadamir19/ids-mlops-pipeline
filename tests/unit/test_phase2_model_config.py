@@ -5,9 +5,7 @@ import unittest
 from pathlib import Path
 
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
+from xgboost import XGBClassifier
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
@@ -24,13 +22,23 @@ class Phase2ModelConfigTests(unittest.TestCase):
         self.assertEqual(config["random_seed"], 42)
         self.assertEqual(
             config["baseline"]["logistic_regression"],
-            {"class_weight": "balanced", "max_iter": 500, "solver": "lbfgs"},
+            {
+                "booster": "gblinear",
+                "n_estimators": 120,
+                "learning_rate": 0.1,
+                "reg_alpha": 0.0,
+                "reg_lambda": 1.0,
+                "tree_method": "hist",
+                "device": "cuda",
+                "n_jobs": 1,
+            },
         )
-        self.assertEqual(config["baseline"]["random_forest"]["n_estimators"], 80)
+        self.assertEqual(config["baseline"]["random_forest"]["num_parallel_tree"], 80)
         self.assertEqual(config["baseline"]["xgboost"]["tree_method"], "hist")
+        self.assertEqual(config["baseline"]["xgboost"]["device"], "cuda")
         self.assertEqual(
-            config["baseline"]["hist_gradient_boosting"]["class_weight"],
-            "balanced",
+            config["baseline"]["hist_gradient_boosting"]["grow_policy"],
+            "lossguide",
         )
 
     def test_builds_all_four_models_from_config_without_behavior_change(self) -> None:
@@ -48,24 +56,33 @@ class Phase2ModelConfigTests(unittest.TestCase):
         )
 
         logistic = specs["logistic_regression"].estimator
-        self.assertIsInstance(logistic, Pipeline)
-        logistic_classifier = logistic.named_steps["classifier"]
-        self.assertIsInstance(logistic_classifier, LogisticRegression)
-        self.assertEqual(logistic_classifier.class_weight, "balanced")
-        self.assertEqual(logistic_classifier.max_iter, 500)
-        self.assertEqual(logistic_classifier.solver, "lbfgs")
-        self.assertEqual(logistic_classifier.random_state, 42)
+        self.assertIsInstance(logistic, XGBClassifier)
+        self.assertEqual(logistic.booster, "gblinear")
+        self.assertEqual(logistic.n_estimators, 120)
+        self.assertEqual(logistic.learning_rate, 0.1)
+        self.assertEqual(logistic.reg_alpha, 0.0)
+        self.assertEqual(logistic.reg_lambda, 1.0)
+        self.assertEqual(logistic.device, "cuda")
+        self.assertEqual(logistic.random_state, 42)
+        self.assertEqual(logistic.scale_pos_weight, 6.5)
 
         random_forest = specs["random_forest"].estimator
-        self.assertIsInstance(random_forest, RandomForestClassifier)
-        self.assertEqual(random_forest.n_estimators, 80)
+        self.assertIsInstance(random_forest, XGBClassifier)
+        self.assertEqual(random_forest.n_estimators, 1)
+        self.assertEqual(random_forest.num_parallel_tree, 80)
         self.assertEqual(random_forest.max_depth, 18)
-        self.assertEqual(random_forest.min_samples_leaf, 2)
-        self.assertEqual(random_forest.class_weight, "balanced_subsample")
+        self.assertEqual(random_forest.learning_rate, 1.0)
+        self.assertEqual(random_forest.subsample, 0.8)
+        self.assertEqual(random_forest.colsample_bynode, 0.8)
+        self.assertEqual(random_forest.min_child_weight, 2.0)
+        self.assertEqual(random_forest.tree_method, "hist")
+        self.assertEqual(random_forest.device, "cuda")
         self.assertEqual(random_forest.n_jobs, 1)
         self.assertEqual(random_forest.random_state, 42)
+        self.assertEqual(random_forest.scale_pos_weight, 6.5)
 
         xgboost = specs["xgboost"].estimator
+        self.assertIsInstance(xgboost, XGBClassifier)
         self.assertEqual(xgboost.n_estimators, 200)
         self.assertEqual(xgboost.max_depth, 6)
         self.assertEqual(xgboost.learning_rate, 0.1)
@@ -74,17 +91,22 @@ class Phase2ModelConfigTests(unittest.TestCase):
         self.assertEqual(xgboost.objective, "binary:logistic")
         self.assertEqual(xgboost.eval_metric, "logloss")
         self.assertEqual(xgboost.tree_method, "hist")
+        self.assertEqual(xgboost.device, "cuda")
         self.assertEqual(xgboost.n_jobs, 1)
         self.assertEqual(xgboost.random_state, 42)
         self.assertEqual(xgboost.scale_pos_weight, 6.5)
         self.assertEqual(xgboost.verbosity, 0)
 
         hist = specs["hist_gradient_boosting"].estimator
-        self.assertIsInstance(hist, HistGradientBoostingClassifier)
-        self.assertEqual(hist.max_iter, 200)
+        self.assertIsInstance(hist, XGBClassifier)
+        self.assertEqual(hist.n_estimators, 200)
         self.assertEqual(hist.learning_rate, 0.1)
-        self.assertEqual(hist.max_leaf_nodes, 31)
-        self.assertEqual(hist.class_weight, "balanced")
+        self.assertEqual(hist.grow_policy, "lossguide")
+        self.assertEqual(hist.max_leaves, 31)
+        self.assertEqual(hist.max_depth, 0)
+        self.assertEqual(hist.min_child_weight, 1.0)
+        self.assertEqual(hist.reg_lambda, 1.0)
+        self.assertEqual(hist.device, "cuda")
         self.assertEqual(hist.random_state, 42)
 
     def test_custom_config_controls_common_seed_for_all_models(self) -> None:
@@ -99,14 +121,24 @@ class Phase2ModelConfigTests(unittest.TestCase):
                         "",
                         "baseline:",
                         "  logistic_regression:",
-                        "    class_weight: balanced",
-                        "    max_iter: 500",
-                        "    solver: lbfgs",
+                        "    booster: gblinear",
+                        "    n_estimators: 120",
+                        "    learning_rate: 0.1",
+                        "    reg_alpha: 0.0",
+                        "    reg_lambda: 1.0",
+                        "    tree_method: hist",
+                        "    device: cuda",
+                        "    n_jobs: 1",
                         "  random_forest:",
-                        "    n_estimators: 80",
+                        "    n_estimators: 1",
+                        "    num_parallel_tree: 80",
                         "    max_depth: 18",
-                        "    min_samples_leaf: 2",
-                        "    class_weight: balanced_subsample",
+                        "    learning_rate: 1.0",
+                        "    subsample: 0.8",
+                        "    colsample_bynode: 0.8",
+                        "    min_child_weight: 2.0",
+                        "    tree_method: hist",
+                        "    device: cuda",
                         "    n_jobs: 1",
                         "  xgboost:",
                         "    n_estimators: 200",
@@ -115,12 +147,19 @@ class Phase2ModelConfigTests(unittest.TestCase):
                         "    subsample: 0.8",
                         "    colsample_bytree: 0.8",
                         "    tree_method: hist",
+                        "    device: cuda",
                         "    n_jobs: 1",
                         "  hist_gradient_boosting:",
-                        "    max_iter: 200",
+                        "    n_estimators: 200",
                         "    learning_rate: 0.1",
-                        "    max_leaf_nodes: 31",
-                        "    class_weight: balanced",
+                        "    grow_policy: lossguide",
+                        "    max_leaves: 31",
+                        "    max_depth: 0",
+                        "    min_child_weight: 1.0",
+                        "    reg_lambda: 1.0",
+                        "    tree_method: hist",
+                        "    device: cuda",
+                        "    n_jobs: 1",
                     ]
                 ),
                 encoding="utf-8",
@@ -141,11 +180,12 @@ class Phase2ModelConfigTests(unittest.TestCase):
                 root.rmdir()
 
         self.assertEqual(
-            specs["logistic_regression"].estimator.named_steps["classifier"].random_state,
+            specs["logistic_regression"].estimator.random_state,
             7,
         )
         self.assertEqual(specs["random_forest"].estimator.random_state, 7)
         self.assertEqual(specs["xgboost"].estimator.random_state, 7)
+        self.assertEqual(specs["xgboost"].estimator.device, "cuda")
         self.assertEqual(specs["hist_gradient_boosting"].estimator.random_state, 7)
 
 

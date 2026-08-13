@@ -1,0 +1,308 @@
+{
+  "execution_mode": "smoke",
+  "objective_metric": "pr_auc",
+  "direction": "maximize",
+  "model_families": [
+    "logistic_regression",
+    "random_forest",
+    "xgboost",
+    "hist_gradient_boosting"
+  ],
+  "studies": [
+    {
+      "study_name": "optuna-study-logistic_regression",
+      "model_family": "logistic_regression",
+      "execution_mode": "smoke",
+      "requested_n_trials": 2,
+      "trial_state_counts": {
+        "COMPLETE": 2,
+        "PRUNED": 0,
+        "FAIL": 0
+      },
+      "objective_metric": "pr_auc",
+      "direction": "maximize",
+      "sampler": "TPESampler",
+      "seed": 42,
+      "pruning_enabled": false,
+      "pruning_strategy": "unsupported",
+      "search_space": {
+        "n_estimators": {
+          "type": "int",
+          "low": 60,
+          "high": 240,
+          "step": 30
+        },
+        "learning_rate": {
+          "type": "float",
+          "low": 0.02,
+          "high": 0.3,
+          "log": true
+        },
+        "reg_alpha": {
+          "type": "float",
+          "low": 1e-06,
+          "high": 1.0,
+          "log": true
+        },
+        "reg_lambda": {
+          "type": "float",
+          "low": 0.1,
+          "high": 10.0,
+          "log": true
+        }
+      },
+      "best_trial_number": 0,
+      "best_objective_value": 0.03162683548020292,
+      "best_params": {
+        "n_estimators": 120,
+        "learning_rate": 0.262516606324193,
+        "reg_alpha": 0.02465832945854911,
+        "reg_lambda": 1.5751320499779735
+      },
+      "best_mlflow_run_id": "0511db5ad4644f848ef0b44aba551010",
+      "best_effective_device": "cuda:0"
+    },
+    {
+      "study_name": "optuna-study-random_forest",
+      "model_family": "random_forest",
+      "execution_mode": "smoke",
+      "requested_n_trials": 2,
+      "trial_state_counts": {
+        "COMPLETE": 2,
+        "PRUNED": 0,
+        "FAIL": 0
+      },
+      "objective_metric": "pr_auc",
+      "direction": "maximize",
+      "sampler": "TPESampler",
+      "seed": 42,
+      "pruning_enabled": false,
+      "pruning_strategy": "unsupported",
+      "search_space": {
+        "num_parallel_tree": {
+          "type": "int",
+          "low": 40,
+          "high": 160,
+          "step": 20
+        },
+        "max_depth": {
+          "type": "int",
+          "low": 8,
+          "high": 28,
+          "step": 2
+        },
+        "subsample": {
+          "type": "float",
+          "low": 0.4,
+          "high": 1.0
+        },
+        "colsample_bynode": {
+          "type": "float",
+          "low": 0.4,
+          "high": 1.0
+        },
+        "min_child_weight": {
+          "type": "float",
+          "low": 1.0,
+          "high": 8.0
+        }
+      },
+      "best_trial_number": 0,
+      "best_objective_value": 0.04859717645374196,
+      "best_params": {
+        "num_parallel_tree": 80,
+        "max_depth": 28,
+        "subsample": 0.839196365086843,
+        "colsample_bynode": 0.759195090518222,
+        "min_child_weight": 2.0921304830970557
+      },
+      "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff",
+      "best_effective_device": "cuda:0"
+    },
+    {
+      "study_name": "optuna-study-xgboost",
+      "model_family": "xgboost",
+      "execution_mode": "smoke",
+      "requested_n_trials": 2,
+      "trial_state_counts": {
+        "COMPLETE": 1,
+        "PRUNED": 1,
+        "FAIL": 0
+      },
+      "objective_metric": "pr_auc",
+      "direction": "maximize",
+      "sampler": "TPESampler",
+      "seed": 42,
+      "pruning_enabled": true,
+      "pruning_strategy": "MedianPruner + XGBoostPruningCallback",
+      "search_space": {
+        "n_estimators": {
+          "type": "int",
+          "low": 80,
+          "high": 320,
+          "step": 40
+        },
+        "max_depth": {
+          "type": "int",
+          "low": 3,
+          "high": 10
+        },
+        "learning_rate": {
+          "type": "float",
+          "low": 0.02,
+          "high": 0.2,
+          "log": true
+        },
+        "subsample": {
+          "type": "float",
+          "low": 0.6,
+          "high": 1.0
+        },
+        "colsample_bytree": {
+          "type": "float",
+          "low": 0.6,
+          "high": 1.0
+        },
+        "min_child_weight": {
+          "type": "float",
+          "low": 1.0,
+          "high": 8.0
+        },
+        "reg_alpha": {
+          "type": "float",
+          "low": 1e-06,
+          "high": 1.0,
+          "log": true
+        },
+        "reg_lambda": {
+          "type": "float",
+          "low": 0.1,
+          "high": 5.0,
+          "log": true
+        }
+      },
+      "best_trial_number": 0,
+      "best_objective_value": 0.23417043740573154,
+      "best_params": {
+        "n_estimators": 160,
+        "max_depth": 10,
+        "learning_rate": 0.10790061933340454,
+        "subsample": 0.8394633936788146,
+        "colsample_bytree": 0.6624074561769746,
+        "min_child_weight": 2.0919616423534184,
+        "reg_alpha": 2.231010801867921e-06,
+        "reg_lambda": 2.962151658830348
+      },
+      "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f",
+      "best_effective_device": "cuda:0"
+    },
+    {
+      "study_name": "optuna-study-hist_gradient_boosting",
+      "model_family": "hist_gradient_boosting",
+      "execution_mode": "smoke",
+      "requested_n_trials": 2,
+      "trial_state_counts": {
+        "COMPLETE": 2,
+        "PRUNED": 0,
+        "FAIL": 0
+      },
+      "objective_metric": "pr_auc",
+      "direction": "maximize",
+      "sampler": "TPESampler",
+      "seed": 42,
+      "pruning_enabled": false,
+      "pruning_strategy": "unsupported",
+      "search_space": {
+        "n_estimators": {
+          "type": "int",
+          "low": 80,
+          "high": 320,
+          "step": 40
+        },
+        "learning_rate": {
+          "type": "float",
+          "low": 0.02,
+          "high": 0.2,
+          "log": true
+        },
+        "max_leaves": {
+          "type": "int",
+          "low": 15,
+          "high": 63,
+          "step": 4
+        },
+        "min_child_weight": {
+          "type": "float",
+          "low": 1.0,
+          "high": 8.0
+        },
+        "reg_lambda": {
+          "type": "float",
+          "low": 0.1,
+          "high": 5.0,
+          "log": true
+        }
+      },
+      "best_trial_number": 0,
+      "best_objective_value": 0.19185714285714286,
+      "best_params": {
+        "n_estimators": 160,
+        "learning_rate": 0.1785436060870726,
+        "max_leaves": 51,
+        "min_child_weight": 5.190609389379256,
+        "reg_lambda": 0.18410729205738682
+      },
+      "best_mlflow_run_id": "748efa7859b44567a4df773e3815429e",
+      "best_effective_device": "cuda:0"
+    }
+  ],
+  "validation_only_comparison": [
+    {
+      "model_family": "xgboost",
+      "best_objective_value": 0.23417043740573154,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f"
+    },
+    {
+      "model_family": "hist_gradient_boosting",
+      "best_objective_value": 0.19185714285714286,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": "748efa7859b44567a4df773e3815429e"
+    },
+    {
+      "model_family": "random_forest",
+      "best_objective_value": 0.04859717645374196,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff"
+    },
+    {
+      "model_family": "logistic_regression",
+      "best_objective_value": 0.03162683548020292,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": "0511db5ad4644f848ef0b44aba551010"
+    }
+  ],
+  "data_usage": {
+    "train": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
+      "original_rows": 1526504,
+      "rows_used": 2000,
+      "sample_size_requested": 2000,
+      "target_distribution": {
+        "0": 1735,
+        "1": 265
+      }
+    },
+    "validation": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+      "original_rows": 398434,
+      "rows_used": 1000,
+      "sample_size_requested": 1000,
+      "target_distribution": {
+        "0": 995,
+        "1": 5
+      }
+    },
+    "test": "not_loaded_or_used"
+  }
+}

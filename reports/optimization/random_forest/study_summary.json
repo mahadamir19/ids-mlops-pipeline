@@ -1,0 +1,57 @@
+{
+  "study_name": "optuna-study-random_forest",
+  "model_family": "random_forest",
+  "execution_mode": "smoke",
+  "requested_n_trials": 2,
+  "trial_state_counts": {
+    "COMPLETE": 2,
+    "PRUNED": 0,
+    "FAIL": 0
+  },
+  "objective_metric": "pr_auc",
+  "direction": "maximize",
+  "sampler": "TPESampler",
+  "seed": 42,
+  "pruning_enabled": false,
+  "pruning_strategy": "unsupported",
+  "search_space": {
+    "num_parallel_tree": {
+      "type": "int",
+      "low": 40,
+      "high": 160,
+      "step": 20
+    },
+    "max_depth": {
+      "type": "int",
+      "low": 8,
+      "high": 28,
+      "step": 2
+    },
+    "subsample": {
+      "type": "float",
+      "low": 0.4,
+      "high": 1.0
+    },
+    "colsample_bynode": {
+      "type": "float",
+      "low": 0.4,
+      "high": 1.0
+    },
+    "min_child_weight": {
+      "type": "float",
+      "low": 1.0,
+      "high": 8.0
+    }
+  },
+  "best_trial_number": 0,
+  "best_objective_value": 0.04859717645374196,
+  "best_params": {
+    "num_parallel_tree": 80,
+    "max_depth": 28,
+    "subsample": 0.839196365086843,
+    "colsample_bynode": 0.759195090518222,
+    "min_child_weight": 2.0921304830970557
+  },
+  "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff",
+  "best_effective_device": "cuda:0"
+}

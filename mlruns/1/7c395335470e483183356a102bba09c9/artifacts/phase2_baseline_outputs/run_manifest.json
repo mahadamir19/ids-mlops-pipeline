@@ -1,0 +1,1692 @@
+{
+  "mode": "smoke",
+  "seed": 42,
+  "training_config_path": "C:\\MLOps-Project\\project\\configs\\training_config.yaml",
+  "feature_schema_path": "C:\\MLOps-Project\\project\\reports\\data\\feature_schema.json",
+  "feature_count": 69,
+  "sample_metadata": {
+    "train": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
+      "original_rows": 1526504,
+      "rows_used": 20000,
+      "sample_size_requested": 20000,
+      "target_distribution": {
+        "0": 17342,
+        "1": 2658
+      }
+    },
+    "validation": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+      "original_rows": 398434,
+      "rows_used": 10000,
+      "sample_size_requested": 10000,
+      "target_distribution": {
+        "0": 9946,
+        "1": 54
+      }
+    },
+    "test": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\test.parquet",
+      "original_rows": 595860,
+      "rows_used": 10000,
+      "sample_size_requested": 10000,
+      "target_distribution": {
+        "0": 6297,
+        "1": 3703
+      }
+    }
+  },
+  "parameters": {
+    "logistic_regression": {
+      "pipeline": [
+        "StandardScaler",
+        "LogisticRegression"
+      ],
+      "LogisticRegression": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 500,
+        "n_jobs": null,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      }
+    },
+    "random_forest": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": "balanced_subsample",
+      "criterion": "gini",
+      "max_depth": 18,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 2,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 80,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": 42,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "xgboost": {
+      "objective": "binary:logistic",
+      "base_score": null,
+      "booster": null,
+      "callbacks": null,
+      "colsample_bylevel": null,
+      "colsample_bynode": null,
+      "colsample_bytree": 0.8,
+      "device": null,
+      "early_stopping_rounds": null,
+      "enable_categorical": true,
+      "eval_metric": "logloss",
+      "feature_types": null,
+      "feature_weights": null,
+      "gamma": null,
+      "grow_policy": null,
+      "importance_type": null,
+      "interaction_constraints": null,
+      "learning_rate": 0.1,
+      "max_bin": null,
+      "max_cat_threshold": null,
+      "max_cat_to_onehot": null,
+      "max_delta_step": null,
+      "max_depth": 6,
+      "max_leaves": null,
+      "min_child_weight": null,
+      "missing": NaN,
+      "monotone_constraints": null,
+      "multi_strategy": null,
+      "n_estimators": 200,
+      "n_jobs": 1,
+      "num_parallel_tree": null,
+      "random_state": 42,
+      "reg_alpha": null,
+      "reg_lambda": null,
+      "sampling_method": null,
+      "scale_pos_weight": 6.524454477050414,
+      "subsample": 0.8,
+      "tree_method": "hist",
+      "validate_parameters": null,
+      "verbosity": 0
+    },
+    "hist_gradient_boosting": {
+      "categorical_features": "from_dtype",
+      "class_weight": "balanced",
+      "early_stopping": "auto",
+      "interaction_cst": null,
+      "l2_regularization": 0.0,
+      "learning_rate": 0.1,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 200,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "validation_results": {
+    "logistic_regression": {
+      "validation_metrics": {
+        "rows": 10000,
+        "accuracy": 0.9746,
+        "precision": 0.0049504950495049506,
+        "recall": 0.018518518518518517,
+        "attack_class_recall": 0.018518518518518517,
+        "f1": 0.0078125,
+        "pr_auc": 0.017235558423905784,
+        "roc_auc": 0.8386323182221032,
+        "confusion_matrix": {
+          "tn": 9745,
+          "fp": 201,
+          "fn": 53,
+          "tp": 1
+        },
+        "false_positive_rate": 0.020209129298210334,
+        "false_negative_rate": 0.9814814814814815,
+        "inference_time_seconds": 0.024754699999903096,
+        "inference_latency_ms_per_row": 0.0024754699999903094
+      },
+      "training_time_seconds": 0.9642330999995465
+    },
+    "random_forest": {
+      "validation_metrics": {
+        "rows": 10000,
+        "accuracy": 0.9941,
+        "precision": 0.0,
+        "recall": 0.0,
+        "attack_class_recall": 0.0,
+        "f1": 0.0,
+        "pr_auc": 0.11428980021040176,
+        "roc_auc": 0.9654355743235695,
+        "confusion_matrix": {
+          "tn": 9941,
+          "fp": 5,
+          "fn": 54,
+          "tp": 0
+        },
+        "false_positive_rate": 0.0005027146591594611,
+        "false_negative_rate": 1.0,
+        "inference_time_seconds": 0.05336720000013884,
+        "inference_latency_ms_per_row": 0.0053367200000138835
+      },
+      "training_time_seconds": 7.0463255000013305
+    },
+    "xgboost": {
+      "validation_metrics": {
+        "rows": 10000,
+        "accuracy": 0.994,
+        "precision": 0.125,
+        "recall": 0.018518518518518517,
+        "attack_class_recall": 0.018518518518518517,
+        "f1": 0.03225806451612903,
+        "pr_auc": 0.4673724786848742,
+        "roc_auc": 0.9968719976763412,
+        "confusion_matrix": {
+          "tn": 9939,
+          "fp": 7,
+          "fn": 53,
+          "tp": 1
+        },
+        "false_positive_rate": 0.0007038005228232455,
+        "false_negative_rate": 0.9814814814814815,
+        "inference_time_seconds": 0.06014669999967737,
+        "inference_latency_ms_per_row": 0.0060146699999677365
+      },
+      "training_time_seconds": 4.759839500000453
+    },
+    "hist_gradient_boosting": {
+      "validation_metrics": {
+        "rows": 10000,
+        "accuracy": 0.9943,
+        "precision": 0.36363636363636365,
+        "recall": 0.07407407407407407,
+        "attack_class_recall": 0.07407407407407407,
+        "f1": 0.12307692307692308,
+        "pr_auc": 0.30769590506136807,
+        "roc_auc": 0.9930830186711949,
+        "confusion_matrix": {
+          "tn": 9939,
+          "fp": 7,
+          "fn": 50,
+          "tp": 4
+        },
+        "false_positive_rate": 0.0007038005228232455,
+        "false_negative_rate": 0.9259259259259259,
+        "inference_time_seconds": 0.14056200000050012,
+        "inference_latency_ms_per_row": 0.014056200000050012
+      },
+      "training_time_seconds": 8.331277000001137
+    }
+  },
+  "comparison": [
+    {
+      "model": "hist_gradient_boosting",
+      "selection_score": 0.282892244801477,
+      "training_time_seconds": 8.331277000001137,
+      "precision": 0.36363636363636365,
+      "recall": 0.07407407407407407,
+      "attack_class_recall": 0.07407407407407407,
+      "f1": 0.12307692307692308,
+      "pr_auc": 0.30769590506136807,
+      "roc_auc": 0.9930830186711949,
+      "false_positive_rate": 0.0007038005228232455,
+      "false_negative_rate": 0.9259259259259259,
+      "inference_latency_ms_per_row": 0.014056200000050012
+    },
+    {
+      "model": "xgboost",
+      "selection_score": 0.28104112702322526,
+      "training_time_seconds": 4.759839500000453,
+      "precision": 0.125,
+      "recall": 0.018518518518518517,
+      "attack_class_recall": 0.018518518518518517,
+      "f1": 0.03225806451612903,
+      "pr_auc": 0.4673724786848742,
+      "roc_auc": 0.9968719976763412,
+      "false_positive_rate": 0.0007038005228232455,
+      "false_negative_rate": 0.9814814814814815,
+      "inference_latency_ms_per_row": 0.0060146699999677365
+    },
+    {
+      "model": "random_forest",
+      "selection_score": 0.17509087175199944,
+      "training_time_seconds": 7.0463255000013305,
+      "precision": 0.0,
+      "recall": 0.0,
+      "attack_class_recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.11428980021040176,
+      "roc_auc": 0.9654355743235695,
+      "false_positive_rate": 0.0005027146591594611,
+      "false_negative_rate": 1.0,
+      "inference_latency_ms_per_row": 0.0053367200000138835
+    },
+    {
+      "model": "logistic_regression",
+      "selection_score": 0.14559627144475773,
+      "training_time_seconds": 0.9642330999995465,
+      "precision": 0.0049504950495049506,
+      "recall": 0.018518518518518517,
+      "attack_class_recall": 0.018518518518518517,
+      "f1": 0.0078125,
+      "pr_auc": 0.017235558423905784,
+      "roc_auc": 0.8386323182221032,
+      "false_positive_rate": 0.020209129298210334,
+      "false_negative_rate": 0.9814814814814815,
+      "inference_latency_ms_per_row": 0.0024754699999903094
+    }
+  ],
+  "selected": {
+    "recommended_baseline": "hist_gradient_boosting",
+    "selection_metric": "validation composite score",
+    "selection_score": 0.282892244801477,
+    "selection_rationale": "Selected from validation behavior using attack recall, F1, PR-AUC, ROC-AUC, and false-positive rate. Accuracy is reported but not used as the ranking criterion."
+  },
+  "selected_test_metrics": {
+    "rows": 10000,
+    "accuracy": 0.765,
+    "precision": 0.9963316214233309,
+    "recall": 0.3667296786389414,
+    "attack_class_recall": 0.3667296786389414,
+    "f1": 0.5361231741018555,
+    "pr_auc": 0.7486308064294945,
+    "roc_auc": 0.6361928108884757,
+    "confusion_matrix": {
+      "tn": 6292,
+      "fp": 5,
+      "fn": 2345,
+      "tp": 1358
+    },
+    "false_positive_rate": 0.0007940289026520565,
+    "false_negative_rate": 0.6332703213610587,
+    "inference_time_seconds": 0.22055790000013076,
+    "inference_latency_ms_per_row": 0.02205579000001308
+  },
+  "feature_importance": {
+    "logistic_regression": {
+      "rows": [
+        {
+          "feature": "bwd_packet_length_min",
+          "importance": 8.309751510620117,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -8.309751510620117,
+          "rank": 1
+        },
+        {
+          "feature": "packet_length_variance",
+          "importance": 7.432013034820557,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 7.432013034820557,
+          "rank": 2
+        },
+        {
+          "feature": "destination_port",
+          "importance": 6.822339057922363,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -6.822339057922363,
+          "rank": 3
+        },
+        {
+          "feature": "fwd_packet_length_std",
+          "importance": 4.682165622711182,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -4.682165622711182,
+          "rank": 4
+        },
+        {
+          "feature": "total_length_of_bwd_packets",
+          "importance": 3.546576499938965,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -3.546576499938965,
+          "rank": 5
+        },
+        {
+          "feature": "subflow_bwd_bytes",
+          "importance": 3.5442898273468018,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -3.5442898273468018,
+          "rank": 6
+        },
+        {
+          "feature": "bwd_header_length",
+          "importance": 3.4521548748016357,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 3.4521548748016357,
+          "rank": 7
+        },
+        {
+          "feature": "flow_duration",
+          "importance": 2.391460657119751,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 2.391460657119751,
+          "rank": 8
+        },
+        {
+          "feature": "min_seg_size_forward",
+          "importance": 1.9980320930480957,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.9980320930480957,
+          "rank": 9
+        },
+        {
+          "feature": "bwd_iat_total",
+          "importance": 1.855709433555603,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.855709433555603,
+          "rank": 10
+        },
+        {
+          "feature": "active_mean",
+          "importance": 1.7139559984207153,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.7139559984207153,
+          "rank": 11
+        },
+        {
+          "feature": "subflow_fwd_packets",
+          "importance": 1.706377625465393,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.706377625465393,
+          "rank": 12
+        },
+        {
+          "feature": "total_fwd_packets",
+          "importance": 1.7063775062561035,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.7063775062561035,
+          "rank": 13
+        },
+        {
+          "feature": "max_packet_length",
+          "importance": 1.6741262674331665,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.6741262674331665,
+          "rank": 14
+        },
+        {
+          "feature": "flow_bytes_per_s",
+          "importance": 1.6499919891357422,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.6499919891357422,
+          "rank": 15
+        },
+        {
+          "feature": "fwd_iat_total",
+          "importance": 1.5708551406860352,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.5708551406860352,
+          "rank": 16
+        },
+        {
+          "feature": "bwd_packet_length_std",
+          "importance": 1.5524041652679443,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.5524041652679443,
+          "rank": 17
+        },
+        {
+          "feature": "average_packet_size",
+          "importance": 1.5216847658157349,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.5216847658157349,
+          "rank": 18
+        },
+        {
+          "feature": "bwd_packet_length_mean",
+          "importance": 1.5040490627288818,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.5040490627288818,
+          "rank": 19
+        },
+        {
+          "feature": "avg_bwd_segment_size",
+          "importance": 1.5040490627288818,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.5040490627288818,
+          "rank": 20
+        },
+        {
+          "feature": "fwd_packet_length_max",
+          "importance": 1.4280563592910767,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.4280563592910767,
+          "rank": 21
+        },
+        {
+          "feature": "active_max",
+          "importance": 1.4030181169509888,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.4030181169509888,
+          "rank": 22
+        },
+        {
+          "feature": "bwd_iat_std",
+          "importance": 1.2746974229812622,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.2746974229812622,
+          "rank": 23
+        },
+        {
+          "feature": "fwd_packet_length_mean",
+          "importance": 1.204747200012207,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.204747200012207,
+          "rank": 24
+        },
+        {
+          "feature": "avg_fwd_segment_size",
+          "importance": 1.204747200012207,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.204747200012207,
+          "rank": 25
+        },
+        {
+          "feature": "init_win_bytes_forward",
+          "importance": 1.1642175912857056,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.1642175912857056,
+          "rank": 26
+        },
+        {
+          "feature": "fwd_iat_min",
+          "importance": 1.091801643371582,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.091801643371582,
+          "rank": 27
+        },
+        {
+          "feature": "bwd_iat_max",
+          "importance": 1.07210111618042,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -1.07210111618042,
+          "rank": 28
+        },
+        {
+          "feature": "idle_max",
+          "importance": 1.0568456649780273,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.0568456649780273,
+          "rank": 29
+        },
+        {
+          "feature": "fin_flag_count",
+          "importance": 1.027557373046875,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 1.027557373046875,
+          "rank": 30
+        },
+        {
+          "feature": "init_win_bytes_backward",
+          "importance": 0.9958239793777466,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.9958239793777466,
+          "rank": 31
+        },
+        {
+          "feature": "bwd_packets_per_s",
+          "importance": 0.9565292596817017,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.9565292596817017,
+          "rank": 32
+        },
+        {
+          "feature": "total_length_of_fwd_packets",
+          "importance": 0.9275525808334351,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.9275525808334351,
+          "rank": 33
+        },
+        {
+          "feature": "subflow_fwd_bytes",
+          "importance": 0.9275525808334351,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.9275525808334351,
+          "rank": 34
+        },
+        {
+          "feature": "packet_length_mean",
+          "importance": 0.8738789558410645,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.8738789558410645,
+          "rank": 35
+        },
+        {
+          "feature": "active_min",
+          "importance": 0.7919639348983765,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.7919639348983765,
+          "rank": 36
+        },
+        {
+          "feature": "urg_flag_count",
+          "importance": 0.7768297791481018,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.7768297791481018,
+          "rank": 37
+        },
+        {
+          "feature": "psh_flag_count",
+          "importance": 0.7659462094306946,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.7659462094306946,
+          "rank": 38
+        },
+        {
+          "feature": "flow_iat_mean",
+          "importance": 0.7576664090156555,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.7576664090156555,
+          "rank": 39
+        },
+        {
+          "feature": "total_backward_packets",
+          "importance": 0.7044565677642822,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.7044565677642822,
+          "rank": 40
+        },
+        {
+          "feature": "subflow_bwd_packets",
+          "importance": 0.7044564485549927,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.7044564485549927,
+          "rank": 41
+        },
+        {
+          "feature": "fwd_header_length",
+          "importance": 0.6843766570091248,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.6843766570091248,
+          "rank": 42
+        },
+        {
+          "feature": "act_data_pkt_fwd",
+          "importance": 0.678626537322998,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.678626537322998,
+          "rank": 43
+        },
+        {
+          "feature": "fwd_iat_mean",
+          "importance": 0.63264399766922,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.63264399766922,
+          "rank": 44
+        },
+        {
+          "feature": "fwd_iat_std",
+          "importance": 0.46202242374420166,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.46202242374420166,
+          "rank": 45
+        },
+        {
+          "feature": "packet_length_std",
+          "importance": 0.449365496635437,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.449365496635437,
+          "rank": 46
+        },
+        {
+          "feature": "fwd_packet_length_min",
+          "importance": 0.4312009811401367,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.4312009811401367,
+          "rank": 47
+        },
+        {
+          "feature": "ack_flag_count",
+          "importance": 0.40635547041893005,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.40635547041893005,
+          "rank": 48
+        },
+        {
+          "feature": "fwd_iat_max",
+          "importance": 0.3598830997943878,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.3598830997943878,
+          "rank": 49
+        },
+        {
+          "feature": "bwd_iat_min",
+          "importance": 0.3185505270957947,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.3185505270957947,
+          "rank": 50
+        },
+        {
+          "feature": "bwd_iat_mean",
+          "importance": 0.31506216526031494,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.31506216526031494,
+          "rank": 51
+        },
+        {
+          "feature": "flow_iat_min",
+          "importance": 0.27859586477279663,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.27859586477279663,
+          "rank": 52
+        },
+        {
+          "feature": "flow_packets_per_s",
+          "importance": 0.24442151188850403,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.24442151188850403,
+          "rank": 53
+        },
+        {
+          "feature": "flow_iat_max",
+          "importance": 0.20773039758205414,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.20773039758205414,
+          "rank": 54
+        },
+        {
+          "feature": "active_std",
+          "importance": 0.19656243920326233,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.19656243920326233,
+          "rank": 55
+        },
+        {
+          "feature": "min_packet_length",
+          "importance": 0.17932267487049103,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.17932267487049103,
+          "rank": 56
+        },
+        {
+          "feature": "idle_min",
+          "importance": 0.15385715663433075,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.15385715663433075,
+          "rank": 57
+        },
+        {
+          "feature": "flow_iat_std",
+          "importance": 0.14791296422481537,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.14791296422481537,
+          "rank": 58
+        },
+        {
+          "feature": "bwd_packet_length_max",
+          "importance": 0.13668569922447205,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.13668569922447205,
+          "rank": 59
+        },
+        {
+          "feature": "fwd_packets_per_s",
+          "importance": 0.08442071825265884,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.08442071825265884,
+          "rank": 60
+        },
+        {
+          "feature": "rst_flag_count",
+          "importance": 0.038562364876270294,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.038562364876270294,
+          "rank": 61
+        },
+        {
+          "feature": "ece_flag_count",
+          "importance": 0.038562364876270294,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.038562364876270294,
+          "rank": 62
+        },
+        {
+          "feature": "fwd_psh_flags",
+          "importance": 0.03673283010721207,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.03673283010721207,
+          "rank": 63
+        },
+        {
+          "feature": "syn_flag_count",
+          "importance": 0.03673283010721207,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.03673283010721207,
+          "rank": 64
+        },
+        {
+          "feature": "idle_std",
+          "importance": 0.03554113209247589,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.03554113209247589,
+          "rank": 65
+        },
+        {
+          "feature": "idle_mean",
+          "importance": 0.023215506225824356,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.023215506225824356,
+          "rank": 66
+        },
+        {
+          "feature": "down_per_up_ratio",
+          "importance": 0.01645500585436821,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": -0.01645500585436821,
+          "rank": 67
+        },
+        {
+          "feature": "fwd_urg_flags",
+          "importance": 0.0,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.0,
+          "rank": 68
+        },
+        {
+          "feature": "cwe_flag_count",
+          "importance": 0.0,
+          "method": "absolute_scaled_coefficient",
+          "signed_coefficient": 0.0,
+          "rank": 69
+        }
+      ],
+      "unsupported_reason": null,
+      "destination_port": {
+        "rank": 3,
+        "importance": 6.822339057922363,
+        "method": "absolute_scaled_coefficient"
+      }
+    },
+    "random_forest": {
+      "rows": [
+        {
+          "feature": "packet_length_variance",
+          "importance": 0.08926354287535566,
+          "method": "native_feature_importances",
+          "rank": 1
+        },
+        {
+          "feature": "packet_length_std",
+          "importance": 0.08356634887833977,
+          "method": "native_feature_importances",
+          "rank": 2
+        },
+        {
+          "feature": "bwd_packet_length_std",
+          "importance": 0.08290481555291543,
+          "method": "native_feature_importances",
+          "rank": 3
+        },
+        {
+          "feature": "avg_bwd_segment_size",
+          "importance": 0.0766314959464968,
+          "method": "native_feature_importances",
+          "rank": 4
+        },
+        {
+          "feature": "bwd_packet_length_max",
+          "importance": 0.05467761193207366,
+          "method": "native_feature_importances",
+          "rank": 5
+        },
+        {
+          "feature": "packet_length_mean",
+          "importance": 0.05445397509681531,
+          "method": "native_feature_importances",
+          "rank": 6
+        },
+        {
+          "feature": "destination_port",
+          "importance": 0.04560513343758873,
+          "method": "native_feature_importances",
+          "rank": 7
+        },
+        {
+          "feature": "max_packet_length",
+          "importance": 0.044992784712975825,
+          "method": "native_feature_importances",
+          "rank": 8
+        },
+        {
+          "feature": "bwd_packet_length_mean",
+          "importance": 0.042898755301926,
+          "method": "native_feature_importances",
+          "rank": 9
+        },
+        {
+          "feature": "average_packet_size",
+          "importance": 0.03085256400743611,
+          "method": "native_feature_importances",
+          "rank": 10
+        },
+        {
+          "feature": "subflow_bwd_bytes",
+          "importance": 0.029495441468391496,
+          "method": "native_feature_importances",
+          "rank": 11
+        },
+        {
+          "feature": "total_length_of_bwd_packets",
+          "importance": 0.02309946926701185,
+          "method": "native_feature_importances",
+          "rank": 12
+        },
+        {
+          "feature": "fwd_iat_max",
+          "importance": 0.022748302645061436,
+          "method": "native_feature_importances",
+          "rank": 13
+        },
+        {
+          "feature": "flow_iat_mean",
+          "importance": 0.02167387142385322,
+          "method": "native_feature_importances",
+          "rank": 14
+        },
+        {
+          "feature": "flow_packets_per_s",
+          "importance": 0.020190300956725755,
+          "method": "native_feature_importances",
+          "rank": 15
+        },
+        {
+          "feature": "fwd_iat_mean",
+          "importance": 0.019191557840294332,
+          "method": "native_feature_importances",
+          "rank": 16
+        },
+        {
+          "feature": "fwd_packets_per_s",
+          "importance": 0.018655281582980836,
+          "method": "native_feature_importances",
+          "rank": 17
+        },
+        {
+          "feature": "idle_max",
+          "importance": 0.015301095239579844,
+          "method": "native_feature_importances",
+          "rank": 18
+        },
+        {
+          "feature": "fwd_iat_total",
+          "importance": 0.014909870255027784,
+          "method": "native_feature_importances",
+          "rank": 19
+        },
+        {
+          "feature": "init_win_bytes_backward",
+          "importance": 0.014658074090162192,
+          "method": "native_feature_importances",
+          "rank": 20
+        },
+        {
+          "feature": "fwd_packet_length_max",
+          "importance": 0.014353515018067392,
+          "method": "native_feature_importances",
+          "rank": 21
+        },
+        {
+          "feature": "flow_duration",
+          "importance": 0.013636315117361525,
+          "method": "native_feature_importances",
+          "rank": 22
+        },
+        {
+          "feature": "flow_iat_max",
+          "importance": 0.011676254550267865,
+          "method": "native_feature_importances",
+          "rank": 23
+        },
+        {
+          "feature": "fwd_iat_min",
+          "importance": 0.01146731817950865,
+          "method": "native_feature_importances",
+          "rank": 24
+        },
+        {
+          "feature": "flow_iat_std",
+          "importance": 0.010407290237243379,
+          "method": "native_feature_importances",
+          "rank": 25
+        },
+        {
+          "feature": "fwd_iat_std",
+          "importance": 0.010320121790577771,
+          "method": "native_feature_importances",
+          "rank": 26
+        },
+        {
+          "feature": "fwd_header_length",
+          "importance": 0.009214804761288043,
+          "method": "native_feature_importances",
+          "rank": 27
+        },
+        {
+          "feature": "min_packet_length",
+          "importance": 0.00855454799212194,
+          "method": "native_feature_importances",
+          "rank": 28
+        },
+        {
+          "feature": "init_win_bytes_forward",
+          "importance": 0.007106560589143631,
+          "method": "native_feature_importances",
+          "rank": 29
+        },
+        {
+          "feature": "fwd_packet_length_mean",
+          "importance": 0.006764904843572795,
+          "method": "native_feature_importances",
+          "rank": 30
+        },
+        {
+          "feature": "total_backward_packets",
+          "importance": 0.006581306748522471,
+          "method": "native_feature_importances",
+          "rank": 31
+        },
+        {
+          "feature": "bwd_header_length",
+          "importance": 0.006177695847343408,
+          "method": "native_feature_importances",
+          "rank": 32
+        },
+        {
+          "feature": "bwd_iat_std",
+          "importance": 0.005920055749796064,
+          "method": "native_feature_importances",
+          "rank": 33
+        },
+        {
+          "feature": "avg_fwd_segment_size",
+          "importance": 0.005906095873904811,
+          "method": "native_feature_importances",
+          "rank": 34
+        },
+        {
+          "feature": "bwd_packets_per_s",
+          "importance": 0.005738161517151249,
+          "method": "native_feature_importances",
+          "rank": 35
+        },
+        {
+          "feature": "subflow_fwd_packets",
+          "importance": 0.005271212257705279,
+          "method": "native_feature_importances",
+          "rank": 36
+        },
+        {
+          "feature": "subflow_bwd_packets",
+          "importance": 0.004552421430886185,
+          "method": "native_feature_importances",
+          "rank": 37
+        },
+        {
+          "feature": "flow_bytes_per_s",
+          "importance": 0.004315849514767352,
+          "method": "native_feature_importances",
+          "rank": 38
+        },
+        {
+          "feature": "min_seg_size_forward",
+          "importance": 0.004243056232870951,
+          "method": "native_feature_importances",
+          "rank": 39
+        },
+        {
+          "feature": "total_fwd_packets",
+          "importance": 0.004146591334708391,
+          "method": "native_feature_importances",
+          "rank": 40
+        },
+        {
+          "feature": "flow_iat_min",
+          "importance": 0.004091153076976577,
+          "method": "native_feature_importances",
+          "rank": 41
+        },
+        {
+          "feature": "fin_flag_count",
+          "importance": 0.003058739266396741,
+          "method": "native_feature_importances",
+          "rank": 42
+        },
+        {
+          "feature": "fwd_packet_length_min",
+          "importance": 0.002551291453177133,
+          "method": "native_feature_importances",
+          "rank": 43
+        },
+        {
+          "feature": "fwd_packet_length_std",
+          "importance": 0.002402198975791786,
+          "method": "native_feature_importances",
+          "rank": 44
+        },
+        {
+          "feature": "idle_mean",
+          "importance": 0.0022997243277608106,
+          "method": "native_feature_importances",
+          "rank": 45
+        },
+        {
+          "feature": "bwd_packet_length_min",
+          "importance": 0.0022707722653798274,
+          "method": "native_feature_importances",
+          "rank": 46
+        },
+        {
+          "feature": "active_max",
+          "importance": 0.0022229614209403866,
+          "method": "native_feature_importances",
+          "rank": 47
+        },
+        {
+          "feature": "total_length_of_fwd_packets",
+          "importance": 0.0022116807945689594,
+          "method": "native_feature_importances",
+          "rank": 48
+        },
+        {
+          "feature": "bwd_iat_mean",
+          "importance": 0.0020565340307227083,
+          "method": "native_feature_importances",
+          "rank": 49
+        },
+        {
+          "feature": "bwd_iat_max",
+          "importance": 0.0019240222716343266,
+          "method": "native_feature_importances",
+          "rank": 50
+        },
+        {
+          "feature": "subflow_fwd_bytes",
+          "importance": 0.001743757925870723,
+          "method": "native_feature_importances",
+          "rank": 51
+        },
+        {
+          "feature": "act_data_pkt_fwd",
+          "importance": 0.001490142224757027,
+          "method": "native_feature_importances",
+          "rank": 52
+        },
+        {
+          "feature": "bwd_iat_total",
+          "importance": 0.0014552366260250718,
+          "method": "native_feature_importances",
+          "rank": 53
+        },
+        {
+          "feature": "idle_min",
+          "importance": 0.0012213695396198119,
+          "method": "native_feature_importances",
+          "rank": 54
+        },
+        {
+          "feature": "ack_flag_count",
+          "importance": 0.0011972393647623684,
+          "method": "native_feature_importances",
+          "rank": 55
+        },
+        {
+          "feature": "bwd_iat_min",
+          "importance": 0.0010775137165844669,
+          "method": "native_feature_importances",
+          "rank": 56
+        },
+        {
+          "feature": "active_std",
+          "importance": 0.0009129222221395828,
+          "method": "native_feature_importances",
+          "rank": 57
+        },
+        {
+          "feature": "active_mean",
+          "importance": 0.0008743988246106922,
+          "method": "native_feature_importances",
+          "rank": 58
+        },
+        {
+          "feature": "down_per_up_ratio",
+          "importance": 0.0007320375426234975,
+          "method": "native_feature_importances",
+          "rank": 59
+        },
+        {
+          "feature": "urg_flag_count",
+          "importance": 0.0005050241366777911,
+          "method": "native_feature_importances",
+          "rank": 60
+        },
+        {
+          "feature": "psh_flag_count",
+          "importance": 0.0004342463048584548,
+          "method": "native_feature_importances",
+          "rank": 61
+        },
+        {
+          "feature": "idle_std",
+          "importance": 0.00042194527810238846,
+          "method": "native_feature_importances",
+          "rank": 62
+        },
+        {
+          "feature": "active_min",
+          "importance": 0.0002500329975935913,
+          "method": "native_feature_importances",
+          "rank": 63
+        },
+        {
+          "feature": "syn_flag_count",
+          "importance": 0.0002430082138827927,
+          "method": "native_feature_importances",
+          "rank": 64
+        },
+        {
+          "feature": "fwd_psh_flags",
+          "importance": 0.000227675100721162,
+          "method": "native_feature_importances",
+          "rank": 65
+        },
+        {
+          "feature": "ece_flag_count",
+          "importance": 2.1616559737119023e-18,
+          "method": "native_feature_importances",
+          "rank": 66
+        },
+        {
+          "feature": "rst_flag_count",
+          "importance": 1.3736016482946016e-18,
+          "method": "native_feature_importances",
+          "rank": 67
+        },
+        {
+          "feature": "fwd_urg_flags",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 68
+        },
+        {
+          "feature": "cwe_flag_count",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 69
+        }
+      ],
+      "unsupported_reason": null,
+      "destination_port": {
+        "rank": 7,
+        "importance": 0.04560513343758873,
+        "method": "native_feature_importances"
+      }
+    },
+    "xgboost": {
+      "rows": [
+        {
+          "feature": "bwd_packet_length_std",
+          "importance": 0.38573649525642395,
+          "method": "native_feature_importances",
+          "rank": 1
+        },
+        {
+          "feature": "packet_length_variance",
+          "importance": 0.22346340119838715,
+          "method": "native_feature_importances",
+          "rank": 2
+        },
+        {
+          "feature": "bwd_packet_length_mean",
+          "importance": 0.07107995450496674,
+          "method": "native_feature_importances",
+          "rank": 3
+        },
+        {
+          "feature": "destination_port",
+          "importance": 0.05467326194047928,
+          "method": "native_feature_importances",
+          "rank": 4
+        },
+        {
+          "feature": "avg_bwd_segment_size",
+          "importance": 0.044101882725954056,
+          "method": "native_feature_importances",
+          "rank": 5
+        },
+        {
+          "feature": "min_packet_length",
+          "importance": 0.03731675446033478,
+          "method": "native_feature_importances",
+          "rank": 6
+        },
+        {
+          "feature": "packet_length_std",
+          "importance": 0.015260650776326656,
+          "method": "native_feature_importances",
+          "rank": 7
+        },
+        {
+          "feature": "init_win_bytes_backward",
+          "importance": 0.0102850878611207,
+          "method": "native_feature_importances",
+          "rank": 8
+        },
+        {
+          "feature": "fwd_iat_max",
+          "importance": 0.009946693666279316,
+          "method": "native_feature_importances",
+          "rank": 9
+        },
+        {
+          "feature": "flow_iat_std",
+          "importance": 0.009329777210950851,
+          "method": "native_feature_importances",
+          "rank": 10
+        },
+        {
+          "feature": "bwd_packet_length_max",
+          "importance": 0.008331112563610077,
+          "method": "native_feature_importances",
+          "rank": 11
+        },
+        {
+          "feature": "fwd_header_length",
+          "importance": 0.0076779029332101345,
+          "method": "native_feature_importances",
+          "rank": 12
+        },
+        {
+          "feature": "bwd_packet_length_min",
+          "importance": 0.007315552327781916,
+          "method": "native_feature_importances",
+          "rank": 13
+        },
+        {
+          "feature": "fin_flag_count",
+          "importance": 0.006589397322386503,
+          "method": "native_feature_importances",
+          "rank": 14
+        },
+        {
+          "feature": "bwd_iat_mean",
+          "importance": 0.006488255690783262,
+          "method": "native_feature_importances",
+          "rank": 15
+        },
+        {
+          "feature": "fwd_iat_mean",
+          "importance": 0.006240263115614653,
+          "method": "native_feature_importances",
+          "rank": 16
+        },
+        {
+          "feature": "total_length_of_bwd_packets",
+          "importance": 0.005871038883924484,
+          "method": "native_feature_importances",
+          "rank": 17
+        },
+        {
+          "feature": "act_data_pkt_fwd",
+          "importance": 0.005748263094574213,
+          "method": "native_feature_importances",
+          "rank": 18
+        },
+        {
+          "feature": "max_packet_length",
+          "importance": 0.005155518651008606,
+          "method": "native_feature_importances",
+          "rank": 19
+        },
+        {
+          "feature": "idle_min",
+          "importance": 0.0051149665378034115,
+          "method": "native_feature_importances",
+          "rank": 20
+        },
+        {
+          "feature": "subflow_bwd_packets",
+          "importance": 0.004513333085924387,
+          "method": "native_feature_importances",
+          "rank": 21
+        },
+        {
+          "feature": "fwd_iat_min",
+          "importance": 0.004268780816346407,
+          "method": "native_feature_importances",
+          "rank": 22
+        },
+        {
+          "feature": "idle_mean",
+          "importance": 0.004158742260187864,
+          "method": "native_feature_importances",
+          "rank": 23
+        },
+        {
+          "feature": "idle_max",
+          "importance": 0.0040144529193639755,
+          "method": "native_feature_importances",
+          "rank": 24
+        },
+        {
+          "feature": "urg_flag_count",
+          "importance": 0.0038829275872558355,
+          "method": "native_feature_importances",
+          "rank": 25
+        },
+        {
+          "feature": "down_per_up_ratio",
+          "importance": 0.003702486865222454,
+          "method": "native_feature_importances",
+          "rank": 26
+        },
+        {
+          "feature": "bwd_packets_per_s",
+          "importance": 0.0033311781007796526,
+          "method": "native_feature_importances",
+          "rank": 27
+        },
+        {
+          "feature": "bwd_header_length",
+          "importance": 0.0031452153343707323,
+          "method": "native_feature_importances",
+          "rank": 28
+        },
+        {
+          "feature": "min_seg_size_forward",
+          "importance": 0.003067079233005643,
+          "method": "native_feature_importances",
+          "rank": 29
+        },
+        {
+          "feature": "total_backward_packets",
+          "importance": 0.002569358330219984,
+          "method": "native_feature_importances",
+          "rank": 30
+        },
+        {
+          "feature": "flow_duration",
+          "importance": 0.0025569924619048834,
+          "method": "native_feature_importances",
+          "rank": 31
+        },
+        {
+          "feature": "total_length_of_fwd_packets",
+          "importance": 0.0024168475065380335,
+          "method": "native_feature_importances",
+          "rank": 32
+        },
+        {
+          "feature": "fwd_packet_length_min",
+          "importance": 0.0023775319568812847,
+          "method": "native_feature_importances",
+          "rank": 33
+        },
+        {
+          "feature": "active_mean",
+          "importance": 0.002284857677295804,
+          "method": "native_feature_importances",
+          "rank": 34
+        },
+        {
+          "feature": "packet_length_mean",
+          "importance": 0.0022254858631640673,
+          "method": "native_feature_importances",
+          "rank": 35
+        },
+        {
+          "feature": "init_win_bytes_forward",
+          "importance": 0.0021365841384977102,
+          "method": "native_feature_importances",
+          "rank": 36
+        },
+        {
+          "feature": "flow_iat_mean",
+          "importance": 0.0018131093820556998,
+          "method": "native_feature_importances",
+          "rank": 37
+        },
+        {
+          "feature": "fwd_packet_length_max",
+          "importance": 0.0016112138982862234,
+          "method": "native_feature_importances",
+          "rank": 38
+        },
+        {
+          "feature": "idle_std",
+          "importance": 0.0015903281746432185,
+          "method": "native_feature_importances",
+          "rank": 39
+        },
+        {
+          "feature": "fwd_iat_total",
+          "importance": 0.0015610319096595049,
+          "method": "native_feature_importances",
+          "rank": 40
+        },
+        {
+          "feature": "ack_flag_count",
+          "importance": 0.001533233211375773,
+          "method": "native_feature_importances",
+          "rank": 41
+        },
+        {
+          "feature": "flow_bytes_per_s",
+          "importance": 0.0015216139145195484,
+          "method": "native_feature_importances",
+          "rank": 42
+        },
+        {
+          "feature": "bwd_iat_total",
+          "importance": 0.0012895857216790318,
+          "method": "native_feature_importances",
+          "rank": 43
+        },
+        {
+          "feature": "subflow_fwd_packets",
+          "importance": 0.0012153692077845335,
+          "method": "native_feature_importances",
+          "rank": 44
+        },
+        {
+          "feature": "average_packet_size",
+          "importance": 0.0012131083058193326,
+          "method": "native_feature_importances",
+          "rank": 45
+        },
+        {
+          "feature": "bwd_iat_min",
+          "importance": 0.0011003933614119887,
+          "method": "native_feature_importances",
+          "rank": 46
+        },
+        {
+          "feature": "bwd_iat_max",
+          "importance": 0.0010921282228082418,
+          "method": "native_feature_importances",
+          "rank": 47
+        },
+        {
+          "feature": "total_fwd_packets",
+          "importance": 0.0010257300455123186,
+          "method": "native_feature_importances",
+          "rank": 48
+        },
+        {
+          "feature": "flow_iat_min",
+          "importance": 0.0009448983473703265,
+          "method": "native_feature_importances",
+          "rank": 49
+        },
+        {
+          "feature": "fwd_packet_length_std",
+          "importance": 0.0007675571250729263,
+          "method": "native_feature_importances",
+          "rank": 50
+        },
+        {
+          "feature": "fwd_iat_std",
+          "importance": 0.0007407339289784431,
+          "method": "native_feature_importances",
+          "rank": 51
+        },
+        {
+          "feature": "subflow_bwd_bytes",
+          "importance": 0.0006602442008443177,
+          "method": "native_feature_importances",
+          "rank": 52
+        },
+        {
+          "feature": "fwd_packets_per_s",
+          "importance": 0.0006076269783079624,
+          "method": "native_feature_importances",
+          "rank": 53
+        },
+        {
+          "feature": "fwd_packet_length_mean",
+          "importance": 0.000603382708504796,
+          "method": "native_feature_importances",
+          "rank": 54
+        },
+        {
+          "feature": "fwd_psh_flags",
+          "importance": 0.0004914900055155158,
+          "method": "native_feature_importances",
+          "rank": 55
+        },
+        {
+          "feature": "flow_packets_per_s",
+          "importance": 0.00047889602137729526,
+          "method": "native_feature_importances",
+          "rank": 56
+        },
+        {
+          "feature": "active_std",
+          "importance": 0.00035965791903436184,
+          "method": "native_feature_importances",
+          "rank": 57
+        },
+        {
+          "feature": "flow_iat_max",
+          "importance": 0.00035866411053575575,
+          "method": "native_feature_importances",
+          "rank": 58
+        },
+        {
+          "feature": "active_min",
+          "importance": 0.0003289532905910164,
+          "method": "native_feature_importances",
+          "rank": 59
+        },
+        {
+          "feature": "subflow_fwd_bytes",
+          "importance": 0.00028014153940603137,
+          "method": "native_feature_importances",
+          "rank": 60
+        },
+        {
+          "feature": "psh_flag_count",
+          "importance": 0.00019505148520693183,
+          "method": "native_feature_importances",
+          "rank": 61
+        },
+        {
+          "feature": "avg_fwd_segment_size",
+          "importance": 0.00013995157496538013,
+          "method": "native_feature_importances",
+          "rank": 62
+        },
+        {
+          "feature": "active_max",
+          "importance": 9.780383697943762e-05,
+          "method": "native_feature_importances",
+          "rank": 63
+        },
+        {
+          "feature": "bwd_iat_std",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 64
+        },
+        {
+          "feature": "fwd_urg_flags",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 65
+        },
+        {
+          "feature": "syn_flag_count",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 66
+        },
+        {
+          "feature": "rst_flag_count",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 67
+        },
+        {
+          "feature": "cwe_flag_count",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 68
+        },
+        {
+          "feature": "ece_flag_count",
+          "importance": 0.0,
+          "method": "native_feature_importances",
+          "rank": 69
+        }
+      ],
+      "unsupported_reason": null,
+      "destination_port": {
+        "rank": 4,
+        "importance": 0.05467326194047928,
+        "method": "native_feature_importances"
+      }
+    },
+    "hist_gradient_boosting": {
+      "rows": [],
+      "unsupported_reason": "No native global feature-importance mechanism was used for this model.",
+      "destination_port": null
+    }
+  },
+  "phase1_dataset_fingerprints_before": {
+    "train": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
+      "size_bytes": 321251134,
+      "mtime_ns": 1786532418067449300
+    },
+    "validation": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+      "size_bytes": 79234111,
+      "mtime_ns": 1786532418306602900
+    },
+    "test": {
+      "path": "C:\\MLOps-Project\\project\\data\\processed\\test.parquet",
+      "size_bytes": 114848938,
+      "mtime_ns": 1786532417641271400
+    }
+  }
+}

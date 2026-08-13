@@ -44,6 +44,14 @@ def main() -> None:
     parser.add_argument("--train-sample-size", type=int, default=20_000)
     parser.add_argument("--validation-sample-size", type=int, default=10_000)
     parser.add_argument("--test-sample-size", type=int, default=10_000)
+    parser.add_argument(
+        "--mlflow",
+        action="store_true",
+        help=(
+            "Register the run in MLflow under the sentinelml-baselines experiment "
+            "with one parent run and one nested child run per baseline model."
+        ),
+    )
     args = parser.parse_args()
 
     report = run_phase2_baselines(
@@ -53,6 +61,7 @@ def main() -> None:
         validation_sample_size=args.validation_sample_size,
         test_sample_size=args.test_sample_size,
         training_config_path=args.training_config,
+        enable_mlflow=args.mlflow,
     )
     selected = report["selected"]["recommended_baseline"]
     print(f"Phase 2 {args.mode} baseline workflow complete")

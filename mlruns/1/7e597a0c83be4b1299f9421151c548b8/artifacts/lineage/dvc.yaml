@@ -1,0 +1,35 @@
+stages:
+  prepare_phase1_data:
+    cmd: python scripts/generate_phase1_data.py
+    deps:
+    - configs/label_mapping.json
+    - configs/phase1_data_config.json
+    - data/raw
+    - reports/eda/summary.json
+    - scripts/generate_phase1_data.py
+    - src/sentinelml/data
+    outs:
+    - data/processed/test.parquet
+    - data/processed/train.parquet
+    - data/processed/validation.parquet
+    - data/reference/reference.parquet
+  phase2_baselines:
+    cmd: python scripts/run_phase2_baselines.py --mode full --output-dir 
+      reports/models/phase2_baseline
+    deps:
+    - data/processed/test.parquet
+    - data/processed/train.parquet
+    - data/processed/validation.parquet
+    - reports/data/feature_schema.json
+    - scripts/run_phase2_baselines.py
+    - src/sentinelml/training
+    params:
+      - configs/training_config.yaml:
+          - random_seed
+          - baseline.logistic_regression
+          - baseline.random_forest
+          - baseline.xgboost
+          - baseline.hist_gradient_boosting
+    outs:
+    - reports/models/phase2_baseline:
+        cache: false

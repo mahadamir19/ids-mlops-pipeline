@@ -1,0 +1,20 @@
+{
+  "rows": 1000,
+  "accuracy": 0.759,
+  "precision": 0.9923664122137404,
+  "recall": 0.35135135135135137,
+  "attack_class_recall": 0.35135135135135137,
+  "f1": 0.5189620758483033,
+  "pr_auc": 0.7838517625563546,
+  "roc_auc": 0.7997511797511798,
+  "confusion_matrix": {
+    "tn": 629,
+    "fp": 1,
+    "fn": 240,
+    "tp": 130
+  },
+  "false_positive_rate": 0.0015873015873015873,
+  "false_negative_rate": 0.6486486486486487,
+  "inference_time_seconds": 0.02114389999769628,
+  "inference_latency_ms_per_row": 0.02114389999769628
+}

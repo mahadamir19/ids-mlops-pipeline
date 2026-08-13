@@ -7,14 +7,16 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
 from sentinelml.data.config import PROJECT_ROOT
 
 DEFAULT_TRAINING_CONFIG_PATH = PROJECT_ROOT / "configs" / "training_config.yaml"
+MODEL_FAMILIES = [
+    "logistic_regression",
+    "random_forest",
+    "xgboost",
+    "hist_gradient_boosting",
+]
 
 
 @dataclass(frozen=True)
@@ -70,12 +72,7 @@ def load_training_config(path: Path = DEFAULT_TRAINING_CONFIG_PATH) -> dict[str,
 
 
 def _validate_training_config(config: dict[str, Any]) -> None:
-    required_models = {
-        "logistic_regression",
-        "random_forest",
-        "xgboost",
-        "hist_gradient_boosting",
-    }
+    required_models = set(MODEL_FAMILIES)
     if "random_seed" not in config:
         raise ValueError("training config is missing random_seed")
     baseline = config.get("baseline")
@@ -111,42 +108,54 @@ def build_baseline_model_specs(
             "XGBoost is required for Phase 2. Install the project ML extras or xgboost."
         ) from exc
 
-    logistic = Pipeline(
-        steps=[
-            ("scaler", StandardScaler()),
-            (
-                "classifier",
-                LogisticRegression(
-                    **baseline_config["logistic_regression"],
-                    random_state=seed,
-                ),
-            ),
-        ]
-    )
-    random_forest = RandomForestClassifier(
-        **baseline_config["random_forest"],
-        random_state=seed,
-    )
-    xgboost = XGBClassifier(
-        **baseline_config["xgboost"],
+    logistic_params = dict(baseline_config["logistic_regression"])
+    logistic_params.setdefault("booster", "gblinear")
+    logistic_params.setdefault("eval_metric", "logloss")
+    logistic_params.setdefault("device", "cuda")
+    logistic = XGBClassifier(
+        **logistic_params,
         objective="binary:logistic",
-        eval_metric="logloss",
         random_state=seed,
         scale_pos_weight=scale_pos_weight,
         verbosity=0,
     )
-    hist_gradient_boosting = HistGradientBoostingClassifier(
-        **baseline_config["hist_gradient_boosting"],
+    random_forest_params = dict(baseline_config["random_forest"])
+    random_forest_params.setdefault("n_estimators", 1)
+    random_forest_params.setdefault("learning_rate", 1.0)
+    random_forest_params.setdefault("eval_metric", "logloss")
+    random_forest_params.setdefault("device", "cuda")
+    random_forest = XGBClassifier(
+        **random_forest_params,
+        objective="binary:logistic",
         random_state=seed,
+        scale_pos_weight=scale_pos_weight,
+        verbosity=0,
+    )
+    xgboost_params = dict(baseline_config["xgboost"])
+    xgboost_params.setdefault("eval_metric", "logloss")
+    xgboost_params.setdefault("device", "cuda")
+    xgboost = XGBClassifier(
+        **xgboost_params,
+        objective="binary:logistic",
+        random_state=seed,
+        scale_pos_weight=scale_pos_weight,
+        verbosity=0,
+    )
+    hist_gradient_boosting_params = dict(baseline_config["hist_gradient_boosting"])
+    hist_gradient_boosting_params.setdefault("eval_metric", "logloss")
+    hist_gradient_boosting_params.setdefault("device", "cuda")
+    hist_gradient_boosting = XGBClassifier(
+        **hist_gradient_boosting_params,
+        objective="binary:logistic",
+        random_state=seed,
+        scale_pos_weight=scale_pos_weight,
+        verbosity=0,
     )
     return [
         ModelSpec(
             name="logistic_regression",
             estimator=logistic,
-            parameters={
-                "pipeline": ["StandardScaler", "LogisticRegression"],
-                "LogisticRegression": logistic.named_steps["classifier"].get_params(),
-            },
+            parameters=logistic.get_params(),
         ),
         ModelSpec(
             name="random_forest",
@@ -164,3 +173,23 @@ def build_baseline_model_specs(
             parameters=hist_gradient_boosting.get_params(),
         ),
     ]
+
+
+def build_baseline_model_spec(
+    model_family: str,
+    target: pd.Series,
+    *,
+    config: dict[str, Any] | None = None,
+) -> ModelSpec:
+    """Create one Phase 2 model family using the existing baseline factories."""
+
+    specs = {
+        spec.name: spec
+        for spec in build_baseline_model_specs(
+            target,
+            config=config,
+        )
+    }
+    if model_family not in specs:
+        raise ValueError(f"unsupported model family: {model_family}")
+    return specs[model_family]

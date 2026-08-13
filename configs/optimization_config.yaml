@@ -1,0 +1,155 @@
+objective_metric: pr_auc
+direction: maximize
+
+sampler:
+  name: TPESampler
+  seed: 42
+
+pruner:
+  name: MedianPruner
+  n_startup_trials: 1
+  n_warmup_steps: 20
+  interval_steps: 10
+
+modes:
+  smoke:
+    train_sample_size: 2000
+    validation_sample_size: 1000
+  full:
+    train_sample_size: null
+    validation_sample_size: null
+
+models:
+  logistic_regression:
+    enabled: true
+    smoke_trials: 2
+    full_trials: 6
+    pruning_enabled: false
+    pruning_strategy: unsupported
+    search_space:
+      n_estimators:
+        type: int
+        low: 60
+        high: 240
+        step: 30
+      learning_rate:
+        type: float
+        low: 0.02
+        high: 0.3
+        log: true
+      reg_alpha:
+        type: float
+        low: 0.000001
+        high: 1.0
+        log: true
+      reg_lambda:
+        type: float
+        low: 0.1
+        high: 10.0
+        log: true
+
+  random_forest:
+    enabled: true
+    smoke_trials: 2
+    full_trials: 8
+    pruning_enabled: false
+    pruning_strategy: unsupported
+    search_space:
+      num_parallel_tree:
+        type: int
+        low: 40
+        high: 160
+        step: 20
+      max_depth:
+        type: int
+        low: 8
+        high: 28
+        step: 2
+      subsample:
+        type: float
+        low: 0.4
+        high: 1.0
+      colsample_bynode:
+        type: float
+        low: 0.4
+        high: 1.0
+      min_child_weight:
+        type: float
+        low: 1.0
+        high: 8.0
+
+  xgboost:
+    enabled: true
+    smoke_trials: 2
+    full_trials: 12
+    pruning_enabled: true
+    pruning_strategy: MedianPruner + XGBoostPruningCallback
+    search_space:
+      n_estimators:
+        type: int
+        low: 80
+        high: 320
+        step: 40
+      max_depth:
+        type: int
+        low: 3
+        high: 10
+      learning_rate:
+        type: float
+        low: 0.02
+        high: 0.2
+        log: true
+      subsample:
+        type: float
+        low: 0.6
+        high: 1.0
+      colsample_bytree:
+        type: float
+        low: 0.6
+        high: 1.0
+      min_child_weight:
+        type: float
+        low: 1.0
+        high: 8.0
+      reg_alpha:
+        type: float
+        low: 0.000001
+        high: 1.0
+        log: true
+      reg_lambda:
+        type: float
+        low: 0.1
+        high: 5.0
+        log: true
+
+  hist_gradient_boosting:
+    enabled: true
+    smoke_trials: 2
+    full_trials: 8
+    pruning_enabled: false
+    pruning_strategy: unsupported
+    search_space:
+      n_estimators:
+        type: int
+        low: 80
+        high: 320
+        step: 40
+      learning_rate:
+        type: float
+        low: 0.02
+        high: 0.2
+        log: true
+      max_leaves:
+        type: int
+        low: 15
+        high: 63
+        step: 4
+      min_child_weight:
+        type: float
+        low: 1.0
+        high: 8.0
+      reg_lambda:
+        type: float
+        low: 0.1
+        high: 5.0
+        log: true

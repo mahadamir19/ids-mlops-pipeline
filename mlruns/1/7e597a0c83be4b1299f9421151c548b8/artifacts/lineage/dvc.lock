@@ -1,0 +1,109 @@
+schema: '2.0'
+stages:
+  prepare_phase1_data:
+    cmd: python scripts/generate_phase1_data.py
+    deps:
+    - path: configs/label_mapping.json
+      hash: md5
+      md5: 56cac8839cbb29c4f50c249da8bef76c
+      size: 789
+    - path: configs/phase1_data_config.json
+      hash: md5
+      md5: 3ad3d3b204893424f904fe399da6fcf3
+      size: 1843
+    - path: data/raw
+      hash: md5
+      md5: 70f6d694b9f1813851c5e905449fa0ba.dir
+      size: 884645759
+      nfiles: 8
+    - path: reports/eda/summary.json
+      hash: md5
+      md5: f16311ecf1ad6b5d92059fe1a8304ea7
+      size: 519314
+    - path: scripts/generate_phase1_data.py
+      hash: md5
+      md5: efc14d6665bdd081c9ebaa790909ce30
+      size: 1317
+    - path: src/sentinelml/data
+      hash: md5
+      md5: 833aebceb7ef828c046f697e96c4eac3.dir
+      size: 81205
+      nfiles: 8
+    outs:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: f861b72425d7277681a70e39ddfcf0e6
+      size: 114848938
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: 189bae41e75fe9bfd9d6e30fc0709c64
+      size: 321251134
+    - path: data/processed/validation.parquet
+      hash: md5
+      md5: 2b0bc70288a24de3ffccd5df6d4d7a27
+      size: 79234111
+    - path: data/reference/reference.parquet
+      hash: md5
+      md5: b5044214a098dfb428e28ab9600eefbc
+      size: 34992126
+  phase2_baselines:
+    cmd: python scripts/run_phase2_baselines.py --mode full --output-dir 
+      reports/models/phase2_baseline
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: f861b72425d7277681a70e39ddfcf0e6
+      size: 114848938
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: 189bae41e75fe9bfd9d6e30fc0709c64
+      size: 321251134
+    - path: data/processed/validation.parquet
+      hash: md5
+      md5: 2b0bc70288a24de3ffccd5df6d4d7a27
+      size: 79234111
+    - path: reports/data/feature_schema.json
+      hash: md5
+      md5: 7a54131c35c83ac288d5dc49383354e8
+      size: 24413
+    - path: scripts/run_phase2_baselines.py
+      hash: md5
+      md5: 48caeb15276122e2c3fb0f20b99c3d71
+      size: 2278
+    - path: src/sentinelml/training
+      hash: md5
+      md5: a801d2520260fb5035c50ff6655bbbef.dir
+      size: 68623
+      nfiles: 12
+    params:
+      configs/training_config.yaml:
+        baseline.hist_gradient_boosting:
+          max_iter: 200
+          learning_rate: 0.1
+          max_leaf_nodes: 31
+          class_weight: balanced
+        baseline.logistic_regression:
+          class_weight: balanced
+          max_iter: 500
+          solver: lbfgs
+        baseline.random_forest:
+          n_estimators: 80
+          max_depth: 18
+          min_samples_leaf: 2
+          class_weight: balanced_subsample
+          n_jobs: 1
+        baseline.xgboost:
+          n_estimators: 200
+          max_depth: 6
+          learning_rate: 0.1
+          subsample: 0.8
+          colsample_bytree: 0.8
+          tree_method: hist
+          n_jobs: 1
+        random_seed: 42
+    outs:
+    - path: reports/models/phase2_baseline
+      hash: md5
+      md5: fb51eaa6d1e9110c1f68a6185e3ad7ce.dir
+      size: 107012
+      nfiles: 9

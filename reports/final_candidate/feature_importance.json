@@ -1,0 +1,424 @@
+{
+  "rows": [
+    {
+      "feature": "packet_length_std",
+      "importance": 0.22193822264671326,
+      "method": "native_feature_importances",
+      "rank": 1
+    },
+    {
+      "feature": "bwd_packet_length_std",
+      "importance": 0.17974190413951874,
+      "method": "native_feature_importances",
+      "rank": 2
+    },
+    {
+      "feature": "packet_length_variance",
+      "importance": 0.12429302930831909,
+      "method": "native_feature_importances",
+      "rank": 3
+    },
+    {
+      "feature": "bwd_packet_length_max",
+      "importance": 0.06293981522321701,
+      "method": "native_feature_importances",
+      "rank": 4
+    },
+    {
+      "feature": "destination_port",
+      "importance": 0.0488707572221756,
+      "method": "native_feature_importances",
+      "rank": 5
+    },
+    {
+      "feature": "fin_flag_count",
+      "importance": 0.039697445929050446,
+      "method": "native_feature_importances",
+      "rank": 6
+    },
+    {
+      "feature": "avg_bwd_segment_size",
+      "importance": 0.03824339434504509,
+      "method": "native_feature_importances",
+      "rank": 7
+    },
+    {
+      "feature": "bwd_packet_length_mean",
+      "importance": 0.03806531801819801,
+      "method": "native_feature_importances",
+      "rank": 8
+    },
+    {
+      "feature": "total_length_of_bwd_packets",
+      "importance": 0.0370127409696579,
+      "method": "native_feature_importances",
+      "rank": 9
+    },
+    {
+      "feature": "max_packet_length",
+      "importance": 0.015084275044500828,
+      "method": "native_feature_importances",
+      "rank": 10
+    },
+    {
+      "feature": "down_per_up_ratio",
+      "importance": 0.014913192950189114,
+      "method": "native_feature_importances",
+      "rank": 11
+    },
+    {
+      "feature": "bwd_packet_length_min",
+      "importance": 0.01343317236751318,
+      "method": "native_feature_importances",
+      "rank": 12
+    },
+    {
+      "feature": "fwd_iat_mean",
+      "importance": 0.011281570419669151,
+      "method": "native_feature_importances",
+      "rank": 13
+    },
+    {
+      "feature": "min_packet_length",
+      "importance": 0.010108272545039654,
+      "method": "native_feature_importances",
+      "rank": 14
+    },
+    {
+      "feature": "flow_packets_per_s",
+      "importance": 0.009569312445819378,
+      "method": "native_feature_importances",
+      "rank": 15
+    },
+    {
+      "feature": "fwd_packet_length_max",
+      "importance": 0.008905412629246712,
+      "method": "native_feature_importances",
+      "rank": 16
+    },
+    {
+      "feature": "bwd_packets_per_s",
+      "importance": 0.008570397272706032,
+      "method": "native_feature_importances",
+      "rank": 17
+    },
+    {
+      "feature": "init_win_bytes_backward",
+      "importance": 0.007766838185489178,
+      "method": "native_feature_importances",
+      "rank": 18
+    },
+    {
+      "feature": "fwd_header_length",
+      "importance": 0.0070421453565359116,
+      "method": "native_feature_importances",
+      "rank": 19
+    },
+    {
+      "feature": "min_seg_size_forward",
+      "importance": 0.006654054392129183,
+      "method": "native_feature_importances",
+      "rank": 20
+    },
+    {
+      "feature": "active_max",
+      "importance": 0.006527615711092949,
+      "method": "native_feature_importances",
+      "rank": 21
+    },
+    {
+      "feature": "bwd_header_length",
+      "importance": 0.0060460832901299,
+      "method": "native_feature_importances",
+      "rank": 22
+    },
+    {
+      "feature": "fwd_packet_length_min",
+      "importance": 0.00584465591236949,
+      "method": "native_feature_importances",
+      "rank": 23
+    },
+    {
+      "feature": "act_data_pkt_fwd",
+      "importance": 0.00559224933385849,
+      "method": "native_feature_importances",
+      "rank": 24
+    },
+    {
+      "feature": "total_fwd_packets",
+      "importance": 0.004668449983000755,
+      "method": "native_feature_importances",
+      "rank": 25
+    },
+    {
+      "feature": "fwd_iat_min",
+      "importance": 0.004524472635239363,
+      "method": "native_feature_importances",
+      "rank": 26
+    },
+    {
+      "feature": "flow_iat_min",
+      "importance": 0.004357536789029837,
+      "method": "native_feature_importances",
+      "rank": 27
+    },
+    {
+      "feature": "idle_mean",
+      "importance": 0.0040863389149308205,
+      "method": "native_feature_importances",
+      "rank": 28
+    },
+    {
+      "feature": "fwd_iat_total",
+      "importance": 0.004025332164019346,
+      "method": "native_feature_importances",
+      "rank": 29
+    },
+    {
+      "feature": "flow_duration",
+      "importance": 0.0033752843737602234,
+      "method": "native_feature_importances",
+      "rank": 30
+    },
+    {
+      "feature": "init_win_bytes_forward",
+      "importance": 0.0033480993006378412,
+      "method": "native_feature_importances",
+      "rank": 31
+    },
+    {
+      "feature": "packet_length_mean",
+      "importance": 0.0032118912786245346,
+      "method": "native_feature_importances",
+      "rank": 32
+    },
+    {
+      "feature": "idle_max",
+      "importance": 0.0031188835855573416,
+      "method": "native_feature_importances",
+      "rank": 33
+    },
+    {
+      "feature": "total_length_of_fwd_packets",
+      "importance": 0.003089377423748374,
+      "method": "native_feature_importances",
+      "rank": 34
+    },
+    {
+      "feature": "flow_iat_mean",
+      "importance": 0.002800686052069068,
+      "method": "native_feature_importances",
+      "rank": 35
+    },
+    {
+      "feature": "average_packet_size",
+      "importance": 0.0024930189829319715,
+      "method": "native_feature_importances",
+      "rank": 36
+    },
+    {
+      "feature": "ack_flag_count",
+      "importance": 0.0023140585981309414,
+      "method": "native_feature_importances",
+      "rank": 37
+    },
+    {
+      "feature": "flow_bytes_per_s",
+      "importance": 0.002259423490613699,
+      "method": "native_feature_importances",
+      "rank": 38
+    },
+    {
+      "feature": "flow_iat_std",
+      "importance": 0.0022233177442103624,
+      "method": "native_feature_importances",
+      "rank": 39
+    },
+    {
+      "feature": "active_std",
+      "importance": 0.002196038607507944,
+      "method": "native_feature_importances",
+      "rank": 40
+    },
+    {
+      "feature": "total_backward_packets",
+      "importance": 0.0021696514450013638,
+      "method": "native_feature_importances",
+      "rank": 41
+    },
+    {
+      "feature": "avg_fwd_segment_size",
+      "importance": 0.002058496931567788,
+      "method": "native_feature_importances",
+      "rank": 42
+    },
+    {
+      "feature": "fwd_iat_max",
+      "importance": 0.0017572022043168545,
+      "method": "native_feature_importances",
+      "rank": 43
+    },
+    {
+      "feature": "fwd_packet_length_std",
+      "importance": 0.0015586656518280506,
+      "method": "native_feature_importances",
+      "rank": 44
+    },
+    {
+      "feature": "active_min",
+      "importance": 0.0014815367758274078,
+      "method": "native_feature_importances",
+      "rank": 45
+    },
+    {
+      "feature": "subflow_fwd_bytes",
+      "importance": 0.0013899507466703653,
+      "method": "native_feature_importances",
+      "rank": 46
+    },
+    {
+      "feature": "fwd_packet_length_mean",
+      "importance": 0.0012232979061082006,
+      "method": "native_feature_importances",
+      "rank": 47
+    },
+    {
+      "feature": "bwd_iat_min",
+      "importance": 0.0012219952186569571,
+      "method": "native_feature_importances",
+      "rank": 48
+    },
+    {
+      "feature": "idle_min",
+      "importance": 0.0012090702075511217,
+      "method": "native_feature_importances",
+      "rank": 49
+    },
+    {
+      "feature": "flow_iat_max",
+      "importance": 0.0011885376879945397,
+      "method": "native_feature_importances",
+      "rank": 50
+    },
+    {
+      "feature": "psh_flag_count",
+      "importance": 0.0009710152517072856,
+      "method": "native_feature_importances",
+      "rank": 51
+    },
+    {
+      "feature": "fwd_iat_std",
+      "importance": 0.0007163711125031114,
+      "method": "native_feature_importances",
+      "rank": 52
+    },
+    {
+      "feature": "fwd_packets_per_s",
+      "importance": 0.0006796374218538404,
+      "method": "native_feature_importances",
+      "rank": 53
+    },
+    {
+      "feature": "subflow_fwd_packets",
+      "importance": 0.0004681958525907248,
+      "method": "native_feature_importances",
+      "rank": 54
+    },
+    {
+      "feature": "bwd_iat_mean",
+      "importance": 0.0004575707425829023,
+      "method": "native_feature_importances",
+      "rank": 55
+    },
+    {
+      "feature": "bwd_iat_total",
+      "importance": 0.00040794102824293077,
+      "method": "native_feature_importances",
+      "rank": 56
+    },
+    {
+      "feature": "bwd_iat_std",
+      "importance": 0.00038887051050551236,
+      "method": "native_feature_importances",
+      "rank": 57
+    },
+    {
+      "feature": "active_mean",
+      "importance": 0.00022458676539827138,
+      "method": "native_feature_importances",
+      "rank": 58
+    },
+    {
+      "feature": "bwd_iat_max",
+      "importance": 0.00019329182396177202,
+      "method": "native_feature_importances",
+      "rank": 59
+    },
+    {
+      "feature": "fwd_psh_flags",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 60
+    },
+    {
+      "feature": "fwd_urg_flags",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 61
+    },
+    {
+      "feature": "syn_flag_count",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 62
+    },
+    {
+      "feature": "rst_flag_count",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 63
+    },
+    {
+      "feature": "urg_flag_count",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 64
+    },
+    {
+      "feature": "cwe_flag_count",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 65
+    },
+    {
+      "feature": "ece_flag_count",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 66
+    },
+    {
+      "feature": "subflow_bwd_packets",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 67
+    },
+    {
+      "feature": "subflow_bwd_bytes",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 68
+    },
+    {
+      "feature": "idle_std",
+      "importance": 0.0,
+      "method": "native_feature_importances",
+      "rank": 69
+    }
+  ],
+  "unsupported_reason": null,
+  "destination_port": {
+    "rank": 5,
+    "importance": 0.0488707572221756,
+    "method": "native_feature_importances"
+  }
+}

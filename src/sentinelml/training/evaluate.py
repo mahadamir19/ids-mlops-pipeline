@@ -18,10 +18,15 @@ from sklearn.metrics import (
 )
 from sklearn.pipeline import Pipeline
 
+from sentinelml.training.gpu import xgboost_positive_scores
+
 
 def positive_class_scores(model: Any, features: pd.DataFrame) -> np.ndarray:
     """Return probability-like positive-class scores for binary metrics."""
 
+    gpu_scores = xgboost_positive_scores(model, features)
+    if gpu_scores is not None:
+        return gpu_scores
     if hasattr(model, "predict_proba"):
         probabilities = model.predict_proba(features)
         return np.asarray(probabilities)[:, 1]

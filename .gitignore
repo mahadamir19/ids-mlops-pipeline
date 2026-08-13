@@ -19,3 +19,4 @@ SPEC.md
 *.egg-info/
 
 infra/mlflow/.env
+setup.ps1
