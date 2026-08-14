@@ -13,8 +13,8 @@ pruner:
 
 modes:
   smoke:
-    train_sample_size: 2000
-    validation_sample_size: 1000
+    train_sample_size: 20000
+    validation_sample_size: 10000
   full:
     train_sample_size: null
     validation_sample_size: null

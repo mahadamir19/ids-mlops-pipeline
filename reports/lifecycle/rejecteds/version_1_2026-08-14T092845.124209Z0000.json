@@ -1,0 +1,207 @@
+{
+  "evaluation": {
+    "absolute_gates": {
+      "failed_gates": [
+        "pr_auc",
+        "f1"
+      ],
+      "gates": {
+        "attack_recall": {
+          "candidate": 0.01818181818181818,
+          "operator": ">=",
+          "passed": true,
+          "source_metric": "attack_class_recall",
+          "threshold": 0.016363636363636365
+        },
+        "f1": {
+          "candidate": 0.024096385542168676,
+          "operator": ">=",
+          "passed": false,
+          "source_metric": "f1",
+          "threshold": 0.027692307692307693
+        },
+        "false_positive_rate": {
+          "candidate": 0.0027149321266968325,
+          "operator": "<=",
+          "passed": true,
+          "source_metric": "false_positive_rate",
+          "threshold": 0.004524886877828055
+        },
+        "inference_latency_ms_per_row": {
+          "candidate": 0.0010635700004058889,
+          "operator": "<=",
+          "passed": true,
+          "source_metric": "inference_latency_ms_per_row",
+          "threshold": 0.07414939999580383
+        },
+        "pr_auc": {
+          "candidate": 0.10331633760644186,
+          "operator": ">=",
+          "passed": false,
+          "source_metric": "pr_auc",
+          "threshold": 0.36837771875826436
+        }
+      },
+      "passed": false
+    },
+    "candidate_version": "1",
+    "comparison": {
+      "candidate_composite_score": {
+        "components": {
+          "attack_recall": 0.005454545454545454,
+          "f1": 0.004819277108433735,
+          "false_positive_rate": 0.04000000000000001,
+          "inference_latency_ms_per_row": 0.09856563910096902,
+          "pr_auc": 0.03099490128193256
+        },
+        "formula": "weighted sum of PR-AUC, attack recall, and F1 as [0,1] metrics; FPR and latency contribute 1 - min(value / configured_ceiling, 1)",
+        "score": 0.1798343629458808,
+        "weights": {
+          "attack_recall": 0.3,
+          "f1": 0.2,
+          "false_positive_rate": 0.1,
+          "inference_latency_ms_per_row": 0.1,
+          "pr_auc": 0.3
+        }
+      },
+      "has_champion": false
+    },
+    "evaluated_at": "2026-08-14T09:28:44.513354+00:00",
+    "event": "evaluated",
+    "model_name": "sentinelml-ids",
+    "passed": false,
+    "threshold_report": {
+      "baseline_metrics": {
+        "accuracy": 0.9937,
+        "attack_class_recall": 0.01818181818181818,
+        "confusion_matrix": {
+          "fn": 54,
+          "fp": 9,
+          "tn": 9936,
+          "tp": 1
+        },
+        "f1": 0.03076923076923077,
+        "false_negative_rate": 0.9818181818181818,
+        "false_positive_rate": 0.0009049773755656109,
+        "inference_latency_ms_per_row": 0.0037074699997901917,
+        "inference_time_seconds": 0.037074699997901917,
+        "pr_auc": 0.4093085763980715,
+        "precision": 0.1,
+        "promotion_evaluation_seconds": 0.08860810000624042,
+        "recall": 0.01818181818181818,
+        "roc_auc": 0.9957840851958499,
+        "rows": 10000
+      },
+      "created_at": "2026-08-14T09:28:43.972739+00:00",
+      "evidence": {
+        "baseline_evaluation": {
+          "baseline_source": "phase2_selected_baseline_smoke_refit",
+          "evaluation_type": "lifecycle_promotion_validation",
+          "model_family": "xgboost",
+          "report_path": "C:\\MLOps-Project\\project\\reports\\lifecycle\\baseline_reference.json"
+        },
+        "baseline_manifest_path": "C:\\MLOps-Project\\project\\reports\\models\\phase2_smoke\\run_manifest.json",
+        "baseline_metrics_path": "C:\\MLOps-Project\\project\\reports\\lifecycle\\baseline_reference.json",
+        "baseline_mode": "smoke",
+        "baseline_report_mode": "smoke",
+        "baseline_validation_sample_metadata": {
+          "original_rows": 398434,
+          "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+          "rows_used": 10000,
+          "sample_size_requested": 10000,
+          "target_distribution": {
+            "0": 9946,
+            "1": 54
+          }
+        },
+        "canonical_promotion_dataset": {
+          "attack_count": 55,
+          "benign_count": 9945,
+          "created_at": "2026-08-14T09:28:38.230385+00:00",
+          "evaluation_type": "lifecycle_promotion_validation",
+          "feature_schema_path": "C:\\MLOps-Project\\project\\reports\\data\\feature_schema.json",
+          "feature_schema_sha256": "7012d012649d968207368c371fa65e5dbb983ae3064ea42e5ecb3666a5dd485b",
+          "max_positive_fraction": 0.05,
+          "min_positive_rows": 50,
+          "random_seed": 52,
+          "sample_size_requested": 10000,
+          "sampling_strategy": "stratified_min_positive",
+          "selected_row_count": 10000,
+          "selected_row_fingerprint": "a4d545c4e80dd9ce83828a13a20e532cf11a41c5030ce969543bd6e1441b38fc",
+          "selected_row_fingerprint_algorithm": "sha256(newline-separated source row positions)",
+          "source_path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+          "source_row_count": 398434,
+          "split": "validation",
+          "target_distribution": {
+            "0": 9945,
+            "1": 55
+          }
+        },
+        "evaluation_split": "validation",
+        "selected_baseline": {
+          "recommended_baseline": "xgboost",
+          "selection_metric": "validation composite score",
+          "selection_rationale": "Selected from validation behavior using attack recall, F1, PR-AUC, ROC-AUC, and false-positive rate. Accuracy is reported but not used as the ranking criterion.",
+          "selection_score": 0.26538196738554676
+        },
+        "selected_baseline_path": "C:\\MLOps-Project\\project\\reports\\models\\phase2_smoke\\selected_baseline.json"
+      },
+      "formulas": {
+        "attack_recall": "attack_class_recall * 0.9",
+        "f1": "f1 * 0.9",
+        "false_positive_rate": "max(false_positive_rate * 5.0, 0.001)",
+        "inference_latency_ms_per_row": "max(inference_latency_ms_per_row * 20.0, 0.01)",
+        "pr_auc": "pr_auc * 0.9"
+      },
+      "policy": {
+        "baseline_mode": "smoke",
+        "evaluation_split": "validation",
+        "metrics": {
+          "attack_recall": {
+            "direction": "min",
+            "fraction_of_baseline": 0.9,
+            "source_metric": "attack_class_recall"
+          },
+          "f1": {
+            "direction": "min",
+            "fraction_of_baseline": 0.9,
+            "source_metric": "f1"
+          },
+          "false_positive_rate": {
+            "direction": "max",
+            "minimum_ceiling": 0.001,
+            "multiplier_of_baseline": 5.0,
+            "source_metric": "false_positive_rate"
+          },
+          "inference_latency_ms_per_row": {
+            "direction": "max",
+            "minimum_ceiling": 0.01,
+            "multiplier_of_baseline": 20.0,
+            "source_metric": "inference_latency_ms_per_row"
+          },
+          "pr_auc": {
+            "direction": "min",
+            "fraction_of_baseline": 0.9,
+            "source_metric": "pr_auc"
+          }
+        }
+      },
+      "schema_version": "1.0",
+      "thresholds": {
+        "attack_recall": 0.016363636363636365,
+        "f1": 0.027692307692307693,
+        "false_positive_rate": 0.004524886877828055,
+        "inference_latency_ms_per_row": 0.07414939999580383,
+        "pr_auc": 0.36837771875826436
+      }
+    }
+  },
+  "event": "rejected",
+  "failed_gates": [
+    "pr_auc",
+    "f1"
+  ],
+  "model_name": "sentinelml-ids",
+  "model_version": "1",
+  "rejected_at": "2026-08-14T09:28:44.788631+00:00"
+}

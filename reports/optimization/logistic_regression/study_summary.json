@@ -41,13 +41,13 @@
     }
   },
   "best_trial_number": 0,
-  "best_objective_value": 0.03162683548020292,
+  "best_objective_value": 0.02688239884984493,
   "best_params": {
     "n_estimators": 120,
     "learning_rate": 0.262516606324193,
     "reg_alpha": 0.02465832945854911,
     "reg_lambda": 1.5751320499779735
   },
-  "best_mlflow_run_id": "0511db5ad4644f848ef0b44aba551010",
+  "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a",
   "best_effective_device": "cuda:0"
 }

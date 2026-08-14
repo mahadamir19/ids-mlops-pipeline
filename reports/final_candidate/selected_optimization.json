@@ -6,8 +6,8 @@
   "model_family": "xgboost",
   "execution_mode": "smoke",
   "best_trial_number": 0,
-  "best_objective_value": 0.23417043740573154,
-  "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f",
+  "best_objective_value": 0.37552147660112,
+  "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1",
   "objective_metric": "pr_auc",
   "direction": "maximize",
   "best_params": {

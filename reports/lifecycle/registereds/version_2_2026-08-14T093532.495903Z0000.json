@@ -1,0 +1,28 @@
+{
+  "event": "registered",
+  "model_name": "sentinelml-ids",
+  "model_version": "2",
+  "registered": true,
+  "reused": false,
+  "source_model_uri": "models:/m-c0bf4f95cd1a4b5a982f0ee98b115dda",
+  "source_run_id": "5fa935449c1c4942af902def85b49f06",
+  "tags": {
+    "demo_model": "true",
+    "dependency_lock_sha256": "f67dd2f9c77e414ca01db47faab902fe29070bbebc30e7ea9231670c0394ede8",
+    "dvc_lock_sha256": "deeb41c99fcd8ce3115f461f6e01dd2abbba7a3f04741896e4cceb2302540b80",
+    "evaluation_source": "reports/final_candidate/validation_metrics.json",
+    "execution_mode": "smoke",
+    "git_commit": "2e658168c52b839dded69ce7dc4571c48dad7386",
+    "lifecycle.metrics_json": "{\"accuracy\":0.9942,\"attack_class_recall\":0.05555555555555555,\"confusion_matrix\":{\"fn\":51,\"fp\":7,\"tn\":9939,\"tp\":3},\"f1\":0.09375,\"false_negative_rate\":0.9444444444444444,\"false_positive_rate\":0.0007038005228232455,\"inference_latency_ms_per_row\":0.003382719999353867,\"inference_time_seconds\":0.03382719999353867,\"pr_auc\":0.37552147660112,\"precision\":0.3,\"recall\":0.05555555555555555,\"roc_auc\":0.9953657156050079,\"rows\":10000}",
+    "lifecycle.test_metrics_json": "{\"accuracy\":0.7635,\"attack_class_recall\":0.3626789089927086,\"confusion_matrix\":{\"fn\":2360,\"fp\":5,\"tn\":6292,\"tp\":1343},\"f1\":0.5317758859631756,\"false_negative_rate\":0.6373210910072914,\"false_positive_rate\":0.0007940289026520565,\"inference_latency_ms_per_row\":0.001479960000142455,\"inference_time_seconds\":0.014799600001424551,\"pr_auc\":0.7815513443182299,\"precision\":0.9962908011869436,\"recall\":0.3626789089927086,\"roc_auc\":0.7734242493210443,\"rows\":10000}",
+    "lifecycle.validation_metrics_json": "{\"accuracy\":0.9942,\"attack_class_recall\":0.05555555555555555,\"confusion_matrix\":{\"fn\":51,\"fp\":7,\"tn\":9939,\"tp\":3},\"f1\":0.09375,\"false_negative_rate\":0.9444444444444444,\"false_positive_rate\":0.0007038005228232455,\"inference_latency_ms_per_row\":0.003382719999353867,\"inference_time_seconds\":0.03382719999353867,\"pr_auc\":0.37552147660112,\"precision\":0.3,\"recall\":0.05555555555555555,\"roc_auc\":0.9953657156050079,\"rows\":10000}",
+    "lifecycle_state": "candidate",
+    "model_family": "xgboost",
+    "optimization_config_sha256": "100769a26edcc5314ead9d84651471f601f2d2df33a396ff1496d5928208e182",
+    "registered_at": "2026-08-14T09:35:30.615756+00:00",
+    "source_model_uri": "models:/m-c0bf4f95cd1a4b5a982f0ee98b115dda",
+    "source_optuna_run_id": "9b19e0606f0547f1843c42024b44f4b1",
+    "source_run_id": "5fa935449c1c4942af902def85b49f06",
+    "training_config_sha256": "7c14d875e72b820bad44c9e4eac74d696351784234c583c0856b8193de7ed725"
+  }
+}

@@ -52,14 +52,14 @@
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.03162683548020292,
+      "best_objective_value": 0.02688239884984493,
       "best_params": {
         "n_estimators": 120,
         "learning_rate": 0.262516606324193,
         "reg_alpha": 0.02465832945854911,
         "reg_lambda": 1.5751320499779735
       },
-      "best_mlflow_run_id": "0511db5ad4644f848ef0b44aba551010",
+      "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a",
       "best_effective_device": "cuda:0"
     },
     {
@@ -108,7 +108,7 @@
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.04859717645374196,
+      "best_objective_value": 0.25703090144531415,
       "best_params": {
         "num_parallel_tree": 80,
         "max_depth": 28,
@@ -116,7 +116,7 @@
         "colsample_bynode": 0.759195090518222,
         "min_child_weight": 2.0921304830970557
       },
-      "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff",
+      "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29",
       "best_effective_device": "cuda:0"
     },
     {
@@ -182,7 +182,7 @@
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.23417043740573154,
+      "best_objective_value": 0.37552147660112,
       "best_params": {
         "n_estimators": 160,
         "max_depth": 10,
@@ -193,7 +193,7 @@
         "reg_alpha": 2.231010801867921e-06,
         "reg_lambda": 2.962151658830348
       },
-      "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f",
+      "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1",
       "best_effective_device": "cuda:0"
     },
     {
@@ -244,7 +244,7 @@
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.19185714285714286,
+      "best_objective_value": 0.23494826381908424,
       "best_params": {
         "n_estimators": 160,
         "learning_rate": 0.1785436060870726,
@@ -252,55 +252,55 @@
         "min_child_weight": 5.190609389379256,
         "reg_lambda": 0.18410729205738682
       },
-      "best_mlflow_run_id": "748efa7859b44567a4df773e3815429e",
+      "best_mlflow_run_id": "faa11c75dfd041df9306ba4e832b90d1",
       "best_effective_device": "cuda:0"
     }
   ],
   "validation_only_comparison": [
     {
       "model_family": "xgboost",
-      "best_objective_value": 0.23417043740573154,
+      "best_objective_value": 0.37552147660112,
       "best_trial_number": 0,
-      "best_mlflow_run_id": "4aaa0d5bc6934ea1a6dbc61b639b929f"
-    },
-    {
-      "model_family": "hist_gradient_boosting",
-      "best_objective_value": 0.19185714285714286,
-      "best_trial_number": 0,
-      "best_mlflow_run_id": "748efa7859b44567a4df773e3815429e"
+      "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1"
     },
     {
       "model_family": "random_forest",
-      "best_objective_value": 0.04859717645374196,
+      "best_objective_value": 0.25703090144531415,
       "best_trial_number": 0,
-      "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff"
+      "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29"
+    },
+    {
+      "model_family": "hist_gradient_boosting",
+      "best_objective_value": 0.23494826381908424,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": "faa11c75dfd041df9306ba4e832b90d1"
     },
     {
       "model_family": "logistic_regression",
-      "best_objective_value": 0.03162683548020292,
+      "best_objective_value": 0.02688239884984493,
       "best_trial_number": 0,
-      "best_mlflow_run_id": "0511db5ad4644f848ef0b44aba551010"
+      "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a"
     }
   ],
   "data_usage": {
     "train": {
       "path": "C:\\MLOps-Project\\project\\data\\processed\\train.parquet",
       "original_rows": 1526504,
-      "rows_used": 2000,
-      "sample_size_requested": 2000,
+      "rows_used": 20000,
+      "sample_size_requested": 20000,
       "target_distribution": {
-        "0": 1735,
-        "1": 265
+        "0": 17342,
+        "1": 2658
       }
     },
     "validation": {
       "path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
       "original_rows": 398434,
-      "rows_used": 1000,
-      "sample_size_requested": 1000,
+      "rows_used": 10000,
+      "sample_size_requested": 10000,
       "target_distribution": {
-        "0": 995,
-        "1": 5
+        "0": 9946,
+        "1": 54
       }
     },
     "test": "not_loaded_or_used"

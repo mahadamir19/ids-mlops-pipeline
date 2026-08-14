@@ -56,7 +56,7 @@ matplotlib==3.11.1
 mlflow==3.15.1
 mlflow-skinny==3.15.1
 mlflow-tracing==3.15.1
--e git+https://github.com/mahadamir19/ids-mlops-pipeline@58a13e5e907eed88b470dedd68506844e6365c0a#egg=mlops_project
+-e git+https://github.com/mahadamir19/ids-mlops-pipeline@2e658168c52b839dded69ce7dc4571c48dad7386#egg=mlops_project
 multidict==6.7.1
 mypy==2.3.0
 mypy_extensions==1.1.0

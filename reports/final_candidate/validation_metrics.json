@@ -1,20 +1,20 @@
 {
-  "rows": 1000,
-  "accuracy": 0.993,
-  "precision": 0.0,
-  "recall": 0.0,
-  "attack_class_recall": 0.0,
-  "f1": 0.0,
-  "pr_auc": 0.23417043740573154,
-  "roc_auc": 0.9817085427135679,
+  "rows": 10000,
+  "accuracy": 0.9942,
+  "precision": 0.3,
+  "recall": 0.05555555555555555,
+  "attack_class_recall": 0.05555555555555555,
+  "f1": 0.09375,
+  "pr_auc": 0.37552147660112,
+  "roc_auc": 0.9953657156050079,
   "confusion_matrix": {
-    "tn": 993,
-    "fp": 2,
-    "fn": 5,
-    "tp": 0
+    "tn": 9939,
+    "fp": 7,
+    "fn": 51,
+    "tp": 3
   },
-  "false_positive_rate": 0.0020100502512562816,
-  "false_negative_rate": 1.0,
-  "inference_time_seconds": 0.032410299994808156,
-  "inference_latency_ms_per_row": 0.032410299994808156
+  "false_positive_rate": 0.0007038005228232455,
+  "false_negative_rate": 0.9444444444444444,
+  "inference_time_seconds": 0.03382719999353867,
+  "inference_latency_ms_per_row": 0.003382719999353867
 }

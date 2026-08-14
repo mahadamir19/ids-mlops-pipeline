@@ -1,0 +1,64 @@
+registered_model_name: sentinelml-ids
+champion_alias: champion
+
+paths:
+  final_candidate_manifest: reports/final_candidate/model_manifest.json
+  smoke_baseline_metrics: reports/models/phase2_smoke/validation_metrics.json
+  smoke_selected_baseline: reports/models/phase2_smoke/selected_baseline.json
+  smoke_baseline_manifest: reports/models/phase2_smoke/run_manifest.json
+  feature_schema: reports/data/feature_schema.json
+  train_partition: data/processed/train.parquet
+  validation_partition: data/processed/validation.parquet
+  threshold_report: reports/lifecycle/threshold_derivation.json
+  lifecycle_reports: reports/lifecycle
+  pending_dir: .tmp/lifecycle/pending_promotions
+
+promotion_evaluation:
+  mode: smoke
+  validation_sample_size: 10000
+  baseline_train_sample_size: 20000
+  random_seed: 42
+  validation_seed_offset: 10
+  baseline_train_seed_offset: 0
+  sampling_strategy: stratified_min_positive
+  min_positive_rows: 50
+  max_positive_fraction: 0.05
+
+mode_policy:
+  allow_cross_mode_promotion: false
+
+threshold_policy:
+  baseline_mode: smoke
+  evaluation_split: validation
+  metrics:
+    pr_auc:
+      source_metric: pr_auc
+      direction: min
+      fraction_of_baseline: 0.90
+    attack_recall:
+      source_metric: attack_class_recall
+      direction: min
+      fraction_of_baseline: 0.90
+    f1:
+      source_metric: f1
+      direction: min
+      fraction_of_baseline: 0.90
+    false_positive_rate:
+      source_metric: false_positive_rate
+      direction: max
+      multiplier_of_baseline: 5.0
+      minimum_ceiling: 0.001
+    inference_latency_ms_per_row:
+      source_metric: inference_latency_ms_per_row
+      direction: max
+      multiplier_of_baseline: 20.0
+      minimum_ceiling: 0.01
+
+composite_score:
+  minimum_relative_improvement: 0.01
+  weights:
+    pr_auc: 0.30
+    attack_recall: 0.30
+    f1: 0.20
+    false_positive_rate: 0.10
+    inference_latency_ms_per_row: 0.10

@@ -44,7 +44,7 @@
     }
   },
   "best_trial_number": 0,
-  "best_objective_value": 0.04859717645374196,
+  "best_objective_value": 0.25703090144531415,
   "best_params": {
     "num_parallel_tree": 80,
     "max_depth": 28,
@@ -52,6 +52,6 @@
     "colsample_bynode": 0.759195090518222,
     "min_child_weight": 2.0921304830970557
   },
-  "best_mlflow_run_id": "2ab6c3fe622f43928605234e6af9a4ff",
+  "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29",
   "best_effective_device": "cuda:0"
 }
