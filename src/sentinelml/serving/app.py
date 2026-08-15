@@ -21,8 +21,10 @@ from sentinelml.serving.database import (
 )
 from sentinelml.serving.metrics import (
     api_metrics,
+    record_db_logging_health,
     record_model_loaded,
     record_model_reload_failure,
+    record_registry_connectivity,
     record_request,
     record_validation_rejection,
 )
@@ -157,8 +159,16 @@ def create_app(
         model_ready = model_manager.is_ready()
         active = model_manager.current() if model_ready else None
         db_status = repository.database_status()
+        registry_status = _registry_status(model_manager, model_ready)
         queue_depth = repository.queue.depth()
-        status = "healthy" if model_ready and db_status == "healthy" else "degraded"
+        record_db_logging_health(db_status)
+        record_registry_connectivity(
+            str(registry_status["connectivity"]),
+            divergent=bool(registry_status["divergent"]),
+        )
+        status = "healthy"
+        if db_status != "healthy" or registry_status["connectivity"] != "available":
+            status = "degraded"
         if not model_ready:
             status = "unhealthy"
         return {
@@ -166,6 +176,13 @@ def create_app(
             "process_alive": True,
             "model_ready": model_ready,
             "model_version": active.model_version if active else None,
+            "inference_ready": model_ready,
+            "registry_connectivity": registry_status["connectivity"],
+            "registry_champion_version": registry_status[
+                "registry_champion_version"
+            ],
+            "loaded_registry_divergence": registry_status["divergent"],
+            "reload_error": registry_status["last_reload_error"],
             "database_logging": db_status,
             "queue_depth": queue_depth,
             "malformed_queue_records": repository.queue.malformed_count(),
@@ -174,7 +191,16 @@ def create_app(
     @app.get("/model", response_model=ModelResponse)
     def model() -> dict[str, Any]:
         active = app.state.model_manager.current()
-        return _model_payload(active)
+        registry_status = _registry_status(app.state.model_manager, True)
+        return {
+            **_model_payload(active),
+            "registry_champion_version": registry_status[
+                "registry_champion_version"
+            ],
+            "registry_connectivity": registry_status["connectivity"],
+            "loaded_registry_divergence": registry_status["divergent"],
+            "reload_error": registry_status["last_reload_error"],
+        }
 
     @app.get("/metrics")
     def metrics() -> Response:
@@ -240,6 +266,19 @@ def create_app(
                     "retryable": False,
                 },
             )
+        except Exception as exc:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "prediction_id": body.prediction_id,
+                    "error": (
+                        "ground truth cannot be recorded while database is "
+                        "unavailable"
+                    ),
+                    "details": str(exc),
+                    "retryable": True,
+                },
+            )
         return result.__dict__
 
     @app.post("/ground-truth/batch", response_model=BatchGroundTruthResponse)
@@ -284,6 +323,19 @@ def create_app(
                 status_code=409,
                 content={"error": str(exc), "retryable": False, "atomic": True},
             )
+        except Exception as exc:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "error": (
+                        "ground truth cannot be recorded while database is "
+                        "unavailable"
+                    ),
+                    "details": str(exc),
+                    "retryable": True,
+                    "atomic": True,
+                },
+            )
         return {
             "labels": [result.__dict__ for result in results],
             "count": len(results),
@@ -303,6 +355,8 @@ def create_app(
         except Exception:
             record_model_reload_failure()
             raise
+        if not result.get("success", True):
+            record_model_reload_failure()
         active = app.state.model_manager.current()
         record_model_loaded(
             model_name=active.model_name,
@@ -398,6 +452,22 @@ def _model_payload(active: Any) -> dict[str, Any]:
         "feature_schema_path": str(active.feature_schema.source_path),
         "feature_schema_fingerprint": active.feature_schema.fingerprint,
         "feature_count": active.feature_schema.feature_count,
+    }
+
+
+def _registry_status(model_manager: Any, model_ready: bool) -> dict[str, Any]:
+    if model_ready and hasattr(model_manager, "registry_status"):
+        return model_manager.registry_status()
+    active_version = None
+    if model_ready:
+        active_version = model_manager.current().model_version
+    return {
+        "connectivity": "available" if model_ready else "unavailable",
+        "registry_champion_version": active_version,
+        "loaded_model_version": active_version,
+        "divergent": False,
+        "error": None,
+        "last_reload_error": None,
     }
 
 

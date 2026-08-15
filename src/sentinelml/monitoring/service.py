@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from sentinelml.data.config import PROJECT_ROOT
 from sentinelml.monitoring.config import (
     DEFAULT_MONITORING_CONFIG_PATH,
     MonitoringConfig,
@@ -150,6 +151,7 @@ def _build_report(
         "performance": performance,
         "errors": errors,
         "retraining_state": _phase8_retraining_state(),
+        "resilience_state": _phase9_resilience_state(),
         "lifecycle_state": "champion_active",
     }
     if current.metadata["actual_window_size"] < config.minimum_window_size:
@@ -252,6 +254,7 @@ def _failure_report(
         "evidently_result_summary": None,
         "errors": errors,
         "retraining_state": _phase8_retraining_state(),
+        "resilience_state": _phase9_resilience_state(),
         "lifecycle_state": "champion_active",
     }
 
@@ -291,6 +294,7 @@ def _unchanged_report(
         "drift_share": previous.get("drift_share"),
         "performance": previous.get("performance", {}),
         "retraining_state": _phase8_retraining_state(),
+        "resilience_state": _phase9_resilience_state(),
         "lifecycle_state": previous.get("lifecycle_state", "champion_active"),
     }
 
@@ -301,3 +305,24 @@ def _phase8_retraining_state() -> dict[str, Any] | str:
         return latest_retraining_state(config)
     except Exception:
         return "idle"
+
+
+def _phase9_resilience_state() -> dict[str, Any]:
+    path = PROJECT_ROOT / "reports" / "resilience" / "latest.json"
+    if not path.exists():
+        return {"state": "idle", "source": "reports/resilience/latest.json"}
+    try:
+        import json
+
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return {
+            "state": "unavailable",
+            "source": "reports/resilience/latest.json",
+            "error": str(exc),
+        }
+    return {
+        "state": "available",
+        "source": "reports/resilience/latest.json",
+        "latest": payload,
+    }

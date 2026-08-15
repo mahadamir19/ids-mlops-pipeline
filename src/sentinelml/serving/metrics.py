@@ -62,6 +62,21 @@ api_metrics.describe(
     "Prediction records queued because database logging failed.",
 )
 api_metrics.describe(
+    "sentinelml_registry_connectivity",
+    "gauge",
+    "Registry connectivity: available=1, unavailable=0.",
+)
+api_metrics.describe(
+    "sentinelml_db_logging_health",
+    "gauge",
+    "Prediction DB logging health: healthy=1, unhealthy=0, unconfigured=-1.",
+)
+api_metrics.describe(
+    "sentinelml_loaded_registry_divergence",
+    "gauge",
+    "Whether loaded model version differs from registry champion.",
+)
+api_metrics.describe(
     "sentinelml_retraining_state",
     "gauge",
     "Current retraining state; Phase 7 exports idle only.",
@@ -151,3 +166,19 @@ def record_model_reload_failure() -> None:
 
 def record_prediction_logging_failure() -> None:
     api_metrics.inc_counter("sentinelml_db_prediction_logging_failures_total")
+
+
+def record_registry_connectivity(status: str, *, divergent: bool = False) -> None:
+    api_metrics.set_gauge(
+        "sentinelml_registry_connectivity",
+        1 if status == "available" else 0,
+    )
+    api_metrics.set_gauge(
+        "sentinelml_loaded_registry_divergence",
+        1 if divergent else 0,
+    )
+
+
+def record_db_logging_health(status: str) -> None:
+    value = {"healthy": 1, "unhealthy": 0, "unconfigured": -1}.get(status, 0)
+    api_metrics.set_gauge("sentinelml_db_logging_health", value)

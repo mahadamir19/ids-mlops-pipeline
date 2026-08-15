@@ -2,7 +2,7 @@
   "affected_features": [],
   "errors_summary": [],
   "failed_labels": [],
-  "finished_at": "2026-08-15T17:52:46.415603+00:00",
+  "finished_at": "2026-08-15T17:49:27.470731+00:00",
   "label_delivery_mode": "randomized",
   "labels_delivered": 5,
   "labels_failed": 0,
@@ -11,7 +11,8 @@
     "2": 5
   },
   "prediction_class_distribution": {
-    "BENIGN": 5
+    "ATTACK": 3,
+    "BENIGN": 2
   },
   "request_count_attempted": 5,
   "requests_failed": 0,
@@ -19,9 +20,9 @@
   "scenario": "normal",
   "scenario_category": "healthy_baseline",
   "scenario_parameters": {},
-  "seed": 902,
-  "simulation_fingerprint": "f18090e35956be6a92e278533ddc2341530ff3e93fb1d71d8c67038093f5c3db",
-  "simulation_run_id": "cc9a6c92-a7fe-4c19-89ac-5c0fb04b6210",
+  "seed": 901,
+  "simulation_fingerprint": "7a6c28d28958a62891b2cc04579a72b2f3a71661ab96d7341e110e05eff4a2bd",
+  "simulation_run_id": "3eab7a5b-9554-44a1-9578-8cca749f21a9",
   "source": {
     "fingerprint": "31d629138332bb736c19a44b0549c10638ec6d5c250339c03d9e0f3e1a87e168",
     "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
@@ -32,9 +33,10 @@
       "1": 20236
     }
   },
-  "started_at": "2026-08-15T17:52:45.677050+00:00",
+  "started_at": "2026-08-15T17:49:26.238489+00:00",
   "true_class_distribution": {
-    "0": 5
+    "0": 2,
+    "1": 3
   },
   "undelivered_labels": []
 }

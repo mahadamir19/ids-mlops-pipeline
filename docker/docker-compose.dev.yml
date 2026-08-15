@@ -21,3 +21,12 @@ services:
       - ../dvc.lock:/app/dvc.lock:ro
       - ../pylock.toml:/app/pylock.toml:ro
       - ../.git:/app/.git:ro
+
+  resilience:
+    volumes:
+      - ../src:/app/src:ro
+      - ../scripts:/app/scripts:ro
+      - ../configs:/app/configs:ro
+      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
+      - ../reports/lifecycle/threshold_derivation.json:/app/reports/lifecycle/threshold_derivation.json:ro
+      - ../.git:/app/.git:ro

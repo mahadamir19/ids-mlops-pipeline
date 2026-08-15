@@ -21,7 +21,7 @@ COPY reports/data/feature_schema.json ./reports/data/feature_schema.json
 
 RUN pip install --no-build-isolation --no-deps -e . \
     && useradd --create-home --uid 10001 appuser \
-    && mkdir -p /app/reports/monitoring /app/data/reference \
+    && mkdir -p /app/reports/monitoring /app/reports/resilience /app/data/reference \
     && chown -R appuser:appuser /app/reports /app/data
 
 USER appuser

@@ -49,6 +49,7 @@ class RetrainingConfig:
     database_url_env: str
     database_connect_timeout_seconds: int
     database_statement_timeout_ms: int
+    monitoring_maximum_heartbeat_age_seconds: int | None
     config_path: Path
 
     @property
@@ -158,6 +159,9 @@ def load_retraining_config(
             database.get("connect_timeout_seconds", 5)
         ),
         database_statement_timeout_ms=int(database.get("statement_timeout_ms", 5000)),
+        monitoring_maximum_heartbeat_age_seconds=_optional_int(
+            raw.get("monitoring", {}).get("maximum_heartbeat_age_seconds", 180)
+        ),
         config_path=path,
     )
     validate_retraining_config(config, validate_data_paths=validate_data_paths)
@@ -181,6 +185,11 @@ def validate_retraining_config(
         raise ValueError("only fresh_champion_family_retrain is supported in Phase 8")
     if config.training_device not in {"cpu", "cuda"}:
         raise ValueError("retraining training.device must be cpu or cuda")
+    if (
+        config.monitoring_maximum_heartbeat_age_seconds is not None
+        and config.monitoring_maximum_heartbeat_age_seconds <= 0
+    ):
+        raise ValueError("monitoring maximum heartbeat age must be positive")
     if validate_data_paths and not config.historical_source.exists():
         raise ValueError(
             f"historical train source does not exist: {config.historical_source}"

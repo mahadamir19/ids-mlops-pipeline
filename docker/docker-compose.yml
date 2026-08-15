@@ -181,6 +181,7 @@ services:
     volumes:
       - ../data/reference/reference.parquet:/app/data/reference/reference.parquet:ro
       - ../reports/monitoring:/app/reports/monitoring
+      - ../reports/resilience:/app/reports/resilience:ro
     healthcheck:
       test:
         [
@@ -224,6 +225,54 @@ services:
       - ../data/processed/train.parquet:/app/data/processed/train.parquet:ro
       - ../data/processed/validation.parquet:/app/data/processed/validation.parquet:ro
 
+  resilience:
+    build:
+      context: ..
+      dockerfile: docker/retrainer.Dockerfile
+    container_name: sentinelml-resilience
+    restart: unless-stopped
+    depends_on:
+      mlflow-server:
+        condition: service_healthy
+      app-postgres:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+      monitor:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow-server:5000
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-sentinelml}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      AWS_DEFAULT_REGION: us-east-1
+      SENTINELML_DATABASE_URL: postgresql+psycopg2://${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}:${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}@app-postgres:5432/${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+      SENTINELML_SERVING_RELOAD_URL: http://api:8000/internal/reload
+    command:
+      - uvicorn
+      - sentinelml.resilience.app:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9201"
+    ports:
+      - "${SENTINELML_RESILIENCE_PORT:-9201}:9201"
+    volumes:
+      - ../reports:/app/reports
+      - ../data/processed/train.parquet:/app/data/processed/train.parquet:ro
+      - ../data/processed/validation.parquet:/app/data/processed/validation.parquet:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:9201/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
   prometheus:
     image: prom/prometheus:v3.5.0
     container_name: sentinelml-prometheus
@@ -232,6 +281,8 @@ services:
       api:
         condition: service_healthy
       monitor:
+        condition: service_healthy
+      resilience:
         condition: service_healthy
     command:
       - --config.file=/etc/prometheus/prometheus.yml

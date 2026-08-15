@@ -14,3 +14,9 @@ scrape_configs:
     static_configs:
       - targets:
           - monitor:9101
+
+  - job_name: sentinelml-resilience
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - resilience:9201

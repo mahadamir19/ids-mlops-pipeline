@@ -139,12 +139,82 @@
       "targets": [{"expr": "sentinelml_lifecycle_state{state=\"champion_active\"}", "legendFormat": "champion", "refId": "A"}],
       "title": "Lifecycle State",
       "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 25},
+      "id": 14,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"expr": "sentinelml_registry_connectivity", "legendFormat": "registry", "refId": "A"}],
+      "title": "Registry Connectivity",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 25},
+      "id": 15,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"expr": "sentinelml_db_logging_health", "legendFormat": "db logging", "refId": "A"}],
+      "title": "DB Logging Health",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 25},
+      "id": 16,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"expr": "sentinelml_loaded_registry_divergence", "legendFormat": "divergence", "refId": "A"}],
+      "title": "Loaded Registry Divergence",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 25},
+      "id": 17,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"expr": "sentinelml_probation_active", "legendFormat": "probation", "refId": "A"}],
+      "title": "Probation Active",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 29},
+      "id": 18,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [{"expr": "sentinelml_probation_labelled_rows", "legendFormat": "labelled rows", "refId": "A"}, {"expr": "sentinelml_probation_severe_violation", "legendFormat": "severe violation", "refId": "B"}],
+      "title": "Probation Evidence",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 29},
+      "id": 19,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [{"expr": "sentinelml_promotion_pending", "legendFormat": "pending", "refId": "A"}, {"expr": "sum by (status) (increase(sentinelml_promotion_retry_total[24h]))", "legendFormat": "{{status}}", "refId": "B"}],
+      "title": "Promotion Retry",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 29},
+      "id": 20,
+      "options": {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [{"expr": "sum by (source,status) (increase(sentinelml_rollback_total[24h]))", "legendFormat": "{{source}} {{status}}", "refId": "A"}],
+      "title": "Rollback Attempts",
+      "type": "timeseries"
     }
   ],
   "refresh": "15s",
   "schemaVersion": 41,
   "style": "dark",
-  "tags": ["sentinelml", "phase7", "mlops"],
+  "tags": ["sentinelml", "phase7", "phase9", "mlops"],
   "templating": {"list": []},
   "time": {"from": "now-1h", "to": "now"},
   "timepicker": {},

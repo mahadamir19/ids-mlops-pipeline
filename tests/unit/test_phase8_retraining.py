@@ -28,13 +28,13 @@ from sentinelml.retraining.trainer import (
     _apply_xgboost_execution_policy,
     _force_cpu_training_config,
 )
-from sentinelml.training.gpu import force_estimator_cpu
 from sentinelml.retraining.triggers import (
     PerformanceThresholds,
     evaluate_trigger,
     thresholds_from_lifecycle_report,
 )
 from sentinelml.tracking.mlflow import sha256_file
+from sentinelml.training.gpu import force_estimator_cpu
 
 FEATURES = ["a", "b", "c"]
 
@@ -746,6 +746,7 @@ def config(
         database_url_env="SENTINELML_TEST_DATABASE_URL",
         database_connect_timeout_seconds=1,
         database_statement_timeout_ms=1000,
+        monitoring_maximum_heartbeat_age_seconds=None,
         config_path=root / "retraining.yaml",
     )
 

@@ -359,8 +359,10 @@ class Phase5ServingTests(unittest.TestCase):
 
         manager.model_loader = failing_loader
         client.champion = FakeVersion("4", source="runs:/bad/model")
-        with self.assertRaises(RuntimeError):
-            manager.reload_champion()
+        failed = manager.reload_champion()
+        self.assertFalse(failed["success"])
+        self.assertEqual(failed["active_model_version"], "3")
+        self.assertEqual(failed["registry_champion_version"], "4")
         self.assertEqual(manager.current().model_version, "3")
 
     def test_prediction_logging_success_and_idempotency(self) -> None:

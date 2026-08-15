@@ -704,6 +704,11 @@ class LifecycleService:
                 "evaluation": evaluation,
             }
             payload["serving_reload_notification"] = self._notify_serving_reload()
+            payload["probation"] = self._start_probation_after_promotion(
+                promoted_version=candidate.version,
+                previous_champion_version=previous_version,
+                promotion_timestamp=promoted_at,
+            )
             write_json(
                 audit_path(self.report_root, "promoted", candidate.version),
                 payload,
@@ -766,16 +771,31 @@ class LifecycleService:
         for path in sorted(self.pending_dir.glob("*.json")):
             pending = load_json(path)
             version = pending["candidate_version"]
+            champion_before = self.get_champion()
             outcome = self.promote_or_reject(version=version)
-            archive = self.pending_dir.parent / "resolved" / path.name
             archive_payload = {
                 "event": "promotion_retry",
                 "retried_at": utc_now(),
                 "pending": pending,
+                "current_champion_version": champion_before.version
+                if champion_before
+                else None,
                 "outcome": outcome,
             }
-            write_json(archive, archive_payload)
-            path.unlink()
+            still_pending = (
+                outcome.get("event") == "promotion_pending"
+                or outcome.get("operation_state") == "promotion_pending"
+            )
+            if still_pending:
+                retry_history = pending.get("retry_history", [])
+                pending["retry_history"] = [*retry_history, archive_payload]
+                pending["last_retry_at"] = archive_payload["retried_at"]
+                pending["last_retry_outcome"] = outcome
+                write_json(path, pending)
+            else:
+                archive = self.pending_dir.parent / "resolved" / path.name
+                write_json(archive, archive_payload)
+                path.unlink()
             write_json(
                 audit_path(self.report_root, "promotion_retry", version),
                 archive_payload,
@@ -788,22 +808,50 @@ class LifecycleService:
         *,
         version: str | int,
         reason: str | None = None,
-        allow_rejected: bool = False,
+        source: str = "manual",
+        probation_id: str | None = None,
+        trigger_metrics: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         target = self._get_version(version)
-        if target.tags.get("lifecycle_state") == "rejected" and not allow_rejected:
-            raise LifecycleError("refusing rollback to rejected model version")
+        state = target.tags.get("lifecycle_state")
+        if state not in {"champion", "superseded"}:
+            raise LifecycleError(
+                "rollback target must be a current or superseded approved champion; "
+                "rejected, failed, and candidate versions are not valid targets"
+            )
         required = ["execution_mode", "demo_model", "model_family", "source_run_id"]
         missing = [key for key in required if key not in target.tags]
         if missing:
             raise LifecycleError(
                 f"rollback target missing lifecycle metadata: {missing}"
             )
-        source = target.source or target.tags.get("source_model_uri")
-        if not source:
+        source_model_uri = target.source or target.tags.get("source_model_uri")
+        if not source_model_uri:
             raise LifecycleError("rollback target has no source model URI")
-        self.validate_source_model_uri(source)
+        self.validate_source_model_uri(source_model_uri)
         previous = self.get_champion()
+        if previous is not None and previous.version == target.version:
+            payload = {
+                "event": "rollback",
+                "status": "already_current",
+                "model_name": self.model_name,
+                "target_version": target.version,
+                "previous_champion_version": previous.version,
+                "rolled_back_at": utc_now(),
+                "reason": reason,
+                "source": source,
+                "probation_id": probation_id,
+                "trigger_metrics": trigger_metrics or {},
+                "serving_reload_notification": {
+                    "attempted": False,
+                    "reason": "target already active champion",
+                },
+            }
+            write_json(
+                audit_path(self.report_root, "rollback", target.version),
+                payload,
+            )
+            return payload
         rolled_back_at = utc_now()
         self.client.set_registered_model_alias(
             self.model_name,
@@ -821,19 +869,39 @@ class LifecycleService:
                 "lifecycle_state": "champion",
                 "lifecycle.rollback_at": rolled_back_at,
                 "lifecycle.rollback_reason": reason or "",
+                "lifecycle.rollback_source": source,
+                "lifecycle.rollback_probation_id": probation_id or "",
                 "lifecycle.rollback_previous_champion_version": previous.version
                 if previous
                 else "",
             },
         )
+        if previous is not None:
+            set_version_tags(
+                self.client,
+                model_name=self.model_name,
+                version=previous.version,
+                tags={
+                    "lifecycle_state": "rolled_back",
+                    "lifecycle.rolled_back_at": rolled_back_at,
+                    "lifecycle.rolled_back_to_version": target.version,
+                    "lifecycle.rollback_source": source,
+                    "lifecycle.rollback_probation_id": probation_id or "",
+                },
+            )
         payload = {
             "event": "rollback",
+            "status": "succeeded",
             "model_name": self.model_name,
             "target_version": target.version,
             "previous_champion_version": previous.version if previous else None,
             "rolled_back_at": rolled_back_at,
             "reason": reason,
+            "source": source,
+            "probation_id": probation_id,
+            "trigger_metrics": trigger_metrics or {},
         }
+        payload["serving_reload_notification"] = self._notify_serving_reload()
         write_json(audit_path(self.report_root, "rollback", target.version), payload)
         return payload
 
@@ -875,6 +943,41 @@ class LifecycleService:
             return {
                 "attempted": True,
                 "success": False,
+                "error": str(exc),
+            }
+
+    def _start_probation_after_promotion(
+        self,
+        *,
+        promoted_version: str,
+        previous_champion_version: str | None,
+        promotion_timestamp: str,
+    ) -> dict[str, Any]:
+        try:
+            from sentinelml.resilience.config import load_resilience_config
+            from sentinelml.resilience.repository import ResilienceRepository
+            from sentinelml.resilience.service import ResilienceService
+
+            resilience_config = load_resilience_config()
+            if resilience_config.database_url is None:
+                return {
+                    "started": False,
+                    "reason": "resilience_database_unconfigured",
+                }
+            service = ResilienceService(
+                config=resilience_config,
+                repository=ResilienceRepository(resilience_config),
+                lifecycle_service=self,
+            )
+            return service.start_probation_after_promotion(
+                promoted_version=promoted_version,
+                previous_champion_version=previous_champion_version,
+                promotion_timestamp=promotion_timestamp,
+            )
+        except Exception as exc:
+            return {
+                "started": False,
+                "reason": "probation_start_failed",
                 "error": str(exc),
             }
 

@@ -87,6 +87,32 @@ for name, metric_type, help_text in [
         "gauge",
         "Current model lifecycle state exposed for dashboards.",
     ),
+    ("sentinelml_probation_active", "gauge", "Whether probation is active."),
+    (
+        "sentinelml_probation_promoted_model_version",
+        "gauge",
+        "Numeric promoted model version under probation.",
+    ),
+    (
+        "sentinelml_probation_labelled_rows",
+        "gauge",
+        "Labelled rows observed during active probation.",
+    ),
+    (
+        "sentinelml_probation_severe_violation",
+        "gauge",
+        "Whether probation has severe guardrail violations.",
+    ),
+    (
+        "sentinelml_promotion_pending",
+        "gauge",
+        "Whether a pending promotion retry exists.",
+    ),
+    (
+        "sentinelml_monitoring_stale",
+        "gauge",
+        "Whether the latest monitor heartbeat is stale.",
+    ),
 ]:
     monitoring_metrics.describe(name, metric_type, help_text)
 
@@ -180,6 +206,28 @@ def update_monitoring_metrics(report: dict[str, Any]) -> None:
         1,
         labels={"state": "champion_active"},
     )
+    resilience = _resilience_summary(report.get("resilience_state", {}))
+    monitoring_metrics.set_gauge(
+        "sentinelml_probation_active",
+        1 if resilience.get("active_probation") else 0,
+    )
+    monitoring_metrics.set_gauge(
+        "sentinelml_probation_promoted_model_version",
+        _numeric(resilience.get("promoted_version")),
+    )
+    monitoring_metrics.set_gauge(
+        "sentinelml_probation_labelled_rows",
+        resilience.get("labelled_rows", 0),
+    )
+    monitoring_metrics.set_gauge(
+        "sentinelml_probation_severe_violation",
+        1 if resilience.get("severe_violation") else 0,
+    )
+    monitoring_metrics.set_gauge(
+        "sentinelml_promotion_pending",
+        1 if resilience.get("promotion_pending") else 0,
+    )
+    monitoring_metrics.set_gauge("sentinelml_monitoring_stale", 0)
 
 
 def _unix_timestamp(value: str) -> float | None:
@@ -187,4 +235,42 @@ def _unix_timestamp(value: str) -> float | None:
         normalized = value.replace("Z", "+00:00")
         return datetime.fromisoformat(normalized).astimezone(UTC).timestamp()
     except Exception:
+        return None
+
+
+def _resilience_summary(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+    latest = value.get("latest")
+    if not isinstance(latest, dict):
+        return {}
+    payload = latest.get("payload", latest)
+    if not isinstance(payload, dict):
+        return {}
+    active = payload.get("active_probation")
+    if isinstance(active, dict):
+        return {
+            "active_probation": True,
+            "promoted_version": active.get("promoted_version"),
+            "labelled_rows": active.get("labelled_rows", 0),
+            "severe_violation": bool(active.get("severe_violation_reasons")),
+            "promotion_pending": False,
+        }
+    category = latest.get("category")
+    retry_payload = payload.get("outcome", {})
+    return {
+        "active_probation": False,
+        "promoted_version": None,
+        "labelled_rows": 0,
+        "severe_violation": False,
+        "promotion_pending": category == "promotion_retry"
+        and isinstance(retry_payload, dict)
+        and retry_payload.get("event") == "promotion_pending",
+    }
+
+
+def _numeric(value: object) -> float | None:
+    try:
+        return float(str(value))
+    except (TypeError, ValueError):
         return None

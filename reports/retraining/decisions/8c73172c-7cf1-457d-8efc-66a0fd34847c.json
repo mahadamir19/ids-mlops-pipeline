@@ -1,0 +1,42 @@
+{
+  "action_taken": "evaluate_only",
+  "already_processed": false,
+  "decision": "blocked_monitoring_stale",
+  "drift_share": 0.7681159420289855,
+  "drift_threshold_used": null,
+  "execution_already_processed": true,
+  "monitoring_health": "healthy",
+  "monitoring_heartbeat": {
+    "age_seconds": 406.988534,
+    "last_check_timestamp": "2026-08-15T17:50:09.101955+00:00",
+    "maximum_age_seconds": 180,
+    "monitoring_stale": true,
+    "reason": "monitoring_stale"
+  },
+  "monitoring_run_id": "8c73172c-7cf1-457d-8efc-66a0fd34847c",
+  "monitoring_status": "healthy",
+  "monitoring_timestamp": "2026-08-15T17:50:09.101955+00:00",
+  "performance_metrics": {
+    "attack_recall": 0.9969135802469136,
+    "f1": 0.9984544049459042,
+    "false_positive_rate": 0.0,
+    "support": {
+      "labelled_rows": 500,
+      "true_attack": 324,
+      "true_benign": 176
+    }
+  },
+  "performance_thresholds": {
+    "baseline_f1": 0.031746031746031744,
+    "max_false_positive_rate": 0.003519356460532931,
+    "min_attack_recall": 0.016363636363636365,
+    "min_f1": -0.06825396825396826,
+    "source": "phase4_threshold_report"
+  },
+  "performance_unavailable_reasons": [],
+  "reason": "blocked_monitoring_stale",
+  "should_retrain": false,
+  "trigger_data_drift": false,
+  "trigger_performance_degradation": false,
+  "trigger_reasons": []
+}

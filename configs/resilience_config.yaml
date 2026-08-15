@@ -1,0 +1,33 @@
+resilience:
+  poll_interval_seconds: 30
+
+probation:
+  enabled: true
+  duration_seconds: 300
+  minimum_labelled_rows: 20
+  minimum_attack_support: 1
+  minimum_benign_support: 1
+
+automatic_rollback:
+  enabled: true
+  severe_guardrails:
+    min_attack_recall: 0.10
+    min_f1: 0.05
+    max_false_positive_rate: 0.25
+    threshold_source: phase9_config_smoke_guardrails
+
+monitoring:
+  maximum_heartbeat_age_seconds: 180
+
+promotion_retry:
+  enabled: true
+  retry_interval_seconds: 60
+  max_attempts: 5
+
+paths:
+  resilience_reports: reports/resilience
+
+database:
+  url_env: SENTINELML_DATABASE_URL
+  connect_timeout_seconds: 5
+  statement_timeout_ms: 5000

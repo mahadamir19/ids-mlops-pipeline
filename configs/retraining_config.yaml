@@ -17,6 +17,9 @@ performance:
   max_false_positive_rate: null
   max_f1_drop: 0.10
 
+monitoring:
+  maximum_heartbeat_age_seconds: 180
+
 dataset:
   historical_source: data/processed/train.parquet
   max_historical_rows_smoke: 20000

@@ -74,6 +74,9 @@ class ModelManager:
         self.client = client or self.mlflow.MlflowClient()
         self.model_loader = model_loader or self._load_model_artifact
         self.schema_path = schema_path or config.schema_path
+        self.last_registry_error: str | None = None
+        self.last_reload_error: str | None = None
+        self.last_resolved_registry_version: str | None = None
 
     def load_startup(self) -> LoadedModel:
         loaded = self._load_champion()
@@ -93,22 +96,76 @@ class ModelManager:
 
     def reload_champion(self, *, force: bool = False) -> dict[str, Any]:
         previous = self.current()
-        champion = self._resolve_champion()
-        if not force and champion.version == previous.model_version:
+        try:
+            champion = self._resolve_champion()
+        except Exception as exc:
+            self.last_reload_error = str(exc)
             return {
                 "reloaded": False,
+                "success": False,
                 "previous_model_version": previous.model_version,
                 "active_model_version": previous.model_version,
+                "registry_champion_version": None,
+                "message": "registry champion could not be resolved",
+                "error": str(exc),
+            }
+        if not force and champion.version == previous.model_version:
+            self.last_reload_error = None
+            return {
+                "reloaded": False,
+                "success": True,
+                "previous_model_version": previous.model_version,
+                "active_model_version": previous.model_version,
+                "registry_champion_version": champion.version,
                 "message": "loaded champion already matches registry alias",
             }
-        loaded = self._build_loaded_model(champion)
+        try:
+            loaded = self._build_loaded_model(champion)
+        except Exception as exc:
+            self.last_reload_error = str(exc)
+            return {
+                "reloaded": False,
+                "success": False,
+                "previous_model_version": previous.model_version,
+                "active_model_version": previous.model_version,
+                "registry_champion_version": champion.version,
+                "message": "champion reload failed; previous model remains active",
+                "error": str(exc),
+            }
         with self._lock:
             self._active = loaded
+        self.last_reload_error = None
         return {
             "reloaded": True,
+            "success": True,
             "previous_model_version": previous.model_version,
             "active_model_version": loaded.model_version,
+            "registry_champion_version": champion.version,
             "message": "champion reloaded successfully",
+        }
+
+    def registry_status(self) -> dict[str, Any]:
+        active_version = self.current().model_version if self.is_ready() else None
+        try:
+            champion = self._resolve_champion()
+        except Exception as exc:
+            self.last_registry_error = str(exc)
+            return {
+                "connectivity": "unavailable",
+                "registry_champion_version": self.last_resolved_registry_version,
+                "loaded_model_version": active_version,
+                "divergent": False,
+                "error": str(exc),
+                "last_reload_error": self.last_reload_error,
+            }
+        divergent = active_version is not None and champion.version != active_version
+        return {
+            "connectivity": "available",
+            "registry_champion_version": champion.version,
+            "loaded_model_version": active_version,
+            "divergent": divergent,
+            "error": None,
+            "last_reload_error": self.last_reload_error,
         }
 
     def _load_champion(self) -> LoadedModel:
@@ -130,6 +187,8 @@ class ModelManager:
                 f"registry alias resolved to version {champion.version} with "
                 f"lifecycle_state={champion.lifecycle_state!r}, not 'champion'"
             )
+        self.last_registry_error = None
+        self.last_resolved_registry_version = champion.version
         return champion
 
     def _build_loaded_model(self, version: ModelVersionInfo) -> LoadedModel:

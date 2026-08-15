@@ -32,4 +32,6 @@ RUN pip install --no-build-isolation --no-deps -e . \
 
 USER appuser
 
+EXPOSE 9201
+
 CMD ["python", "scripts/run_phase8_retraining.py", "--watch"]

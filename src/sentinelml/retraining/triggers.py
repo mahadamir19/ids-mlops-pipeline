@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 from sentinelml.retraining.config import RetrainingConfig
@@ -95,6 +96,17 @@ def evaluate_trigger(
             else "blocked_monitoring_unhealthy"
         )
         decision.update({"decision": blocked, "reason": blocked})
+        return decision
+    heartbeat = _monitoring_heartbeat_status(monitoring_report, config)
+    decision["monitoring_heartbeat"] = heartbeat
+    if heartbeat["monitoring_stale"]:
+        decision.update(
+            {
+                "decision": "blocked_monitoring_stale",
+                "reason": "blocked_monitoring_stale",
+                "should_retrain": False,
+            }
+        )
         return decision
 
     if config.drift_enabled:
@@ -195,3 +207,50 @@ def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
     return float(value)
+
+
+def _monitoring_heartbeat_status(
+    monitoring_report: dict[str, Any],
+    config: RetrainingConfig,
+) -> dict[str, Any]:
+    maximum_age = config.monitoring_maximum_heartbeat_age_seconds
+    timestamp = monitoring_report.get("last_check_timestamp") or monitoring_report.get(
+        "finished_at"
+    )
+    if maximum_age is None:
+        return {
+            "monitoring_stale": False,
+            "reason": "heartbeat_staleness_disabled",
+            "last_check_timestamp": timestamp,
+            "age_seconds": None,
+            "maximum_age_seconds": None,
+        }
+    if not timestamp:
+        return {
+            "monitoring_stale": True,
+            "reason": "monitoring_heartbeat_missing",
+            "last_check_timestamp": None,
+            "age_seconds": None,
+            "maximum_age_seconds": maximum_age,
+        }
+    try:
+        checked_at = datetime.fromisoformat(
+            str(timestamp).replace("Z", "+00:00")
+        ).astimezone(UTC)
+    except ValueError:
+        return {
+            "monitoring_stale": True,
+            "reason": "monitoring_heartbeat_invalid",
+            "last_check_timestamp": timestamp,
+            "age_seconds": None,
+            "maximum_age_seconds": maximum_age,
+        }
+    age = (datetime.now(UTC) - checked_at).total_seconds()
+    stale = age > maximum_age
+    return {
+        "monitoring_stale": stale,
+        "reason": "monitoring_stale" if stale else "monitoring_fresh",
+        "last_check_timestamp": checked_at.isoformat(),
+        "age_seconds": max(0.0, float(age)),
+        "maximum_age_seconds": maximum_age,
+    }

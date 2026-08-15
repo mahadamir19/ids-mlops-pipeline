@@ -12,6 +12,11 @@ class HealthResponse(BaseModel):
     process_alive: bool
     model_ready: bool
     model_version: str | None
+    inference_ready: bool
+    registry_connectivity: Literal["available", "unavailable"]
+    registry_champion_version: str | None
+    loaded_registry_divergence: bool
+    reload_error: str | None = None
     database_logging: str
     queue_depth: int
     malformed_queue_records: int
@@ -29,6 +34,10 @@ class ModelResponse(BaseModel):
     feature_schema_path: str
     feature_schema_fingerprint: str
     feature_count: int
+    registry_champion_version: str | None = None
+    registry_connectivity: Literal["available", "unavailable"] = "available"
+    loaded_registry_divergence: bool = False
+    reload_error: str | None = None
 
 
 class PredictionResponse(BaseModel):
@@ -68,9 +77,12 @@ class BatchGroundTruthResponse(BaseModel):
 
 class ReloadResponse(BaseModel):
     reloaded: bool
+    success: bool = True
     previous_model_version: str | None
     active_model_version: str
+    registry_champion_version: str | None = None
     message: str
+    error: str | None = None
 
 
 class QueueStatusResponse(BaseModel):

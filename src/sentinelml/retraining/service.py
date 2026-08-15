@@ -123,6 +123,7 @@ class RetrainingService:
         decision = self.evaluate_trigger_report(report)
         if decision["decision"] in {
             "blocked_monitoring_unhealthy",
+            "blocked_monitoring_stale",
             "blocked_monitoring_warming_up",
             "not_triggered",
         }:
