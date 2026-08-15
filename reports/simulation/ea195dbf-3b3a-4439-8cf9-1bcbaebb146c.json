@@ -2,27 +2,27 @@
   "affected_features": [],
   "errors_summary": [],
   "failed_labels": [],
-  "finished_at": "2026-08-15T16:58:13.685074+00:00",
+  "finished_at": "2026-08-15T16:50:02.040495+00:00",
   "label_delivery_mode": "randomized",
-  "labels_delivered": 50,
+  "labels_delivered": 8,
   "labels_failed": 0,
   "labels_pending": 0,
   "model_versions_observed": {
-    "2": 50
+    "2": 8
   },
   "prediction_class_distribution": {
-    "ATTACK": 1,
-    "BENIGN": 49
+    "ATTACK": 2,
+    "BENIGN": 6
   },
-  "request_count_attempted": 50,
+  "request_count_attempted": 8,
   "requests_failed": 0,
-  "requests_succeeded": 50,
+  "requests_succeeded": 8,
   "scenario": "normal",
   "scenario_category": "healthy_baseline",
   "scenario_parameters": {},
-  "seed": 805,
-  "simulation_fingerprint": "e680c52bf2fb5b38a27888b642fbd82eeafad7a60ffb9c2cc3cea2ef820d3c5f",
-  "simulation_run_id": "9b590c71-070d-43b4-bea1-202b56b40a54",
+  "seed": 850,
+  "simulation_fingerprint": "2eea06c24cd66859d683f18368461e0a6807ceae37809413f03d8c93f0b4b58f",
+  "simulation_run_id": "ea195dbf-3b3a-4439-8cf9-1bcbaebb146c",
   "source": {
     "fingerprint": "31d629138332bb736c19a44b0549c10638ec6d5c250339c03d9e0f3e1a87e168",
     "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
@@ -33,10 +33,10 @@
       "1": 20236
     }
   },
-  "started_at": "2026-08-15T16:58:10.053569+00:00",
+  "started_at": "2026-08-15T16:50:00.759920+00:00",
   "true_class_distribution": {
-    "0": 49,
-    "1": 1
+    "0": 6,
+    "1": 2
   },
   "undelivered_labels": []
 }

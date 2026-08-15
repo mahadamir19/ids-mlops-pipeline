@@ -1,24 +1,25 @@
 {
-  "action_taken": "skipped",
-  "already_processed": true,
-  "decision": "already_processed",
+  "action_taken": "disabled",
+  "already_processed": false,
+  "decision": "triggered",
   "drift_share": 0.8115942028985508,
-  "drift_threshold_used": null,
-  "execution_already_processed": true,
+  "drift_threshold_used": "phase7.configured_data_drift_detected",
+  "execution_already_processed": false,
   "monitoring_health": "healthy",
-  "monitoring_run_id": "d2109e07-ea84-4896-8e11-6a52e2ba2c6e",
+  "monitoring_run_id": "a9b9b57f-798d-4ed5-ba8f-4932b8185551",
   "monitoring_status": "healthy",
-  "monitoring_timestamp": "2026-08-15T15:00:51.354445+00:00",
+  "monitoring_timestamp": "2026-08-15T16:49:36.314953+00:00",
   "performance_metrics": {
-    "attack_recall": 0.9946236559139785,
-    "f1": 0.9973045822102425,
+    "attack_recall": 0.9945945945945946,
+    "f1": 0.997289972899729,
     "false_positive_rate": 0.0,
     "support": {
       "labelled_rows": 500,
-      "true_attack": 372,
-      "true_benign": 128
+      "true_attack": 370,
+      "true_benign": 130
     }
   },
+  "performance_reasons": [],
   "performance_thresholds": {
     "baseline_f1": 0.031746031746031744,
     "max_false_positive_rate": 0.003519356460532931,
@@ -27,9 +28,11 @@
     "source": "phase4_threshold_report"
   },
   "performance_unavailable_reasons": [],
-  "reason": "monitoring_run_already_processed",
+  "reason": "retraining_disabled",
   "should_retrain": false,
-  "trigger_data_drift": false,
+  "trigger_data_drift": true,
   "trigger_performance_degradation": false,
-  "trigger_reasons": []
+  "trigger_reasons": [
+    "data_drift"
+  ]
 }

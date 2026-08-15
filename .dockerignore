@@ -18,19 +18,24 @@ docker/.env
 
 data/
 !data/
+!data/raw.dvc
 !data/reference/
 !data/reference/reference.parquet
 mlruns/
 mlflow.db
 notebooks/
 tests/
-scripts/
 *.egg-info/
 
 reports/**
 !reports/
 !reports/data/
 !reports/data/feature_schema.json
+!reports/models/
+!reports/models/phase2_smoke/
+!reports/models/phase2_smoke/**
+!reports/lifecycle/
+!reports/lifecycle/threshold_derivation.json
 
 *.jsonl
 *.malformed.*

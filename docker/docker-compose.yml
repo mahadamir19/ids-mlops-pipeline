@@ -61,7 +61,7 @@ services:
   mlflow-server:
     build:
       context: ..
-      dockerfile: docker/api.Dockerfile
+      dockerfile: docker/mlflow.Dockerfile
     container_name: sentinelml-mlflow-server
     restart: unless-stopped
     depends_on:
@@ -145,9 +145,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ../src:/app/src:ro
-      - ../configs:/app/configs:ro
-      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
       - ../.tmp/serving:/app/.tmp/serving
     healthcheck:
       test:
@@ -182,9 +179,6 @@ services:
     ports:
       - "${SENTINELML_MONITOR_PORT:-9101}:9101"
     volumes:
-      - ../src:/app/src:ro
-      - ../configs:/app/configs:ro
-      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
       - ../data/reference/reference.parquet:/app/data/reference/reference.parquet:ro
       - ../reports/monitoring:/app/reports/monitoring
     healthcheck:
@@ -202,7 +196,7 @@ services:
   retrainer:
     build:
       context: ..
-      dockerfile: docker/api.Dockerfile
+      dockerfile: docker/retrainer.Dockerfile
     container_name: sentinelml-retrainer
     restart: unless-stopped
     depends_on:
@@ -226,17 +220,9 @@ services:
       - scripts/run_phase8_retraining.py
       - --watch
     volumes:
-      - ../src:/app/src:ro
-      - ../scripts:/app/scripts:ro
-      - ../configs:/app/configs:ro
       - ../reports:/app/reports
       - ../data/processed/train.parquet:/app/data/processed/train.parquet:ro
       - ../data/processed/validation.parquet:/app/data/processed/validation.parquet:ro
-      - ../data/raw.dvc:/app/data/raw.dvc:ro
-      - ../dvc.yaml:/app/dvc.yaml:ro
-      - ../dvc.lock:/app/dvc.lock:ro
-      - ../pylock.toml:/app/pylock.toml:ro
-      - ../.git:/app/.git:ro
 
   prometheus:
     image: prom/prometheus:v3.5.0

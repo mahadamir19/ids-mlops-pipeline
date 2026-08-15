@@ -1,0 +1,23 @@
+services:
+  api:
+    volumes:
+      - ../src:/app/src:ro
+      - ../configs:/app/configs:ro
+      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
+
+  monitor:
+    volumes:
+      - ../src:/app/src:ro
+      - ../configs:/app/configs:ro
+      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
+
+  retrainer:
+    volumes:
+      - ../src:/app/src:ro
+      - ../scripts:/app/scripts:ro
+      - ../configs:/app/configs:ro
+      - ../data/raw.dvc:/app/data/raw.dvc:ro
+      - ../dvc.yaml:/app/dvc.yaml:ro
+      - ../dvc.lock:/app/dvc.lock:ro
+      - ../pylock.toml:/app/pylock.toml:ro
+      - ../.git:/app/.git:ro

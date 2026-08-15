@@ -3,7 +3,7 @@
   "canonical_dataset": {
     "attack_count": 55,
     "benign_count": 9945,
-    "created_at": "2026-08-15T15:02:53.535157+00:00",
+    "created_at": "2026-08-15T17:01:55.184223+00:00",
     "evaluation_type": "lifecycle_promotion_validation",
     "feature_schema_path": "/app/reports/data/feature_schema.json",
     "feature_schema_sha256": "7012d012649d968207368c371fa65e5dbb983ae3064ea42e5ecb3666a5dd485b",
@@ -23,7 +23,7 @@
       "1": 55
     }
   },
-  "evaluated_at": "2026-08-15T15:03:07.501048+00:00",
+  "evaluated_at": "2026-08-15T17:02:13.056230+00:00",
   "evaluation_type": "lifecycle_promotion_validation",
   "event": "baseline_evaluated",
   "execution_mode": "smoke",
@@ -39,11 +39,11 @@
     "f1": 0.031746031746031744,
     "false_negative_rate": 0.9818181818181818,
     "false_positive_rate": 0.0007038712921065862,
-    "inference_latency_ms_per_row": 0.01152975829973002,
-    "inference_time_seconds": 0.1152975829973002,
+    "inference_latency_ms_per_row": 0.009209934799991971,
+    "inference_time_seconds": 0.0920993479999197,
     "pr_auc": 0.48389957383668103,
     "precision": 0.125,
-    "promotion_evaluation_seconds": 0.18872960899898317,
+    "promotion_evaluation_seconds": 0.1602095999996891,
     "recall": 0.01818181818181818,
     "roc_auc": 0.9971479500891266,
     "rows": 10000
