@@ -1,0 +1,33 @@
+{
+  "event": "registered",
+  "model_name": "sentinelml-ids",
+  "model_version": "7",
+  "registered": true,
+  "reused": false,
+  "source_model_uri": "models:/m-97e3c70834af469aa17cb3470502fdc3",
+  "source_run_id": "de3fb700a53344589979a9ef67d206e9",
+  "tags": {
+    "candidate_source": "continuous_retraining",
+    "dataset_fingerprint": "c2c812882831118dd0a9283f536da2ab3897d4d2b1c7a1add0e1a63db1e40511",
+    "demo_model": "true",
+    "dependency_lock_sha256": "19e28007df0c3599fc45dedb39dce3d5f81b8c258613f228e517a18ad9d8011b",
+    "dvc_lock_sha256": "deeb41c99fcd8ce3115f461f6e01dd2abbba7a3f04741896e4cceb2302540b80",
+    "evaluation_source": "phase8_canonical_promotion_validation",
+    "execution_mode": "smoke",
+    "git_commit": null,
+    "lifecycle.metrics_json": "{\"accuracy\":0.9944,\"attack_class_recall\":0.07272727272727272,\"confusion_matrix\":{\"fn\":51,\"fp\":5,\"tn\":9940,\"tp\":4},\"f1\":0.125,\"false_negative_rate\":0.9272727272727272,\"false_positive_rate\":0.0005027652086475615,\"inference_latency_ms_per_row\":0.005011371000000509,\"inference_time_seconds\":0.050113710000005085,\"pr_auc\":0.36391076578301834,\"precision\":0.4444444444444444,\"promotion_evaluation_seconds\":0.2904156500007957,\"recall\":0.07272727272727272,\"roc_auc\":0.9940344622697563,\"rows\":10000}",
+    "lifecycle.validation_metrics_json": "{\"accuracy\":0.9944,\"attack_class_recall\":0.07272727272727272,\"confusion_matrix\":{\"fn\":51,\"fp\":5,\"tn\":9940,\"tp\":4},\"f1\":0.125,\"false_negative_rate\":0.9272727272727272,\"false_positive_rate\":0.0005027652086475615,\"inference_latency_ms_per_row\":0.005011371000000509,\"inference_time_seconds\":0.050113710000005085,\"pr_auc\":0.36391076578301834,\"precision\":0.4444444444444444,\"promotion_evaluation_seconds\":0.2904156500007957,\"recall\":0.07272727272727272,\"roc_auc\":0.9940344622697563,\"rows\":10000}",
+    "lifecycle_state": "candidate",
+    "model_family": "xgboost",
+    "optimization_config_sha256": "not_used_continuous_retraining",
+    "registered_at": "2026-08-15T15:02:48.310909+00:00",
+    "retraining_run_id": "08e5c54a-1e2a-41ea-946e-5f986c785867",
+    "source": "continuous_retraining",
+    "source_model_uri": "models:/m-97e3c70834af469aa17cb3470502fdc3",
+    "source_optuna_run_id": "not_used_continuous_retraining",
+    "source_run_id": "de3fb700a53344589979a9ef67d206e9",
+    "test_data_consulted": "false",
+    "training_config_sha256": "7c14d875e72b820bad44c9e4eac74d696351784234c583c0856b8193de7ed725",
+    "trigger_monitoring_run_id": "d2109e07-ea84-4896-8e11-6a52e2ba2c6e"
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "candidate_source": "continuous_retraining",
+  "configuration": {
+    "feature_schema_sha256": "7012d012649d968207368c371fa65e5dbb983ae3064ea42e5ecb3666a5dd485b",
+    "optimization_config_sha256": "not_used_continuous_retraining",
+    "training_config_sha256": "7c14d875e72b820bad44c9e4eac74d696351784234c583c0856b8193de7ed725"
+  },
+  "created_at_utc": "2026-08-15T14:15:55.149023+00:00",
+  "dependencies": {
+    "dependency_lock_file": "/app/pylock.toml",
+    "dependency_lock_name": "pylock.toml",
+    "dependency_lock_sha256": "19e28007df0c3599fc45dedb39dce3d5f81b8c258613f228e517a18ad9d8011b",
+    "dependency_lock_size_bytes": 70307,
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "python_version": "3.14.7 (main, Aug  5 2026, 16:32:40) [GCC 14.2.0]"
+  },
+  "dvc": {
+    "dvc_lock_sha256": "deeb41c99fcd8ce3115f461f6e01dd2abbba7a3f04741896e4cceb2302540b80",
+    "dvc_status_clean": null,
+    "raw_dvc_sha256": "901d6a18d014de533f7b703b7dfbf46612ba7d7c2f6f7197a7cb77e597cb1545"
+  },
+  "evaluation": {
+    "effective_device": "cpu",
+    "promotion_validation_metadata": {
+      "attack_count": 55,
+      "benign_count": 9945,
+      "created_at": "2026-08-15T14:15:28.588827+00:00",
+      "evaluation_type": "lifecycle_promotion_validation",
+      "feature_schema_path": "/app/reports/data/feature_schema.json",
+      "feature_schema_sha256": "7012d012649d968207368c371fa65e5dbb983ae3064ea42e5ecb3666a5dd485b",
+      "max_positive_fraction": 0.05,
+      "min_positive_rows": 50,
+      "random_seed": 52,
+      "sample_size_requested": 10000,
+      "sampling_strategy": "stratified_min_positive",
+      "selected_row_count": 10000,
+      "selected_row_fingerprint": "a4d545c4e80dd9ce83828a13a20e532cf11a41c5030ce969543bd6e1441b38fc",
+      "selected_row_fingerprint_algorithm": "sha256(newline-separated source row positions)",
+      "source_path": "/app/data/processed/validation.parquet",
+      "source_row_count": 398434,
+      "split": "validation",
+      "target_distribution": {
+        "0": 9945,
+        "1": 55
+      }
+    },
+    "test_data_consulted": false,
+    "test_metrics": null,
+    "training_metrics": {
+      "accuracy": 0.9998136501281155,
+      "attack_class_recall": 1.0,
+      "confusion_matrix": {
+        "fn": 0,
+        "fp": 4,
+        "tn": 18235,
+        "tp": 3226
+      },
+      "f1": 0.9993804213135068,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 0.00021931026920335545,
+      "inference_latency_ms_per_row": 0.005109064337316561,
+      "inference_time_seconds": 0.1096660660005,
+      "pr_auc": 1.0,
+      "precision": 0.9987616099071207,
+      "recall": 1.0,
+      "roc_auc": 1.0,
+      "rows": 21465
+    },
+    "training_time_seconds": 1.8134162979986286,
+    "validation_metrics": {
+      "accuracy": 0.9941,
+      "attack_class_recall": 0.05454545454545454,
+      "confusion_matrix": {
+        "fn": 52,
+        "fp": 7,
+        "tn": 9938,
+        "tp": 3
+      },
+      "f1": 0.09230769230769231,
+      "false_negative_rate": 0.9454545454545454,
+      "false_positive_rate": 0.0007038712921065862,
+      "inference_latency_ms_per_row": 0.0040284040998813,
+      "inference_time_seconds": 0.040284040998813,
+      "pr_auc": 0.33880957041711557,
+      "precision": 0.3,
+      "promotion_evaluation_seconds": 0.3115682679999736,
+      "recall": 0.05454545454545454,
+      "roc_auc": 0.993604826546003,
+      "rows": 10000
+    }
+  },
+  "git": {
+    "branch": null,
+    "commit": null,
+    "dirty": null
+  },
+  "mlflow": {
+    "experiment_name": "sentinelml-retraining",
+    "final_candidate_run_id": "ecee28e7123f480ba7ada9395b88def7",
+    "logged_model_uri": "models:/m-0427834fbdfd4914bb01d49b95c400c6",
+    "model_flavor": "xgboost"
+  },
+  "model_family": "xgboost",
+  "model_name": "sentinelml-ids",
+  "random_seed": 42,
+  "registry_state": {
+    "model_version": null,
+    "registered": false
+  },
+  "retraining": {
+    "dataset_fingerprint": "d3ea6b58de6be5e99ab9ef9f64bf314b4888b036e16f2d86be107352956afb70",
+    "dataset_manifest_path": "/app/reports/retraining/d0113679-027e-4ba2-bd86-7e79806820a6/dataset_manifest.json",
+    "retraining_run_id": "d0113679-027e-4ba2-bd86-7e79806820a6",
+    "source_champion_model_uri": "models:/m-c0bf4f95cd1a4b5a982f0ee98b115dda",
+    "source_champion_run_id": "5fa935449c1c4942af902def85b49f06",
+    "source_champion_version": "2",
+    "trigger_decision": {
+      "action_taken": "evaluate_only",
+      "already_processed": false,
+      "decision": "triggered",
+      "drift_share": 0.782608695652174,
+      "drift_threshold_used": "phase7.configured_data_drift_detected",
+      "eligible_new_approved_production_rows": 2470,
+      "execution_already_processed": false,
+      "monitoring_health": "healthy",
+      "monitoring_run_id": "f134ed23-0a6d-43c7-9f07-3c8697495ff3",
+      "monitoring_status": "healthy",
+      "monitoring_timestamp": "2026-08-15T13:45:24.721464+00:00",
+      "performance_metrics": {
+        "attack_recall": 0.9973333333333333,
+        "f1": 0.9986648865153538,
+        "false_positive_rate": 0.0,
+        "support": {
+          "labelled_rows": 500,
+          "true_attack": 375,
+          "true_benign": 125
+        }
+      },
+      "performance_reasons": [],
+      "performance_thresholds": {
+        "baseline_f1": 0.03076923076923077,
+        "max_false_positive_rate": 0.004524886877828055,
+        "min_attack_recall": 0.016363636363636365,
+        "min_f1": -0.06923076923076923,
+        "source": "phase4_threshold_report"
+      },
+      "performance_unavailable_reasons": [],
+      "should_retrain": true,
+      "trigger_data_drift": true,
+      "trigger_performance_degradation": false,
+      "trigger_reasons": [
+        "data_drift"
+      ]
+    },
+    "trigger_monitoring_run_id": "f134ed23-0a6d-43c7-9f07-3c8697495ff3",
+    "trigger_reasons": [
+      "data_drift"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_optimization": {
+    "best_trial_mlflow_run_id": "not_used_continuous_retraining",
+    "execution_mode": "smoke",
+    "note": "Optuna is intentionally not run during Phase 8 automatic retraining."
+  },
+  "winning_hyperparameters": {
+    "base_score": null,
+    "booster": null,
+    "callbacks": null,
+    "colsample_bylevel": null,
+    "colsample_bynode": null,
+    "colsample_bytree": 0.6624074561769746,
+    "device": "cpu",
+    "early_stopping_rounds": null,
+    "enable_categorical": true,
+    "eval_metric": "aucpr",
+    "feature_types": null,
+    "feature_weights": null,
+    "gamma": null,
+    "grow_policy": null,
+    "importance_type": null,
+    "interaction_constraints": null,
+    "learning_rate": 0.10790061933340454,
+    "max_bin": null,
+    "max_cat_threshold": null,
+    "max_cat_to_onehot": null,
+    "max_delta_step": null,
+    "max_depth": 10,
+    "max_leaves": null,
+    "min_child_weight": 2.0919616423534184,
+    "missing": NaN,
+    "monotone_constraints": null,
+    "multi_strategy": null,
+    "n_estimators": 160,
+    "n_jobs": 1,
+    "num_parallel_tree": null,
+    "objective": "binary:logistic",
+    "random_state": 42,
+    "reg_alpha": 2.231010801867921e-06,
+    "reg_lambda": 2.962151658830348,
+    "sampling_method": null,
+    "scale_pos_weight": 5.653750774953503,
+    "subsample": 0.8394633936788146,
+    "tree_method": "hist",
+    "validate_parameters": null,
+    "verbosity": 0
+  }
+}

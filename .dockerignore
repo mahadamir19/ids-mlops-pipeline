@@ -17,6 +17,9 @@ __pycache__/
 docker/.env
 
 data/
+!data/
+!data/reference/
+!data/reference/reference.parquet
 mlruns/
 mlflow.db
 notebooks/

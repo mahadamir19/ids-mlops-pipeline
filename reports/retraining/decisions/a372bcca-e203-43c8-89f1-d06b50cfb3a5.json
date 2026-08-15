@@ -1,0 +1,34 @@
+{
+  "action_taken": "skipped",
+  "already_processed": false,
+  "decision": "blocked_monitoring_unhealthy",
+  "drift_share": null,
+  "drift_threshold_used": null,
+  "monitoring_health": "unhealthy",
+  "monitoring_run_id": "a372bcca-e203-43c8-89f1-d06b50cfb3a5",
+  "monitoring_status": "unhealthy",
+  "monitoring_timestamp": "2026-08-15T12:54:23.324217+00:00",
+  "performance_metrics": {
+    "attack_recall": null,
+    "f1": null,
+    "false_positive_rate": null,
+    "support": {
+      "labelled_rows": 0,
+      "true_attack": 0,
+      "true_benign": 0
+    }
+  },
+  "performance_thresholds": {
+    "baseline_f1": 0.03076923076923077,
+    "max_false_positive_rate": 0.004524886877828055,
+    "min_attack_recall": 0.016363636363636365,
+    "min_f1": -0.06923076923076923,
+    "source": "phase4_threshold_report"
+  },
+  "performance_unavailable_reasons": [],
+  "reason": "blocked_monitoring_unhealthy",
+  "should_retrain": false,
+  "trigger_data_drift": false,
+  "trigger_performance_degradation": false,
+  "trigger_reasons": []
+}

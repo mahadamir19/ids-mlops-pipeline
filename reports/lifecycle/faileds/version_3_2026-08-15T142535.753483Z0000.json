@@ -1,0 +1,9 @@
+{
+  "error": "previous Phase 8 lifecycle evaluation failed before CPU-safe model loading fix: cudaErrorInsufficientDriver",
+  "event": "failed",
+  "failed_at": "2026-08-15T14:25:35.066178+00:00",
+  "model_name": "sentinelml-ids",
+  "model_version": "3",
+  "monitoring_run_id": "f134ed23-0a6d-43c7-9f07-3c8697495ff3",
+  "retraining_run_id": "d0113679-027e-4ba2-bd86-7e79806820a6"
+}

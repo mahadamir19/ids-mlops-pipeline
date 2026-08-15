@@ -161,6 +161,120 @@ services:
       timeout: 5s
       retries: 18
 
+  monitor:
+    build:
+      context: ..
+      dockerfile: docker/monitor.Dockerfile
+    container_name: sentinelml-monitor
+    restart: unless-stopped
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      SENTINELML_DATABASE_URL: postgresql+psycopg2://${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}:${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}@app-postgres:5432/${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+    command:
+      - uvicorn
+      - sentinelml.monitoring.app:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9101"
+    ports:
+      - "${SENTINELML_MONITOR_PORT:-9101}:9101"
+    volumes:
+      - ../src:/app/src:ro
+      - ../configs:/app/configs:ro
+      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
+      - ../data/reference/reference.parquet:/app/data/reference/reference.parquet:ro
+      - ../reports/monitoring:/app/reports/monitoring
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:9101/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
+  retrainer:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: sentinelml-retrainer
+    restart: unless-stopped
+    depends_on:
+      mlflow-server:
+        condition: service_healthy
+      app-postgres:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow-server:5000
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-sentinelml}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      AWS_DEFAULT_REGION: us-east-1
+      SENTINELML_DATABASE_URL: postgresql+psycopg2://${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}:${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}@app-postgres:5432/${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+      SENTINELML_SERVING_RELOAD_URL: http://api:8000/internal/reload
+      SENTINELML_RETRAINING_ENABLED: ${SENTINELML_RETRAINING_ENABLED:-false}
+    command:
+      - python
+      - scripts/run_phase8_retraining.py
+      - --watch
+    volumes:
+      - ../src:/app/src:ro
+      - ../scripts:/app/scripts:ro
+      - ../configs:/app/configs:ro
+      - ../reports:/app/reports
+      - ../data/processed/train.parquet:/app/data/processed/train.parquet:ro
+      - ../data/processed/validation.parquet:/app/data/processed/validation.parquet:ro
+      - ../data/raw.dvc:/app/data/raw.dvc:ro
+      - ../dvc.yaml:/app/dvc.yaml:ro
+      - ../dvc.lock:/app/dvc.lock:ro
+      - ../pylock.toml:/app/pylock.toml:ro
+      - ../.git:/app/.git:ro
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: sentinelml-prometheus
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+      monitor:
+        condition: service_healthy
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:12.1.0
+    container_name: sentinelml-grafana
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_started
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
 volumes:
   mlflow_postgres_data:
     name: mlflow_mlflow_postgres_data
@@ -168,3 +282,7 @@ volumes:
     name: mlflow_mlflow_minio_data
   app_postgres_data:
     name: sentinelml_app_postgres_data
+  prometheus_data:
+    name: sentinelml_prometheus_data
+  grafana_data:
+    name: sentinelml_grafana_data

@@ -1,0 +1,38 @@
+{
+  "action_taken": "disabled",
+  "already_processed": false,
+  "decision": "triggered",
+  "drift_share": 0.782608695652174,
+  "drift_threshold_used": "phase7.configured_data_drift_detected",
+  "execution_already_processed": false,
+  "monitoring_health": "healthy",
+  "monitoring_run_id": "8b354845-2ad0-4ff6-9e46-a024c3be3db0",
+  "monitoring_status": "healthy",
+  "monitoring_timestamp": "2026-08-15T14:43:48.811200+00:00",
+  "performance_metrics": {
+    "attack_recall": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "support": {
+      "labelled_rows": 500,
+      "true_attack": 375,
+      "true_benign": 125
+    }
+  },
+  "performance_reasons": [],
+  "performance_thresholds": {
+    "baseline_f1": 0.03076923076923077,
+    "max_false_positive_rate": 0.004524886877828055,
+    "min_attack_recall": 0.016363636363636365,
+    "min_f1": -0.06923076923076923,
+    "source": "phase4_threshold_report"
+  },
+  "performance_unavailable_reasons": [],
+  "reason": "retraining_disabled",
+  "should_retrain": false,
+  "trigger_data_drift": true,
+  "trigger_performance_degradation": false,
+  "trigger_reasons": [
+    "data_drift"
+  ]
+}

@@ -18,6 +18,7 @@ from sentinelml.lifecycle.registry import ModelVersionInfo, get_champion
 from sentinelml.serving.config import ServingConfig
 from sentinelml.serving.validation import FeatureSchema, load_serving_feature_schema
 from sentinelml.tracking.mlflow import configure_mlflow_runtime_environment
+from sentinelml.training.gpu import force_estimator_cpu
 
 
 class ModelLoadError(RuntimeError):
@@ -160,7 +161,7 @@ class ModelManager:
                 continue
             try:
                 with _patched_accessible_temporary_directory():
-                    return loader(model_uri)
+                    return force_estimator_cpu(loader(model_uri))
             except Exception:
                 continue
         raise ModelLoadError(f"unable to load model artifact from MLflow: {model_uri}")

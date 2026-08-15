@@ -49,6 +49,7 @@ def configure_mlflow_runtime_environment(repo_root: Path = PROJECT_ROOT) -> str:
         )
     os.environ.setdefault("AWS_DEFAULT_REGION", "us-east-1")
     os.environ.setdefault("MLFLOW_S3_ENDPOINT_URL", "http://127.0.0.1:9000")
+    os.environ.setdefault("GIT_PYTHON_REFRESH", "quiet")
 
     return os.environ.setdefault(
         "MLFLOW_TRACKING_URI",
@@ -94,31 +95,66 @@ def collect_reproducibility_lineage(
     optimization_config_path: Path | None = None,
     dependency_lock_path: Path | None = None,
     repo_root: Path = PROJECT_ROOT,
+    strict_repository_tools: bool = True,
 ) -> dict[str, Any]:
-    git_commit = run_repository_command(["git", "rev-parse", "HEAD"], repo_root).strip()
-    git_branch = run_repository_command(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-        repo_root,
-    ).strip()
-    git_status_porcelain = run_repository_command(
-        ["git", "status", "--porcelain=v1"],
-        repo_root,
-    )
-    dvc_status = run_repository_command(["dvc", "status"], repo_root)
+    command_errors: dict[str, str] = {}
+    if strict_repository_tools:
+        git_commit = run_repository_command(
+            ["git", "rev-parse", "HEAD"],
+            repo_root,
+        ).strip()
+        git_branch = run_repository_command(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            repo_root,
+        ).strip()
+        git_status_porcelain = run_repository_command(
+            ["git", "status", "--porcelain=v1"],
+            repo_root,
+        )
+        dvc_status = run_repository_command(["dvc", "status"], repo_root)
+    else:
+        git_commit = _optional_repository_command(
+            ["git", "rev-parse", "HEAD"],
+            repo_root=repo_root,
+            errors=command_errors,
+        ).strip()
+        git_branch = _optional_repository_command(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            repo_root=repo_root,
+            errors=command_errors,
+        ).strip()
+        git_status_porcelain = _optional_repository_command(
+            ["git", "status", "--porcelain=v1"],
+            repo_root=repo_root,
+            errors=command_errors,
+        )
+        dvc_status = _optional_repository_command(
+            ["dvc", "status"],
+            repo_root=repo_root,
+            errors=command_errors,
+        )
     dvc_lock_path = repo_root / "dvc.lock"
 
     lineage: dict[str, Any] = {
         "mlflow_parent_run_id": mlflow_parent_run_id,
-        "git_commit": git_commit,
-        "git_branch": git_branch,
-        "git_dirty": bool(git_status_porcelain.strip()),
+        "git_commit": git_commit or None,
+        "git_branch": git_branch or None,
+        "git_dirty": bool(git_status_porcelain.strip())
+        if "git status --porcelain=v1" not in command_errors
+        else None,
         "git_status_porcelain": git_status_porcelain,
-        "dvc_lock_sha256": sha256_file(dvc_lock_path),
-        "dvc_status_clean": dvc_status_is_clean(dvc_status),
+        "dvc_lock_sha256": sha256_file(dvc_lock_path)
+        if dvc_lock_path.exists()
+        else None,
+        "dvc_status_clean": dvc_status_is_clean(dvc_status)
+        if "dvc status" not in command_errors
+        else None,
         "dvc_status": dvc_status,
         "training_config_sha256": sha256_file(training_config_path),
         "feature_schema_sha256": sha256_file(feature_schema_path),
     }
+    if command_errors:
+        lineage["repository_command_errors"] = command_errors
     if optimization_config_path is not None:
         lineage["optimization_config_sha256"] = sha256_file(optimization_config_path)
     if dependency_lock_path is not None:
@@ -127,6 +163,25 @@ def collect_reproducibility_lineage(
     lineage["python_version"] = sys.version
     lineage["platform"] = platform.platform()
     return lineage
+
+
+def _optional_repository_command(
+    args: list[str],
+    *,
+    repo_root: Path,
+    errors: dict[str, str],
+) -> str:
+    command_name = " ".join(args)
+    try:
+        return run_repository_command(args, repo_root)
+    except FileNotFoundError as exc:
+        errors[command_name] = f"executable_not_found: {exc.filename}"
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or "").strip()
+        stdout = (exc.stdout or "").strip()
+        detail = stderr or stdout or f"exit_status_{exc.returncode}"
+        errors[command_name] = detail
+    return ""
 
 
 def lineage_tags(lineage: dict[str, Any]) -> dict[str, str]:

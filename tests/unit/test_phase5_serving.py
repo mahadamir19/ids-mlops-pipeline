@@ -10,9 +10,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import yaml
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
+from sentinelml.serving.app import create_app
 from sentinelml.serving.config import ServingConfig
 from sentinelml.serving.database import PredictionDatabase, PredictionRecord
 from sentinelml.serving.model_manager import ModelLoadError, ModelManager
@@ -177,6 +179,60 @@ class FakeHealthDatabase:
 
     def insert_prediction(self, record: object) -> None:
         return None
+
+
+class FakeQueue:
+    path = "queue.jsonl"
+
+    def depth(self) -> int:
+        return 0
+
+    def malformed_count(self) -> int:
+        return 0
+
+
+class FakeRepository:
+    def __init__(self) -> None:
+        self.queue = FakeQueue()
+
+    def initialize(self) -> None:
+        return None
+
+    def database_status(self) -> str:
+        return "healthy"
+
+    def flush_queue(self) -> object:
+        return types.SimpleNamespace(
+            attempted=0,
+            persisted=0,
+            remaining=0,
+            malformed=0,
+            database_logging="healthy",
+        )
+
+
+class FakeReadyModelManager:
+    def __init__(self, schema_path: Path) -> None:
+        self.loaded = types.SimpleNamespace(
+            model_name="sentinelml-ids",
+            model_version="2",
+            model_family="xgboost",
+            execution_mode="smoke",
+            demo_model=True,
+            source_run_id="run-2",
+            source_model_uri="runs:/run-2/model",
+            loaded_at="2026-08-15T00:00:00+00:00",
+            feature_schema=load_serving_feature_schema(schema_path),
+        )
+
+    def load_startup(self) -> object:
+        return self.loaded
+
+    def current(self) -> object:
+        return self.loaded
+
+    def is_ready(self) -> bool:
+        return True
 
 
 class Phase5ServingTests(unittest.TestCase):
@@ -402,6 +458,23 @@ class Phase5ServingTests(unittest.TestCase):
         self.assertEqual(event["endpoint"], "/predict")
         self.assertEqual(event["missing_fields"], ["a"])
         self.assertNotIn("payload", event)
+
+    def test_api_metrics_route_and_active_model_metric(self) -> None:
+        app = create_app(
+            self.config,
+            model_manager_factory=lambda _config: FakeReadyModelManager(
+                self.schema_path
+            ),
+            repository_factory=lambda _config: FakeRepository(),
+        )
+
+        with TestClient(app) as client:
+            self.assertEqual(client.get("/health").status_code, 200)
+            response = client.get("/metrics")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("sentinelml_api_requests_total", response.text)
+        self.assertIn("sentinelml_active_model_version", response.text)
 
 
 def prediction_record(prediction_id: str) -> PredictionRecord:

@@ -1,0 +1,48 @@
+retraining:
+  enabled: false
+  poll_interval_seconds: 60
+  cooldown_seconds: 300
+  execution_mode: smoke
+  minimum_approved_production_rows: 10
+
+trigger:
+  drift_enabled: true
+  performance_enabled: true
+
+performance:
+  minimum_labelled_rows: 20
+  minimum_attack_support: 1
+  minimum_benign_support: 1
+  min_attack_recall: null
+  max_false_positive_rate: null
+  max_f1_drop: 0.10
+
+dataset:
+  historical_source: data/processed/train.parquet
+  max_historical_rows_smoke: 20000
+  max_production_rows_smoke: 10000
+  sampling_seed: 42
+  deduplication: canonical_feature_target_sha256
+  production_weighting_ratio: 1.0
+
+training:
+  candidate_strategy: fresh_champion_family_retrain
+  device: cpu
+  force_cpu: true
+
+lifecycle:
+  auto_register: true
+  auto_evaluate: true
+  auto_promote: true
+
+paths:
+  monitoring_reports: reports/monitoring
+  retraining_reports: reports/retraining
+  feature_schema: reports/data/feature_schema.json
+  lifecycle_config: configs/lifecycle_config.yaml
+  training_config: configs/training_config.yaml
+
+database:
+  url_env: SENTINELML_DATABASE_URL
+  connect_timeout_seconds: 5
+  statement_timeout_ms: 5000

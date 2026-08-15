@@ -1,0 +1,9 @@
+{
+  "error": "cudaErrorInsufficientDriver: CUDA driver version is insufficient for CUDA runtime version",
+  "event": "failed",
+  "failed_at": "2026-08-15T14:29:48.957921+00:00",
+  "model_name": "sentinelml-ids",
+  "model_version": "4",
+  "monitoring_run_id": "807ab6cd-9875-4c86-b8df-64a6959ecaf0",
+  "retraining_run_id": "c44016f5-4690-43f2-9a1b-5503303bd568"
+}

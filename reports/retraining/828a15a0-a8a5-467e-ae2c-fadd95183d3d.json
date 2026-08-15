@@ -1,0 +1,7 @@
+{
+  "cooldown_until": "2026-08-15T13:51:56.291560+00:00",
+  "error": "[Errno 2] No such file or directory: 'git'",
+  "monitoring_run_id": "f134ed23-0a6d-43c7-9f07-3c8697495ff3",
+  "retraining_run_id": "828a15a0-a8a5-467e-ae2c-fadd95183d3d",
+  "status": "failed"
+}

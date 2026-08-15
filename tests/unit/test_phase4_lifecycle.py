@@ -10,7 +10,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from sentinelml.lifecycle.evaluation import canonical_promotion_slice
-from sentinelml.lifecycle.service import LifecycleError, LifecycleService
+from sentinelml.lifecycle.service import (
+    LifecycleError,
+    LifecycleService,
+    _lifecycle_training_config,
+)
 from sentinelml.lifecycle.thresholds import (
     composite_score,
     evaluate_absolute_gates,
@@ -119,6 +123,49 @@ class FakeMLflow:
         return self.client.create_version(name, model_uri)
 
 
+class FakeCudaBooster:
+    def __init__(self) -> None:
+        self.params: dict[str, str] = {}
+
+    def set_param(self, params: dict[str, str]) -> None:
+        self.params.update(params)
+
+
+class FakeCudaEstimator:
+    def __init__(self) -> None:
+        self.device = "cuda"
+        self.tree_method = "gpu_hist"
+        self.predictor = "gpu_predictor"
+        self.gpu_id = 0
+        self.sampling_method = "gradient_based"
+        self.booster = FakeCudaBooster()
+
+    def get_params(self) -> dict[str, object]:
+        return {
+            "device": self.device,
+            "tree_method": self.tree_method,
+            "predictor": self.predictor,
+            "gpu_id": self.gpu_id,
+            "sampling_method": self.sampling_method,
+        }
+
+    def set_params(self, **params: object) -> FakeCudaEstimator:
+        if "device" in params:
+            self.device = str(params["device"])
+        if "tree_method" in params:
+            self.tree_method = str(params["tree_method"])
+        if "predictor" in params:
+            self.predictor = str(params["predictor"])
+        if "gpu_id" in params:
+            self.gpu_id = params["gpu_id"]
+        if "sampling_method" in params:
+            self.sampling_method = str(params["sampling_method"])
+        return self
+
+    def get_booster(self) -> FakeCudaBooster:
+        return self.booster
+
+
 def lifecycle_config(root: Path) -> dict[str, object]:
     return {
         "registered_model_name": "sentinelml-ids",
@@ -177,6 +224,7 @@ def lifecycle_config(root: Path) -> dict[str, object]:
         },
         "promotion_evaluation": {
             "mode": "smoke",
+            "device": "cpu",
             "validation_sample_size": 100,
             "baseline_train_sample_size": 200,
             "random_seed": 42,
@@ -544,6 +592,28 @@ class Phase4LifecycleTests(unittest.TestCase):
         self.assertEqual(version.tags["lifecycle_state"], "rejected")
         self.assertIn("attack_recall", version.tags["lifecycle.failed_gates"])
 
+    def test_candidate_can_be_marked_failed_after_infrastructure_error(self) -> None:
+        registration = self.service.register_candidate(mode="smoke")
+        version = self.client.get_model_version(
+            "sentinelml-ids",
+            registration["model_version"],
+        )
+
+        result = self.service.mark_candidate_failed(
+            version=registration["model_version"],
+            error="cudaErrorInsufficientDriver",
+            retraining_run_id="retrain-1",
+            monitoring_run_id="monitor-1",
+        )
+
+        self.assertEqual(result["event"], "failed")
+        self.assertEqual(version.tags["lifecycle_state"], "failed")
+        self.assertEqual(
+            version.tags["lifecycle.failure_reason"],
+            "cudaErrorInsufficientDriver",
+        )
+        self.assertEqual(version.tags["retraining_run_id"], "retrain-1")
+
     def test_mlflow_alias_verification_failure_creates_promotion_pending(self) -> None:
         registration = self.service.register_candidate(mode="smoke")
         self.client.force_wrong_champion_after_set = "99"
@@ -727,6 +797,61 @@ class Phase4LifecycleTests(unittest.TestCase):
 
         self.assertEqual(result["event"], "rejected")
         self.assertIn("attack_recall", result["failed_gates"])
+
+    def test_mlflow_loaded_xgboost_model_is_forced_to_cpu(self) -> None:
+        estimator = FakeCudaEstimator()
+        mlflow = types.SimpleNamespace(
+            xgboost=types.SimpleNamespace(load_model=lambda uri: estimator),
+            sklearn=types.SimpleNamespace(load_model=lambda uri: None),
+            pyfunc=types.SimpleNamespace(load_model=lambda uri: None),
+            MlflowClient=lambda: self.client,
+            models=types.SimpleNamespace(get_model_info=lambda uri: {"uri": uri}),
+        )
+        service = LifecycleService(
+            config=self.config,
+            client=self.client,
+            mlflow_module=mlflow,
+            validate_model_uri=False,
+        )
+
+        loaded = service._load_model_from_mlflow("runs:/cuda/model")
+
+        self.assertIs(loaded, estimator)
+        self.assertEqual(estimator.device, "cpu")
+        self.assertEqual(estimator.tree_method, "hist")
+        self.assertEqual(estimator.predictor, "auto")
+        self.assertIsNone(estimator.gpu_id)
+        self.assertEqual(estimator.sampling_method, "uniform")
+        self.assertEqual(estimator.booster.params["device"], "cpu")
+        self.assertEqual(estimator.booster.params["tree_method"], "hist")
+
+    def test_phase4_baseline_refit_uses_cpu_compatible_config(self) -> None:
+        training_config = {
+            "baseline": {
+                "xgboost": {
+                    "device": "cuda",
+                    "tree_method": "gpu_hist",
+                    "predictor": "gpu_predictor",
+                    "gpu_id": 0,
+                    "n_estimators": 2,
+                    "max_depth": 4,
+                }
+            }
+        }
+
+        updated = _lifecycle_training_config(
+            training_config,
+            "xgboost",
+            requested_device="cpu",
+        )
+
+        params = updated["baseline"]["xgboost"]
+        self.assertEqual(params["device"], "cpu")
+        self.assertEqual(params["tree_method"], "hist")
+        self.assertNotIn("predictor", params)
+        self.assertNotIn("gpu_id", params)
+        self.assertEqual(params["max_depth"], 4)
+        self.assertEqual(training_config["baseline"]["xgboost"]["device"], "cuda")
 
 
 class Phase4OptionalIntegrationTests(unittest.TestCase):

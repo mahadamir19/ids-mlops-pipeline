@@ -1,0 +1,36 @@
+monitoring:
+  window_size: 500
+  minimum_window_size: 50
+  interval_seconds: 60
+
+reference:
+  path: data/reference/reference.parquet
+  sample_size: 5000
+  sample_seed: 42
+
+paths:
+  feature_schema: reports/data/feature_schema.json
+
+drift:
+  monitored_features: []
+  drift_share_threshold: 0.30
+  psi_threshold: 0.20
+  evidently_method: psi
+  evidently_include_html: false
+
+performance:
+  minimum_labelled_rows: 20
+  min_attack_support: 1
+  min_benign_support: 1
+
+database:
+  url_env: SENTINELML_DATABASE_URL
+  connect_timeout_seconds: 5
+  statement_timeout_ms: 5000
+
+prometheus:
+  host: 0.0.0.0
+  port: 9101
+
+reports:
+  output_dir: reports/monitoring

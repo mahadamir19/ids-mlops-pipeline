@@ -1,35 +1,35 @@
 {
   "baseline_metrics": {
-    "accuracy": 0.9937,
+    "accuracy": 0.9939,
     "attack_class_recall": 0.01818181818181818,
     "confusion_matrix": {
       "fn": 54,
-      "fp": 9,
-      "tn": 9936,
+      "fp": 7,
+      "tn": 9938,
       "tp": 1
     },
-    "f1": 0.03076923076923077,
+    "f1": 0.031746031746031744,
     "false_negative_rate": 0.9818181818181818,
-    "false_positive_rate": 0.0009049773755656109,
-    "inference_latency_ms_per_row": 0.006875320000108331,
-    "inference_time_seconds": 0.06875320000108331,
-    "pr_auc": 0.4093085763980715,
-    "precision": 0.1,
-    "promotion_evaluation_seconds": 0.13167560000147205,
+    "false_positive_rate": 0.0007038712921065862,
+    "inference_latency_ms_per_row": 0.01152975829973002,
+    "inference_time_seconds": 0.1152975829973002,
+    "pr_auc": 0.48389957383668103,
+    "precision": 0.125,
+    "promotion_evaluation_seconds": 0.18872960899898317,
     "recall": 0.01818181818181818,
-    "roc_auc": 0.9957840851958499,
+    "roc_auc": 0.9971479500891266,
     "rows": 10000
   },
-  "created_at": "2026-08-14T09:36:34.242239+00:00",
+  "created_at": "2026-08-15T15:03:07.647591+00:00",
   "evidence": {
     "baseline_evaluation": {
       "baseline_source": "phase2_selected_baseline_smoke_refit",
       "evaluation_type": "lifecycle_promotion_validation",
       "model_family": "xgboost",
-      "report_path": "C:\\MLOps-Project\\project\\reports\\lifecycle\\baseline_reference.json"
+      "report_path": "/app/reports/lifecycle/baseline_reference.json"
     },
-    "baseline_manifest_path": "C:\\MLOps-Project\\project\\reports\\models\\phase2_smoke\\run_manifest.json",
-    "baseline_metrics_path": "C:\\MLOps-Project\\project\\reports\\lifecycle\\baseline_reference.json",
+    "baseline_manifest_path": "/app/reports/models/phase2_smoke/run_manifest.json",
+    "baseline_metrics_path": "/app/reports/lifecycle/baseline_reference.json",
     "baseline_mode": "smoke",
     "baseline_report_mode": "smoke",
     "baseline_validation_sample_metadata": {
@@ -45,9 +45,9 @@
     "canonical_promotion_dataset": {
       "attack_count": 55,
       "benign_count": 9945,
-      "created_at": "2026-08-14T09:36:28.549586+00:00",
+      "created_at": "2026-08-15T15:02:53.535157+00:00",
       "evaluation_type": "lifecycle_promotion_validation",
-      "feature_schema_path": "C:\\MLOps-Project\\project\\reports\\data\\feature_schema.json",
+      "feature_schema_path": "/app/reports/data/feature_schema.json",
       "feature_schema_sha256": "7012d012649d968207368c371fa65e5dbb983ae3064ea42e5ecb3666a5dd485b",
       "max_positive_fraction": 0.05,
       "min_positive_rows": 50,
@@ -57,7 +57,7 @@
       "selected_row_count": 10000,
       "selected_row_fingerprint": "a4d545c4e80dd9ce83828a13a20e532cf11a41c5030ce969543bd6e1441b38fc",
       "selected_row_fingerprint_algorithm": "sha256(newline-separated source row positions)",
-      "source_path": "C:\\MLOps-Project\\project\\data\\processed\\validation.parquet",
+      "source_path": "/app/data/processed/validation.parquet",
       "source_row_count": 398434,
       "split": "validation",
       "target_distribution": {
@@ -72,7 +72,7 @@
       "selection_rationale": "Selected from validation behavior using attack recall, F1, PR-AUC, ROC-AUC, and false-positive rate. Accuracy is reported but not used as the ranking criterion.",
       "selection_score": 0.26538196738554676
     },
-    "selected_baseline_path": "C:\\MLOps-Project\\project\\reports\\models\\phase2_smoke\\selected_baseline.json"
+    "selected_baseline_path": "/app/reports/models/phase2_smoke/selected_baseline.json"
   },
   "formulas": {
     "attack_recall": "attack_class_recall * 0.9",
@@ -117,9 +117,9 @@
   "schema_version": "1.0",
   "thresholds": {
     "attack_recall": 0.016363636363636365,
-    "f1": 0.027692307692307693,
-    "false_positive_rate": 0.004524886877828055,
-    "inference_latency_ms_per_row": 0.13750640000216663,
-    "pr_auc": 0.36837771875826436
+    "f1": 0.02857142857142857,
+    "false_positive_rate": 0.003519356460532931,
+    "inference_latency_ms_per_row": 0.2305951659946004,
+    "pr_auc": 0.43550961645301295
   }
 }

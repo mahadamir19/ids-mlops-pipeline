@@ -23,6 +23,10 @@ SPEC.md
 docker/.env
 setup.ps1
 
+reports/monitoring/*.json
+reports/monitoring/*.json.tmp
+reports/monitoring/*.html
+
 *.jsonl
 *.malformed.*
 postgres-data/

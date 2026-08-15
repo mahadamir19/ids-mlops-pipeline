@@ -1,5 +1,15 @@
 """Phase 5 production-style serving package for SentinelML."""
 
-from sentinelml.serving.app import create_app
+from __future__ import annotations
+
+from typing import Any
 
 __all__ = ["create_app"]
+
+
+def __getattr__(name: str) -> Any:
+    if name == "create_app":
+        from sentinelml.serving.app import create_app
+
+        return create_app
+    raise AttributeError(name)

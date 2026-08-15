@@ -14,6 +14,12 @@ import pandas as pd
 
 from sentinelml.data.config import PROJECT_ROOT
 
+CPU_TREE_METHOD = "hist"
+CUDA_TREE_METHOD = "hist"
+GPU_ONLY_XGBOOST_PARAMS = ("gpu_id", "predictor")
+GPU_TREE_METHODS = {"gpu_hist"}
+GPU_SAMPLING_METHODS = {"gradient_based"}
+
 
 def configure_gpu_runtime_environment() -> None:
     """Keep GPU library scratch files inside the project when possible."""
@@ -35,7 +41,14 @@ def estimator_requests_cuda(estimator: Any) -> bool:
     get_params = getattr(estimator, "get_params", None)
     params = get_params() if callable(get_params) else {}
     device = str(params.get("device", "")).lower()
-    return device.startswith("cuda") or device.startswith("gpu")
+    tree_method = str(params.get("tree_method", "")).lower()
+    predictor = str(params.get("predictor", "")).lower()
+    return (
+        device.startswith("cuda")
+        or device.startswith("gpu")
+        or tree_method in GPU_TREE_METHODS
+        or predictor == "gpu_predictor"
+    )
 
 
 def estimator_effective_device(estimator: Any) -> str | None:
@@ -49,6 +62,113 @@ def estimator_effective_device(estimator: Any) -> str | None:
     except Exception:
         return None
     return config.get("learner", {}).get("generic_param", {}).get("device")
+
+
+def force_estimator_cpu(estimator: Any) -> Any:
+    """Best-effort CPU coercion for loaded estimators in non-GPU runtimes."""
+
+    steps = getattr(estimator, "steps", None)
+    if isinstance(steps, list):
+        for _, step in steps:
+            force_estimator_cpu(step)
+
+    set_params = getattr(estimator, "set_params", None)
+    if callable(set_params):
+        try:
+            params = _cpu_set_params_for_estimator(estimator)
+            set_params(**params)
+        except (TypeError, ValueError):
+            pass
+    elif hasattr(estimator, "device"):
+        try:
+            estimator.device = "cpu"
+        except Exception:
+            pass
+
+    booster = _booster(estimator)
+    if booster is not None:
+        try:
+            booster.set_param({"device": "cpu", "tree_method": CPU_TREE_METHOD})
+        except Exception:
+            pass
+    return estimator
+
+
+def normalize_xgboost_execution_params(
+    params: dict[str, Any],
+    *,
+    requested_device: str = "cpu",
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Normalize XGBoost runtime-only parameters for the active environment."""
+
+    requested = str(requested_device or "cpu").strip().lower()
+    if requested not in {"cpu", "cuda"}:
+        raise ValueError("XGBoost execution device must be cpu or cuda")
+
+    normalized = dict(params)
+    removed: dict[str, Any] = {}
+    changed: dict[str, dict[str, Any]] = {}
+
+    def set_changed(key: str, value: Any) -> None:
+        previous = normalized.get(key)
+        if previous != value:
+            changed[key] = {"from": previous, "to": value}
+        normalized[key] = value
+
+    if requested == "cpu":
+        for key in GPU_ONLY_XGBOOST_PARAMS:
+            if key in normalized:
+                removed[key] = normalized.pop(key)
+        set_changed("device", "cpu")
+        tree_method = str(normalized.get("tree_method", "")).lower()
+        if tree_method in GPU_TREE_METHODS | {"auto", ""}:
+            set_changed("tree_method", CPU_TREE_METHOD)
+        else:
+            normalized.setdefault("tree_method", CPU_TREE_METHOD)
+        if str(normalized.get("sampling_method", "")).lower() in GPU_SAMPLING_METHODS:
+            set_changed("sampling_method", "uniform")
+    else:
+        set_changed("device", "cuda")
+        normalized.setdefault("tree_method", CUDA_TREE_METHOD)
+
+    runtime_config = {
+        "requested_device": requested,
+        "effective_device": normalized.get("device"),
+        "effective_tree_method": normalized.get("tree_method"),
+        "removed_gpu_params": sorted(removed),
+        "removed_gpu_param_values": removed,
+        "changed_runtime_params": changed,
+        "xgboost_version": _xgboost_version(),
+    }
+    return normalized, runtime_config
+
+
+def validate_xgboost_runtime_available(requested_device: str) -> None:
+    """Fail fast for explicitly requested CUDA in environments without a GPU."""
+
+    requested = str(requested_device or "cpu").strip().lower()
+    if requested != "cuda":
+        return
+    try:
+        cp = _cupy()
+    except Exception as exc:
+        raise RuntimeError(
+            "Configured XGBoost device 'cuda' is unavailable in the retrainer "
+            "environment. Set retraining training.device to 'cpu' for local V1 "
+            "execution or run on a CUDA-capable host with compatible drivers."
+        ) from exc
+    try:
+        count = int(cp.cuda.runtime.getDeviceCount())
+    except Exception as exc:
+        raise RuntimeError(
+            "Configured XGBoost device 'cuda' is unavailable in the retrainer "
+            "environment because CUDA device discovery failed."
+        ) from exc
+    if count < 1:
+        raise RuntimeError(
+            "Configured XGBoost device 'cuda' is unavailable in the retrainer "
+            "environment because no CUDA devices were found."
+        )
 
 
 def fit_estimator_on_configured_device(
@@ -76,7 +196,33 @@ def fit_estimator_on_configured_device(
     return estimator.fit(gpu_features, gpu_target, **fit_kwargs)
 
 
-def xgboost_positive_scores(estimator: Any, features: pd.DataFrame) -> np.ndarray | None:
+def _cpu_set_params_for_estimator(estimator: Any) -> dict[str, Any]:
+    params: dict[str, Any] = {"device": "cpu"}
+    get_params = getattr(estimator, "get_params", None)
+    existing = get_params() if callable(get_params) else {}
+    if "tree_method" in existing:
+        params["tree_method"] = CPU_TREE_METHOD
+    if existing.get("predictor") == "gpu_predictor":
+        params["predictor"] = "auto"
+    if "gpu_id" in existing:
+        params["gpu_id"] = None
+    if str(existing.get("sampling_method", "")).lower() in GPU_SAMPLING_METHODS:
+        params["sampling_method"] = "uniform"
+    return params
+
+
+def _xgboost_version() -> str | None:
+    try:
+        import xgboost
+    except Exception:
+        return None
+    return str(getattr(xgboost, "__version__", "unknown"))
+
+
+def xgboost_positive_scores(
+    estimator: Any,
+    features: pd.DataFrame,
+) -> np.ndarray | None:
     """Use XGBoost GPU in-place prediction for CUDA estimators."""
 
     if not estimator_requests_cuda(estimator):

@@ -145,6 +145,44 @@ class Phase2LineageTests(unittest.TestCase):
             if root.exists():
                 shutil.rmtree(root)
 
+    def test_collect_lineage_can_tolerate_missing_repository_tools(self) -> None:
+        root = Path.cwd() / "tmp_tests" / "phase2_lineage_missing_tools"
+        training_config = root / "training_config.yaml"
+        feature_schema = root / "feature_schema.json"
+        try:
+            root.mkdir(parents=True, exist_ok=True)
+            training_config.write_bytes(b"random_seed: 42\n")
+            feature_schema.write_bytes(b'{"feature_columns":[]}\n')
+
+            def missing_run(*args: object, **kwargs: object) -> None:
+                raise FileNotFoundError("git")
+
+            with patch("sentinelml.tracking.mlflow.subprocess.run", missing_run):
+                lineage = collect_reproducibility_lineage(
+                    mlflow_parent_run_id="parent-run-id",
+                    training_config_path=training_config,
+                    feature_schema_path=feature_schema,
+                    repo_root=root,
+                    strict_repository_tools=False,
+                )
+
+            self.assertIsNone(lineage["git_commit"])
+            self.assertIsNone(lineage["git_branch"])
+            self.assertIsNone(lineage["git_dirty"])
+            self.assertIsNone(lineage["dvc_status_clean"])
+            self.assertIsNone(lineage["dvc_lock_sha256"])
+            self.assertIn("git rev-parse HEAD", lineage["repository_command_errors"])
+            self.assertEqual(
+                lineage["training_config_sha256"],
+                hashlib.sha256(b"random_seed: 42\n").hexdigest(),
+            )
+        finally:
+            for path in [feature_schema, training_config]:
+                if path.exists():
+                    path.unlink()
+            if root.exists():
+                shutil.rmtree(root)
+
 
 if __name__ == "__main__":
     unittest.main()

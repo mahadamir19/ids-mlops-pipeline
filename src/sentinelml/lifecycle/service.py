@@ -33,7 +33,11 @@ from sentinelml.lifecycle.thresholds import (
 )
 from sentinelml.tracking.mlflow import configure_mlflow_runtime_environment
 from sentinelml.training.data import load_feature_schema, load_partition
-from sentinelml.training.gpu import fit_estimator_on_configured_device
+from sentinelml.training.gpu import (
+    fit_estimator_on_configured_device,
+    force_estimator_cpu,
+    normalize_xgboost_execution_params,
+)
 from sentinelml.training.models import build_baseline_model_spec, load_training_config
 
 
@@ -80,8 +84,13 @@ class LifecycleService:
     def pending_dir(self) -> Path:
         return configured_path(self.config, "pending_dir")
 
-    def load_final_candidate_manifest(self, mode: str | None = None) -> dict[str, Any]:
-        path = configured_path(self.config, "final_candidate_manifest")
+    def load_final_candidate_manifest(
+        self,
+        mode: str | None = None,
+        *,
+        manifest_path: Path | None = None,
+    ) -> dict[str, Any]:
+        path = manifest_path or configured_path(self.config, "final_candidate_manifest")
         manifest = load_json(path)
         self._validate_manifest(manifest, mode=mode)
         return manifest
@@ -96,8 +105,14 @@ class LifecycleService:
             raise LifecycleError("manifest missing logged model URI")
         if not manifest.get("model_family"):
             raise LifecycleError("manifest missing model family")
+        continuous_retraining = manifest.get("candidate_source") == (
+            "continuous_retraining"
+        )
         source_optimization = manifest.get("source_optimization", {})
-        if not source_optimization.get("best_trial_mlflow_run_id"):
+        if (
+            not continuous_retraining
+            and not source_optimization.get("best_trial_mlflow_run_id")
+        ):
             raise LifecycleError("manifest missing source Optuna run id")
         for section in ["git", "dvc", "configuration", "dependencies", "evaluation"]:
             if not isinstance(manifest.get(section), dict):
@@ -105,8 +120,10 @@ class LifecycleService:
         evaluation = manifest["evaluation"]
         if "validation_metrics" not in evaluation:
             raise LifecycleError("manifest missing validation metrics")
-        if "test_metrics" not in evaluation:
+        if not continuous_retraining and "test_metrics" not in evaluation:
             raise LifecycleError("manifest missing reporting test metrics")
+        if continuous_retraining and evaluation.get("test_data_consulted") is not False:
+            raise LifecycleError("continuous retraining manifest must not consult TEST")
         actual_mode = self.execution_mode_from_manifest(manifest)
         if mode is not None and actual_mode != mode:
             raise LifecycleError(
@@ -142,8 +159,13 @@ class LifecycleService:
         *,
         mode: str = "smoke",
         force_new_version: bool = False,
+        manifest_path: Path | None = None,
+        extra_tags: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        manifest = self.load_final_candidate_manifest(mode=mode)
+        manifest = self.load_final_candidate_manifest(
+            mode=mode,
+            manifest_path=manifest_path,
+        )
         source_run_id = str(manifest["mlflow"]["final_candidate_run_id"])
         source_model_uri = str(manifest["mlflow"]["logged_model_uri"])
         ensure_registered_model(self.client, self.model_name)
@@ -169,6 +191,8 @@ class LifecycleService:
         version = str(created.version)
         execution_mode = self.execution_mode_from_manifest(manifest)
         tags = self._registration_tags(manifest, execution_mode)
+        if extra_tags:
+            tags.update(extra_tags)
         set_version_tags(
             self.client,
             model_name=self.model_name,
@@ -194,17 +218,19 @@ class LifecycleService:
         execution_mode: str,
     ) -> dict[str, Any]:
         validation_metrics = manifest["evaluation"]["validation_metrics"]
-        test_metrics = manifest["evaluation"]["test_metrics"]
-        return {
+        test_metrics = manifest["evaluation"].get("test_metrics")
+        tags = {
             "lifecycle_state": "candidate",
             "execution_mode": execution_mode,
             "demo_model": self.demo_model_for_mode(execution_mode),
             "model_family": manifest["model_family"],
             "source_run_id": manifest["mlflow"]["final_candidate_run_id"],
             "source_model_uri": manifest["mlflow"]["logged_model_uri"],
-            "source_optuna_run_id": manifest["source_optimization"][
-                "best_trial_mlflow_run_id"
-            ],
+            "candidate_source": manifest.get("candidate_source", "final_candidate"),
+            "source_optuna_run_id": manifest.get("source_optimization", {}).get(
+                "best_trial_mlflow_run_id",
+                "",
+            ),
             "git_commit": manifest["git"]["commit"],
             "dvc_lock_sha256": manifest["dvc"]["dvc_lock_sha256"],
             "training_config_sha256": manifest["configuration"][
@@ -220,8 +246,24 @@ class LifecycleService:
             "evaluation_source": "reports/final_candidate/validation_metrics.json",
             "lifecycle.metrics_json": tag_json(validation_metrics),
             "lifecycle.validation_metrics_json": tag_json(validation_metrics),
-            "lifecycle.test_metrics_json": tag_json(test_metrics),
         }
+        if manifest.get("candidate_source") == "continuous_retraining":
+            tags.update(
+                {
+                    "evaluation_source": "phase8_canonical_promotion_validation",
+                    "retraining_run_id": manifest["retraining"]["retraining_run_id"],
+                    "trigger_monitoring_run_id": manifest["retraining"][
+                        "trigger_monitoring_run_id"
+                    ],
+                    "dataset_fingerprint": manifest["retraining"][
+                        "dataset_fingerprint"
+                    ],
+                    "test_data_consulted": "false",
+                }
+            )
+        elif test_metrics is not None:
+            tags["lifecycle.test_metrics_json"] = tag_json(test_metrics)
+        return tags
 
     def derive_thresholds(self) -> dict[str, Any]:
         selected_baseline_path = configured_path(
@@ -281,7 +323,11 @@ class LifecycleService:
         spec = build_baseline_model_spec(
             selected_model,
             train.target,
-            config=training_config,
+            config=_lifecycle_training_config(
+                training_config,
+                selected_model,
+                requested_device=str(policy.get("device", "cpu")),
+            ),
         )
         fit_estimator_on_configured_device(
             spec.estimator,
@@ -418,7 +464,7 @@ class LifecycleService:
             if loader is None:
                 continue
             try:
-                return loader(model_uri)
+                return force_estimator_cpu(loader(model_uri))
             except Exception:
                 continue
         raise LifecycleError(f"unable to load model artifact from MLflow: {model_uri}")
@@ -561,6 +607,43 @@ class LifecycleService:
             "evaluation": evaluation,
         }
         write_json(audit_path(self.report_root, "rejected", candidate.version), payload)
+        return payload
+
+    def mark_candidate_failed(
+        self,
+        *,
+        version: str | int,
+        error: str,
+        retraining_run_id: str | None = None,
+        monitoring_run_id: str | None = None,
+    ) -> dict[str, Any]:
+        candidate = self._get_version(version)
+        failed_at = utc_now()
+        payload = {
+            "event": "failed",
+            "model_name": self.model_name,
+            "model_version": candidate.version,
+            "failed_at": failed_at,
+            "error": error,
+            "retraining_run_id": retraining_run_id,
+            "monitoring_run_id": monitoring_run_id,
+        }
+        tags = {
+            "lifecycle_state": "failed",
+            "lifecycle.failed_at": failed_at,
+            "lifecycle.failure_reason": error[:1000],
+        }
+        if retraining_run_id:
+            tags["retraining_run_id"] = retraining_run_id
+        if monitoring_run_id:
+            tags["trigger_monitoring_run_id"] = monitoring_run_id
+        set_version_tags(
+            self.client,
+            model_name=self.model_name,
+            version=candidate.version,
+            tags=tags,
+        )
+        write_json(audit_path(self.report_root, "failed", candidate.version), payload)
         return payload
 
     def _promote_candidate(
@@ -804,3 +887,23 @@ class LifecycleService:
             "champion": champion.__dict__ if champion else None,
             "versions": [version.__dict__ for version in versions],
         }
+
+
+def _lifecycle_training_config(
+    training_config: dict[str, Any],
+    model_family: str,
+    *,
+    requested_device: str = "cpu",
+) -> dict[str, Any]:
+    """Normalize Phase 4 baseline refits for the local lifecycle environment."""
+
+    import copy
+
+    updated = copy.deepcopy(training_config)
+    family_config = updated["baseline"][model_family]
+    normalized, _runtime_config = normalize_xgboost_execution_params(
+        family_config,
+        requested_device=requested_device,
+    )
+    updated["baseline"][model_family] = normalized
+    return updated

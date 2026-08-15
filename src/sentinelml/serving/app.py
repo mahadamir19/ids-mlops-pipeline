@@ -5,18 +5,26 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
 from fastapi import Body, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from sentinelml.serving.config import ServingConfig, load_serving_config
 from sentinelml.serving.database import (
     ConflictingGroundTruthError,
     PredictionDatabase,
     PredictionNotFoundError,
+)
+from sentinelml.serving.metrics import (
+    api_metrics,
+    record_model_loaded,
+    record_model_reload_failure,
+    record_request,
+    record_validation_rejection,
 )
 from sentinelml.serving.model_manager import ModelManager
 from sentinelml.serving.prediction_service import PredictionService
@@ -75,6 +83,11 @@ def create_app(
             else model_manager_factory(serving_config)
         )
         model_manager.load_startup()
+        active = model_manager.current()
+        record_model_loaded(
+            model_name=active.model_name,
+            model_version=active.model_version,
+        )
         app.state.config = serving_config
         app.state.repository = repository
         app.state.model_manager = model_manager
@@ -98,10 +111,27 @@ def create_app(
                 pass
 
     app = FastAPI(
-        title="SentinelML Phase 5 Serving API",
-        version="0.5.0",
+        title="SentinelML Serving API",
+        version="0.7.0",
         lifespan=lifespan,
     )
+
+    @app.middleware("http")
+    async def prometheus_middleware(request: Request, call_next: Any) -> Response:
+        start = perf_counter()
+        status_code = 500
+        try:
+            response = await call_next(request)
+            status_code = int(response.status_code)
+            return response
+        finally:
+            route = getattr(request.scope.get("route"), "path", request.url.path)
+            record_request(
+                method=request.method,
+                route=str(route),
+                status_code=status_code,
+                duration_seconds=perf_counter() - start,
+            )
 
     @app.exception_handler(RequestValidationError)
     async def malformed_request_handler(
@@ -145,6 +175,13 @@ def create_app(
     def model() -> dict[str, Any]:
         active = app.state.model_manager.current()
         return _model_payload(active)
+
+    @app.get("/metrics")
+    def metrics() -> Response:
+        return Response(
+            api_metrics.render(),
+            media_type="text/plain; version=0.0.4; charset=utf-8",
+        )
 
     @app.post("/predict", response_model=PredictionResponse)
     def predict(request: Request, body: Any = REQUEST_BODY) -> dict[str, Any]:
@@ -261,7 +298,17 @@ def create_app(
                 status_code=404,
                 content={"detail": "internal reload endpoint is disabled"},
             )
-        return app.state.model_manager.reload_champion()
+        try:
+            result = app.state.model_manager.reload_champion()
+        except Exception:
+            record_model_reload_failure()
+            raise
+        active = app.state.model_manager.current()
+        record_model_loaded(
+            model_name=active.model_name,
+            model_version=active.model_version,
+        )
+        return result
 
     @app.get("/internal/queue", response_model=QueueStatusResponse)
     def queue_status() -> dict[str, Any]:
@@ -325,6 +372,10 @@ def _log_rejection(request: Request, request_id: str, error: dict[str, Any]) -> 
     if model_manager is not None and model_manager.is_ready():
         schema_fingerprint = model_manager.current().feature_schema.fingerprint
     if logger is not None:
+        record_validation_rejection(
+            endpoint=request.url.path,
+            category=str(error.get("category", "unknown")),
+        )
         logger.log(
             endpoint=request.url.path,
             request_id=request_id,

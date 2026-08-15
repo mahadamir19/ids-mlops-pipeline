@@ -1,0 +1,55 @@
+{
+  "affected_features": [
+    "flow_duration",
+    "packet_length_mean",
+    "total_fwd_packets"
+  ],
+  "errors_summary": [],
+  "failed_labels": [],
+  "finished_at": "2026-08-15T13:00:54.254014+00:00",
+  "label_delivery_mode": "randomized",
+  "labels_delivered": 500,
+  "labels_failed": 0,
+  "labels_pending": 0,
+  "model_versions_observed": {
+    "2": 500
+  },
+  "prediction_class_distribution": {
+    "ATTACK": 71,
+    "BENIGN": 429
+  },
+  "request_count_attempted": 500,
+  "requests_failed": 0,
+  "requests_succeeded": 500,
+  "scenario": "multi_feature_shift",
+  "scenario_category": "feature_drift",
+  "scenario_parameters": {
+    "additive_shift": 25.0,
+    "affected_features": [
+      "flow_duration",
+      "packet_length_mean",
+      "total_fwd_packets"
+    ],
+    "multiplicative_scale": 1.15,
+    "schedule": "gradual"
+  },
+  "seed": 804,
+  "simulation_fingerprint": "9695976b83240d77fa1d19488ee686d20d98511cd2fdd4883eb3c6522a8e44c4",
+  "simulation_run_id": "a4ce381e-105a-4656-baa4-dd5bc48e6b2a",
+  "source": {
+    "fingerprint": "31d629138332bb736c19a44b0549c10638ec6d5c250339c03d9e0f3e1a87e168",
+    "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
+    "provenance": "Phase 1 reference partition derived from non-test train days (Monday, Tuesday, Wednesday).",
+    "row_count": 152695,
+    "target_distribution": {
+      "0": 132459,
+      "1": 20236
+    }
+  },
+  "started_at": "2026-08-15T13:00:27.769109+00:00",
+  "true_class_distribution": {
+    "0": 429,
+    "1": 71
+  },
+  "undelivered_labels": []
+}

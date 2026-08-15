@@ -11,6 +11,10 @@ import numpy as np
 import pandas as pd
 
 from sentinelml.serving.database import PredictionRecord
+from sentinelml.serving.metrics import (
+    record_prediction,
+    record_prediction_logging_failure,
+)
 from sentinelml.serving.model_manager import LoadedModel, ModelManager
 from sentinelml.serving.repository import PredictionRepository
 from sentinelml.training.evaluate import positive_class_scores
@@ -55,13 +59,16 @@ class PredictionService:
                 "model_version": loaded.model_version,
                 "latency_ms": float(latency_ms),
             }
-            self.repository.persist_prediction(
+            persisted = self.repository.persist_prediction(
                 build_prediction_record(
                     loaded=loaded,
                     features=features,
                     response=response,
                 )
             )
+            if not persisted:
+                record_prediction_logging_failure()
+            record_prediction(prediction=prediction)
             responses.append(response)
         return responses
 

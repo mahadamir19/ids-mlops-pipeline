@@ -15,6 +15,7 @@ paths:
 
 promotion_evaluation:
   mode: smoke
+  device: cpu
   validation_sample_size: 10000
   baseline_train_sample_size: 20000
   random_seed: 42
