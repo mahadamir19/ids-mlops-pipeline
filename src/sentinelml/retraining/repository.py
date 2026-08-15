@@ -6,7 +6,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Connection, Engine
 
 from sentinelml.retraining.config import RetrainingConfig
@@ -50,6 +50,18 @@ class RetrainingRepository:
     @property
     def dialect_name(self) -> str | None:
         return self.engine.dialect.name if self.engine is not None else None
+
+    def schema_available(self) -> bool:
+        if self.engine is None:
+            return False
+        inspector = inspect(self.engine)
+        return all(
+            inspector.has_table(table_name)
+            for table_name in [
+                "retraining_runs",
+                "retraining_monitoring_processed",
+            ]
+        )
 
     def initialize(self) -> None:
         if self.engine is None:
@@ -477,6 +489,48 @@ class RetrainingRepository:
             "cooldown": cooldown,
         }
 
+    def latest_run(self) -> dict[str, Any] | None:
+        """Return the latest retraining run without changing retraining state."""
+
+        if self.engine is None:
+            return None
+        with self.engine.connect() as connection:
+            row = connection.execute(
+                text(
+                    """
+                    SELECT retraining_run_id, trigger_monitoring_run_id, started_at,
+                           finished_at, status, trigger_reasons, drift_share,
+                           performance_metrics, historical_rows, production_rows,
+                           deduplicated_rows, dataset_fingerprint, mlflow_run_id,
+                           registered_model_version, candidate_evaluation,
+                           promotion_result, error, cooldown_until
+                    FROM retraining_runs
+                    ORDER BY started_at DESC
+                    LIMIT 1
+                    """
+                )
+            ).mappings().first()
+        return _jsonable_mapping(row)
+
+    def latest_processed_monitoring(self) -> dict[str, Any] | None:
+        """Return the latest processed monitoring decision, if one exists."""
+
+        if self.engine is None:
+            return None
+        with self.engine.connect() as connection:
+            row = connection.execute(
+                text(
+                    """
+                    SELECT monitoring_run_id, processed_at, decision, action_taken,
+                           report_path
+                    FROM retraining_monitoring_processed
+                    ORDER BY processed_at DESC
+                    LIMIT 1
+                    """
+                )
+            ).mappings().first()
+        return _jsonable_mapping(row)
+
     def acquire_table_lock(self, *, owner: str, lock_name: str = "phase8") -> bool:
         if self.engine is None:
             return False
@@ -545,3 +599,22 @@ def _jsonable_time(value: Any) -> Any:
     if isinstance(value, datetime):
         return value.isoformat()
     return value
+
+
+def _jsonable_mapping(row: Any) -> dict[str, Any] | None:
+    if row is None:
+        return None
+    payload = {key: _jsonable_time(value) for key, value in dict(row).items()}
+    for key in [
+        "trigger_reasons",
+        "performance_metrics",
+        "candidate_evaluation",
+        "promotion_result",
+    ]:
+        value = payload.get(key)
+        if isinstance(value, str):
+            try:
+                payload[key] = json.loads(value)
+            except json.JSONDecodeError:
+                pass
+    return payload

@@ -222,13 +222,12 @@ class Phase3FinalCandidateTests(unittest.TestCase):
             input_example="example",
         )
 
-        self.assertEqual(rf_info["flavor"], "xgboost")
+        self.assertEqual(rf_info["flavor"], "sklearn")
         self.assertEqual(xgboost_info["flavor"], "xgboost")
-        self.assertEqual(len(fake_mlflow.sklearn.calls), 0)
+        self.assertEqual(fake_mlflow.sklearn.calls[0]["name"], "model")
         self.assertEqual(fake_mlflow.xgboost.calls[0]["name"], "model")
-        self.assertEqual(fake_mlflow.xgboost.calls[1]["name"], "model")
+        self.assertNotIn("registered_model_name", fake_mlflow.sklearn.calls[0])
         self.assertNotIn("registered_model_name", fake_mlflow.xgboost.calls[0])
-        self.assertNotIn("registered_model_name", fake_mlflow.xgboost.calls[1])
 
     def test_final_candidate_manifest_and_mlflow_traceability(self) -> None:
         root = Path.cwd() / "tmp_tests" / "phase3e_run"
@@ -244,7 +243,7 @@ class Phase3FinalCandidateTests(unittest.TestCase):
             "best_mlflow_run_id": "trial-run-id",
             "objective_metric": "pr_auc",
             "direction": "maximize",
-            "best_params": {"n_estimators": 120},
+            "best_params": {"max_iter": 120},
         }
         dataset = DatasetBundle(
             features=pd.DataFrame({"feature": [0.0, 1.0, 2.0]}),
@@ -283,7 +282,7 @@ class Phase3FinalCandidateTests(unittest.TestCase):
             captured_config.update(kwargs["config"]["baseline"][model_family])
             return types.SimpleNamespace(
                 estimator=FakeEstimator(),
-                parameters={"n_estimators": captured_config["n_estimators"]},
+                parameters={"max_iter": captured_config["max_iter"]},
             )
 
         try:
@@ -324,16 +323,13 @@ class Phase3FinalCandidateTests(unittest.TestCase):
                         "random_seed": 42,
                         "baseline": {
                             "hist_gradient_boosting": {
-                                "n_estimators": 200,
+                                "max_iter": 200,
                                 "learning_rate": 0.1,
-                                "grow_policy": "lossguide",
-                                "max_leaves": 31,
-                                "max_depth": 0,
-                                "min_child_weight": 1.0,
-                                "reg_lambda": 1.0,
-                                "tree_method": "hist",
-                                "device": "cuda",
-                                "n_jobs": 1,
+                                "max_leaf_nodes": 31,
+                                "max_depth": None,
+                                "min_samples_leaf": 20,
+                                "l2_regularization": 0.0,
+                                "class_weight": "balanced",
                             }
                         },
                     },
@@ -387,7 +383,7 @@ class Phase3FinalCandidateTests(unittest.TestCase):
                 "validation.parquet",
                 "test.parquet",
             ])
-            self.assertEqual(captured_config["n_estimators"], 120)
+            self.assertEqual(captured_config["max_iter"], 120)
             self.assertEqual(manifest["model_family"], "hist_gradient_boosting")
             self.assertEqual(
                 manifest["source_optimization"]["best_trial_mlflow_run_id"],

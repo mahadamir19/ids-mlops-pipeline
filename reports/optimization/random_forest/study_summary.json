@@ -15,7 +15,7 @@
   "pruning_enabled": false,
   "pruning_strategy": "unsupported",
   "search_space": {
-    "num_parallel_tree": {
+    "n_estimators": {
       "type": "int",
       "low": 40,
       "high": 160,
@@ -27,31 +27,41 @@
       "high": 28,
       "step": 2
     },
-    "subsample": {
-      "type": "float",
-      "low": 0.4,
-      "high": 1.0
+    "min_samples_split": {
+      "type": "int",
+      "low": 2,
+      "high": 10
     },
-    "colsample_bynode": {
-      "type": "float",
-      "low": 0.4,
-      "high": 1.0
+    "min_samples_leaf": {
+      "type": "int",
+      "low": 1,
+      "high": 6
     },
-    "min_child_weight": {
-      "type": "float",
-      "low": 1.0,
-      "high": 8.0
+    "max_features": {
+      "type": "categorical",
+      "choices": [
+        "sqrt",
+        "log2"
+      ]
+    },
+    "class_weight": {
+      "type": "categorical",
+      "choices": [
+        "balanced",
+        "balanced_subsample"
+      ]
     }
   },
   "best_trial_number": 0,
-  "best_objective_value": 0.25703090144531415,
+  "best_objective_value": 0.1026471967388535,
   "best_params": {
-    "num_parallel_tree": 80,
+    "n_estimators": 80,
     "max_depth": 28,
-    "subsample": 0.839196365086843,
-    "colsample_bynode": 0.759195090518222,
-    "min_child_weight": 2.0921304830970557
+    "min_samples_split": 8,
+    "min_samples_leaf": 4,
+    "max_features": "sqrt",
+    "class_weight": "balanced_subsample"
   },
-  "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29",
-  "best_effective_device": "cuda:0"
+  "best_mlflow_run_id": null,
+  "best_effective_device": null
 }

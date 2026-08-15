@@ -4,8 +4,8 @@
   "execution_mode": "smoke",
   "requested_n_trials": 2,
   "trial_state_counts": {
-    "COMPLETE": 1,
-    "PRUNED": 1,
+    "COMPLETE": 2,
+    "PRUNED": 0,
     "FAIL": 0
   },
   "objective_metric": "pr_auc",
@@ -61,7 +61,7 @@
     }
   },
   "best_trial_number": 0,
-  "best_objective_value": 0.37552147660112,
+  "best_objective_value": 0.3855657939843833,
   "best_params": {
     "n_estimators": 160,
     "max_depth": 10,
@@ -72,6 +72,6 @@
     "reg_alpha": 2.231010801867921e-06,
     "reg_lambda": 2.962151658830348
   },
-  "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1",
-  "best_effective_device": "cuda:0"
+  "best_mlflow_run_id": null,
+  "best_effective_device": "cpu"
 }

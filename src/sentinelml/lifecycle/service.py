@@ -16,6 +16,10 @@ from sentinelml.lifecycle.evaluation import (
     evaluate_model_on_promotion_slice,
     load_promotion_validation_dataset,
 )
+from sentinelml.lifecycle.candidate_evaluation import CandidateEvaluator
+from sentinelml.lifecycle.notifier import ServingNotifier
+from sentinelml.lifecycle.promotion import PromotionManager
+from sentinelml.lifecycle.registration import CandidateRegistrar
 from sentinelml.lifecycle.registry import (
     ModelVersionInfo,
     ensure_registered_model,
@@ -25,6 +29,7 @@ from sentinelml.lifecycle.registry import (
     set_version_tags,
     tag_json,
 )
+from sentinelml.lifecycle.rollback import RollbackManager
 from sentinelml.lifecycle.thresholds import (
     composite_score,
     derive_thresholds,
@@ -75,6 +80,11 @@ class LifecycleService:
         self.evaluator = evaluator or evaluate_model_on_promotion_slice
         self.promotion_dataset_loader = promotion_dataset_loader
         self.baseline_reference_evaluator = baseline_reference_evaluator
+        self.registrar = CandidateRegistrar(self)
+        self.candidate_evaluator = CandidateEvaluator(self)
+        self.promotion_manager = PromotionManager(self)
+        self.rollback_manager = RollbackManager(self)
+        self.serving_notifier = ServingNotifier(self)
 
     @property
     def report_root(self) -> Path:
@@ -155,6 +165,21 @@ class LifecycleService:
             raise LifecycleError(message) from exc
 
     def register_candidate(
+        self,
+        *,
+        mode: str = "smoke",
+        force_new_version: bool = False,
+        manifest_path: Path | None = None,
+        extra_tags: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        return self.registrar.register_candidate(
+            mode=mode,
+            force_new_version=force_new_version,
+            manifest_path=manifest_path,
+            extra_tags=extra_tags,
+        )
+
+    def _register_candidate(
         self,
         *,
         mode: str = "smoke",
@@ -470,6 +495,9 @@ class LifecycleService:
         raise LifecycleError(f"unable to load model artifact from MLflow: {model_uri}")
 
     def evaluate_candidate(self, *, version: str | int) -> dict[str, Any]:
+        return self.candidate_evaluator.evaluate_candidate(version=version)
+
+    def _evaluate_candidate(self, *, version: str | int) -> dict[str, Any]:
         candidate = self._get_version(version)
         thresholds = self.derive_thresholds()
         candidate_metrics = self.metrics_for_version(candidate)
@@ -558,6 +586,9 @@ class LifecycleService:
         )
 
     def promote_or_reject(self, *, version: str | int) -> dict[str, Any]:
+        return self.promotion_manager.promote_or_reject(version=version)
+
+    def _promote_or_reject(self, *, version: str | int) -> dict[str, Any]:
         candidate = self._get_version(version)
         evaluation = self.evaluate_candidate(version=version)
         champion = self.get_champion()
@@ -766,6 +797,9 @@ class LifecycleService:
         return payload
 
     def retry_pending(self) -> list[dict[str, Any]]:
+        return self.promotion_manager.retry_pending()
+
+    def _retry_pending(self) -> list[dict[str, Any]]:
         results: list[dict[str, Any]] = []
         self.pending_dir.mkdir(parents=True, exist_ok=True)
         for path in sorted(self.pending_dir.glob("*.json")):
@@ -804,6 +838,23 @@ class LifecycleService:
         return results
 
     def rollback(
+        self,
+        *,
+        version: str | int,
+        reason: str | None = None,
+        source: str = "manual",
+        probation_id: str | None = None,
+        trigger_metrics: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        return self.rollback_manager.rollback(
+            version=version,
+            reason=reason,
+            source=source,
+            probation_id=probation_id,
+            trigger_metrics=trigger_metrics,
+        )
+
+    def _rollback(
         self,
         *,
         version: str | int,
@@ -912,6 +963,9 @@ class LifecycleService:
         return {"registration": registration, "outcome": outcome}
 
     def _notify_serving_reload(self) -> dict[str, Any]:
+        return self.serving_notifier.notify_reload()
+
+    def _notify_serving_reload_impl(self) -> dict[str, Any]:
         reload_config = self.config.get("serving_reload", {})
         url_env = str(reload_config.get("url_env", "SENTINELML_SERVING_RELOAD_URL"))
         timeout_env = str(
@@ -1003,6 +1057,8 @@ def _lifecycle_training_config(
     import copy
 
     updated = copy.deepcopy(training_config)
+    if model_family != "xgboost":
+        return updated
     family_config = updated["baseline"][model_family]
     normalized, _runtime_config = normalize_xgboost_execution_params(
         family_config,

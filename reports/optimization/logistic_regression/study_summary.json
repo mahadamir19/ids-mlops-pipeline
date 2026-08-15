@@ -15,39 +15,40 @@
   "pruning_enabled": false,
   "pruning_strategy": "unsupported",
   "search_space": {
-    "n_estimators": {
-      "type": "int",
-      "low": 60,
-      "high": 240,
-      "step": 30
-    },
-    "learning_rate": {
+    "C": {
       "type": "float",
-      "low": 0.02,
-      "high": 0.3,
-      "log": true
-    },
-    "reg_alpha": {
-      "type": "float",
-      "low": 1e-06,
-      "high": 1.0,
-      "log": true
-    },
-    "reg_lambda": {
-      "type": "float",
-      "low": 0.1,
+      "low": 0.001,
       "high": 10.0,
       "log": true
+    },
+    "penalty": {
+      "type": "categorical",
+      "choices": [
+        "l2"
+      ]
+    },
+    "solver": {
+      "type": "categorical",
+      "choices": [
+        "lbfgs",
+        "liblinear"
+      ]
+    },
+    "max_iter": {
+      "type": "int",
+      "low": 300,
+      "high": 800,
+      "step": 100
     }
   },
-  "best_trial_number": 0,
-  "best_objective_value": 0.02688239884984493,
+  "best_trial_number": 1,
+  "best_objective_value": 0.01829970128901302,
   "best_params": {
-    "n_estimators": 120,
-    "learning_rate": 0.262516606324193,
-    "reg_alpha": 0.02465832945854911,
-    "reg_lambda": 1.5751320499779735
+    "C": 0.004207988669606638,
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 800
   },
-  "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a",
-  "best_effective_device": "cuda:0"
+  "best_mlflow_run_id": null,
+  "best_effective_device": null
 }

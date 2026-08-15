@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from fastapi import Body, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
 from sentinelml.serving.config import ServingConfig, load_serving_config
@@ -29,6 +30,13 @@ from sentinelml.serving.metrics import (
     record_validation_rejection,
 )
 from sentinelml.serving.model_manager import ModelManager
+from sentinelml.serving.ops import (
+    ops_models,
+    ops_monitoring,
+    ops_overview,
+    ops_resilience,
+    ops_retraining,
+)
 from sentinelml.serving.prediction_service import PredictionService
 from sentinelml.serving.queue import DurableJsonlQueue
 from sentinelml.serving.rejection_logging import StructuredRejectionLogger
@@ -114,8 +122,19 @@ def create_app(
 
     app = FastAPI(
         title="SentinelML Serving API",
-        version="0.7.0",
+        version="0.9.5",
         lifespan=lifespan,
+    )
+
+    configured_origins = (config.cors_allowed_origins if config else None) or (
+        "http://localhost:5173",
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(configured_origins),
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["*"],
     )
 
     @app.middleware("http")
@@ -201,6 +220,26 @@ def create_app(
             "loaded_registry_divergence": registry_status["divergent"],
             "reload_error": registry_status["last_reload_error"],
         }
+
+    @app.get("/ops/overview")
+    def operations_overview() -> dict[str, Any]:
+        return ops_overview(app.state)
+
+    @app.get("/ops/models")
+    def operations_models() -> dict[str, Any]:
+        return ops_models(app.state)
+
+    @app.get("/ops/monitoring")
+    def operations_monitoring() -> dict[str, Any]:
+        return ops_monitoring()
+
+    @app.get("/ops/retraining")
+    def operations_retraining() -> dict[str, Any]:
+        return ops_retraining()
+
+    @app.get("/ops/resilience")
+    def operations_resilience() -> dict[str, Any]:
+        return ops_resilience()
 
     @app.get("/metrics")
     def metrics() -> Response:

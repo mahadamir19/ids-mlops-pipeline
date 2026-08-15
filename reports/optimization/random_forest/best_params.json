@@ -1,7 +1,8 @@
 {
-  "num_parallel_tree": 80,
+  "n_estimators": 80,
   "max_depth": 28,
-  "subsample": 0.839196365086843,
-  "colsample_bynode": 0.759195090518222,
-  "min_child_weight": 2.0921304830970557
+  "min_samples_split": 8,
+  "min_samples_leaf": 4,
+  "max_features": "sqrt",
+  "class_weight": "balanced_subsample"
 }

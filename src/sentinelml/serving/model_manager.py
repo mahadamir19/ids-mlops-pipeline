@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import shutil
+import os
 import tempfile
 import threading
-import uuid
-from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -197,7 +195,10 @@ class ModelManager:
             or version.source
             or f"models:/{version.name}/{version.version}"
         )
-        model = self.model_loader(source_uri)
+        model = self._invoke_model_loader(
+            source_uri,
+            model_family=version.tags.get("model_family"),
+        )
         feature_schema = load_serving_feature_schema(self.schema_path)
         self._validate_model_compatibility(model, feature_schema)
         return LoadedModel(
@@ -213,17 +214,39 @@ class ModelManager:
             feature_schema=feature_schema,
         )
 
-    def _load_model_artifact(self, model_uri: str) -> Any:
-        for flavor in ["xgboost", "sklearn", "pyfunc"]:
+    def _invoke_model_loader(
+        self,
+        model_uri: str,
+        *,
+        model_family: str | None,
+    ) -> Any:
+        try:
+            return self.model_loader(model_uri, model_family=model_family)
+        except TypeError:
+            return self.model_loader(model_uri)
+
+    def _load_model_artifact(
+        self,
+        model_uri: str,
+        *,
+        model_family: str | None = None,
+    ) -> Any:
+        attempts: list[tuple[str, str]] = []
+        for flavor in _flavor_order(model_family):
             loader = getattr(getattr(self.mlflow, flavor, None), "load_model", None)
             if loader is None:
+                attempts.append((flavor, "loader unavailable"))
                 continue
             try:
-                with _patched_accessible_temporary_directory():
+                with _isolated_mlflow_temp_root():
                     return force_estimator_cpu(loader(model_uri))
-            except Exception:
+            except Exception as exc:
+                attempts.append((flavor, f"{type(exc).__name__}: {exc}"))
                 continue
-        raise ModelLoadError(f"unable to load model artifact from MLflow: {model_uri}")
+        details = "\n".join(f"- {flavor}: {message}" for flavor, message in attempts)
+        raise ModelLoadError(
+            f"Unable to load model {model_uri}\n\nAttempts:\n{details}"
+        )
 
     def _validate_model_compatibility(
         self,
@@ -249,54 +272,34 @@ def _parse_bool_tag(value: str | None) -> bool | None:
     return None
 
 
-def _accessible_mkdtemp(
-    suffix: str | None = None,
-    prefix: str | None = None,
-    dir: str | None = None,
-) -> str:
-    root = Path(dir or tempfile.gettempdir())
-    root.mkdir(parents=True, exist_ok=True)
-    name = f"{prefix or 'tmp'}{uuid.uuid4().hex}{suffix or ''}"
-    path = root / name
-    path.mkdir()
-    return str(path)
-
-
-class _AccessibleTemporaryDirectory:
-    """TemporaryDirectory replacement for managed Windows runs with bad ACLs."""
-
-    def __init__(
-        self,
-        suffix: str | None = None,
-        prefix: str | None = None,
-        dir: str | None = None,
-        ignore_cleanup_errors: bool = False,
-        delete: bool = True,
-    ) -> None:
-        self.name = _accessible_mkdtemp(suffix=suffix, prefix=prefix, dir=dir)
-        self.ignore_cleanup_errors = ignore_cleanup_errors
-        self.delete = delete
-
-    def __enter__(self) -> str:
-        return self.name
-
-    def __exit__(self, *_exc: object) -> None:
-        self.cleanup()
-
-    def cleanup(self) -> None:
-        if not self.delete:
-            return
-        shutil.rmtree(self.name, ignore_errors=self.ignore_cleanup_errors)
-
-
 @contextmanager
-def _patched_accessible_temporary_directory() -> Iterator[None]:
-    original_temporary_directory = tempfile.TemporaryDirectory
-    original_mkdtemp = tempfile.mkdtemp
-    tempfile.TemporaryDirectory = _AccessibleTemporaryDirectory
-    tempfile.mkdtemp = _accessible_mkdtemp
+def _isolated_mlflow_temp_root() -> Any:
+    root = PROJECT_ROOT / ".tmp" / "mlflow-model-load"
+    try:
+        root.mkdir(parents=True, exist_ok=True)
+        temp_root = str(root)
+    except OSError:
+        temp_root = tempfile.gettempdir()
+    previous = {key: os.environ.get(key) for key in ["TMP", "TEMP", "TMPDIR"]}
+    for key in previous:
+        os.environ[key] = temp_root
     try:
         yield
     finally:
-        tempfile.TemporaryDirectory = original_temporary_directory
-        tempfile.mkdtemp = original_mkdtemp
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
+def _flavor_order(model_family: str | None) -> list[str]:
+    if model_family == "xgboost":
+        return ["xgboost", "sklearn", "pyfunc"]
+    if model_family in {
+        "logistic_regression",
+        "random_forest",
+        "hist_gradient_boosting",
+    }:
+        return ["sklearn", "xgboost", "pyfunc"]
+    return ["sklearn", "xgboost", "pyfunc"]

@@ -1,6 +1,0 @@
-{
-  "recommended_baseline": "hist_gradient_boosting",
-  "selection_metric": "validation composite score",
-  "selection_score": 0.282892244801477,
-  "selection_rationale": "Selected from validation behavior using attack recall, F1, PR-AUC, ROC-AUC, and false-positive rate. Accuracy is reported but not used as the ranking criterion."
-}

@@ -73,13 +73,22 @@ def log_model_artifact(
 ) -> dict[str, Any]:
     """Log the final candidate model with the correct MLflow flavor."""
 
-    model_info = mlflow.xgboost.log_model(
-        xgb_model=model,
-        name="model",
-        signature=signature,
-        input_example=input_example,
-    )
-    flavor = "xgboost"
+    if model_family == "xgboost":
+        model_info = mlflow.xgboost.log_model(
+            xgb_model=model,
+            name="model",
+            signature=signature,
+            input_example=input_example,
+        )
+        flavor = "xgboost"
+    else:
+        model_info = mlflow.sklearn.log_model(
+            sk_model=model,
+            name="model",
+            signature=signature,
+            input_example=input_example,
+        )
+        flavor = "sklearn"
     return {
         "flavor": flavor,
         "model_uri": getattr(model_info, "model_uri", None),

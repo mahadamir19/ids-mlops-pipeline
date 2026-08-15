@@ -37,6 +37,14 @@ def suggest_hyperparameters(
                 float(spec["high"]),
                 **kwargs,
             )
+        elif kind == "categorical":
+            choices = spec.get("choices")
+            if not isinstance(choices, list) or not choices:
+                raise ValueError(
+                    f"categorical search space for {model_family}.{name} "
+                    "requires non-empty choices"
+                )
+            params[name] = trial.suggest_categorical(name, choices)
         else:
             raise ValueError(
                 f"unsupported search-space type for {model_family}.{name}: {kind}"
@@ -48,4 +56,3 @@ def search_space_summary(search_space: dict[str, Any]) -> dict[str, dict[str, An
     """Return a JSON-friendly copy of configured search-space bounds."""
 
     return {name: dict(spec) for name, spec in search_space.items()}
-

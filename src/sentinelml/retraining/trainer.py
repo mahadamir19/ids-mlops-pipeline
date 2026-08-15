@@ -72,7 +72,10 @@ class RetrainingTrainer:
             champion,
             model_family,
         )
-        validate_xgboost_runtime_available(str(execution_config["requested_device"]))
+        if model_family == "xgboost":
+            validate_xgboost_runtime_available(
+                str(execution_config["requested_device"])
+            )
         model_spec = build_baseline_model_spec(
             model_family,
             dataset.bundle.target,
@@ -149,7 +152,7 @@ class RetrainingTrainer:
                     "effective_tree_method": execution_config[
                         "effective_tree_method"
                     ],
-                    "xgboost_version": execution_config["xgboost_version"],
+                    "xgboost_version": execution_config.get("xgboost_version"),
                     "removed_gpu_params": ",".join(
                         execution_config["removed_gpu_params"]
                     ),
@@ -176,7 +179,7 @@ class RetrainingTrainer:
                     "effective_tree_method": str(
                         execution_config["effective_tree_method"]
                     ),
-                    "xgboost_version": str(execution_config["xgboost_version"]),
+                    "xgboost_version": str(execution_config.get("xgboost_version")),
                 }
             )
             model_info = log_model_artifact(
@@ -310,6 +313,13 @@ class RetrainingTrainer:
         training_config = load_training_config(self.config.training_config_path)
         recovered = self._recover_champion_hyperparameters(champion)
         if recovered:
+            if model_family != "xgboost":
+                known_keys = set(training_config["baseline"][model_family])
+                recovered = {
+                    key: value
+                    for key, value in recovered.items()
+                    if key in known_keys or key.startswith("classifier__")
+                }
             training_config = overlay_model_params(
                 training_config,
                 model_family,
@@ -404,6 +414,17 @@ def _apply_xgboost_execution_policy(
     import copy
 
     updated = copy.deepcopy(training_config)
+    if model_family != "xgboost":
+        return updated, {
+            "requested_device": "cpu",
+            "effective_device": "cpu",
+            "effective_tree_method": None,
+            "removed_gpu_params": [],
+            "removed_gpu_param_values": {},
+            "changed_runtime_params": {},
+            "xgboost_version": None,
+            "note": "non-XGBoost estimator; no XGBoost runtime policy applied",
+        }
     family_config = updated["baseline"][model_family]
     normalized, runtime_config = normalize_xgboost_execution_params(
         family_config,

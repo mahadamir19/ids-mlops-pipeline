@@ -1,3 +1,3 @@
-number,state,value,mlflow_run_id,param.learning_rate,param.n_estimators,param.reg_alpha,param.reg_lambda,user_attr.effective_device,user_attr.objective_metric,user_attr.objective_value
-0,COMPLETE,0.02688239884984493,db287fea6bfc4c51941b593045ea873a,0.262516606324193,120,0.02465832945854911,1.5751320499779735,cuda:0,pr_auc,0.02688239884984493
-1,COMPLETE,0.007680318262572922,cdcbb16406e24a06afc099f5eebe5c2c,0.03051362379613698,90,2.231010801867921e-06,5.3994844097874335,cuda:0,pr_auc,0.007680318262572922
+number,state,value,mlflow_run_id,param.C,param.max_iter,param.penalty,param.solver,user_attr.effective_device,user_attr.objective_metric,user_attr.objective_value
+0,COMPLETE,0.013952636189022387,,0.03148911647956861,600,l2,lbfgs,,pr_auc,0.013952636189022387
+1,COMPLETE,0.01829970128901302,,0.004207988669606638,800,l2,lbfgs,,pr_auc,0.01829970128901302

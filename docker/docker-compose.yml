@@ -142,6 +142,9 @@ services:
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
       AWS_DEFAULT_REGION: us-east-1
       SENTINELML_DATABASE_URL: postgresql+psycopg2://${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}:${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}@app-postgres:5432/${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+      SENTINELML_MONITOR_STATUS_URL: http://monitor:9101/status
+      SENTINELML_RESILIENCE_STATUS_URL: http://resilience:9201/status
+      SENTINELML_OPS_TIMEOUT_SECONDS: "2"
     ports:
       - "8000:8000"
     volumes:
@@ -272,6 +275,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 18
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    container_name: sentinelml-frontend
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${SENTINELML_FRONTEND_PORT:-8080}:8080"
 
   prometheus:
     image: prom/prometheus:v3.5.0

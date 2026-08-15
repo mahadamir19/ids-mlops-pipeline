@@ -1,7 +1,8 @@
 {
-  "n_estimators": 160,
+  "max_iter": 160,
   "learning_rate": 0.1785436060870726,
-  "max_leaves": 51,
-  "min_child_weight": 5.190609389379256,
-  "reg_lambda": 0.18410729205738682
+  "max_leaf_nodes": 51,
+  "max_depth": 11,
+  "min_samples_leaf": 20,
+  "l2_regularization": 1.1091814877139725e-05
 }

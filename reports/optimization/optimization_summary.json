@@ -26,41 +26,42 @@
       "pruning_enabled": false,
       "pruning_strategy": "unsupported",
       "search_space": {
-        "n_estimators": {
-          "type": "int",
-          "low": 60,
-          "high": 240,
-          "step": 30
-        },
-        "learning_rate": {
+        "C": {
           "type": "float",
-          "low": 0.02,
-          "high": 0.3,
-          "log": true
-        },
-        "reg_alpha": {
-          "type": "float",
-          "low": 1e-06,
-          "high": 1.0,
-          "log": true
-        },
-        "reg_lambda": {
-          "type": "float",
-          "low": 0.1,
+          "low": 0.001,
           "high": 10.0,
           "log": true
+        },
+        "penalty": {
+          "type": "categorical",
+          "choices": [
+            "l2"
+          ]
+        },
+        "solver": {
+          "type": "categorical",
+          "choices": [
+            "lbfgs",
+            "liblinear"
+          ]
+        },
+        "max_iter": {
+          "type": "int",
+          "low": 300,
+          "high": 800,
+          "step": 100
         }
       },
-      "best_trial_number": 0,
-      "best_objective_value": 0.02688239884984493,
+      "best_trial_number": 1,
+      "best_objective_value": 0.01829970128901302,
       "best_params": {
-        "n_estimators": 120,
-        "learning_rate": 0.262516606324193,
-        "reg_alpha": 0.02465832945854911,
-        "reg_lambda": 1.5751320499779735
+        "C": 0.004207988669606638,
+        "penalty": "l2",
+        "solver": "lbfgs",
+        "max_iter": 800
       },
-      "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a",
-      "best_effective_device": "cuda:0"
+      "best_mlflow_run_id": null,
+      "best_effective_device": null
     },
     {
       "study_name": "optuna-study-random_forest",
@@ -79,7 +80,7 @@
       "pruning_enabled": false,
       "pruning_strategy": "unsupported",
       "search_space": {
-        "num_parallel_tree": {
+        "n_estimators": {
           "type": "int",
           "low": 40,
           "high": 160,
@@ -91,33 +92,43 @@
           "high": 28,
           "step": 2
         },
-        "subsample": {
-          "type": "float",
-          "low": 0.4,
-          "high": 1.0
+        "min_samples_split": {
+          "type": "int",
+          "low": 2,
+          "high": 10
         },
-        "colsample_bynode": {
-          "type": "float",
-          "low": 0.4,
-          "high": 1.0
+        "min_samples_leaf": {
+          "type": "int",
+          "low": 1,
+          "high": 6
         },
-        "min_child_weight": {
-          "type": "float",
-          "low": 1.0,
-          "high": 8.0
+        "max_features": {
+          "type": "categorical",
+          "choices": [
+            "sqrt",
+            "log2"
+          ]
+        },
+        "class_weight": {
+          "type": "categorical",
+          "choices": [
+            "balanced",
+            "balanced_subsample"
+          ]
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.25703090144531415,
+      "best_objective_value": 0.1026471967388535,
       "best_params": {
-        "num_parallel_tree": 80,
+        "n_estimators": 80,
         "max_depth": 28,
-        "subsample": 0.839196365086843,
-        "colsample_bynode": 0.759195090518222,
-        "min_child_weight": 2.0921304830970557
+        "min_samples_split": 8,
+        "min_samples_leaf": 4,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample"
       },
-      "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29",
-      "best_effective_device": "cuda:0"
+      "best_mlflow_run_id": null,
+      "best_effective_device": null
     },
     {
       "study_name": "optuna-study-xgboost",
@@ -125,8 +136,8 @@
       "execution_mode": "smoke",
       "requested_n_trials": 2,
       "trial_state_counts": {
-        "COMPLETE": 1,
-        "PRUNED": 1,
+        "COMPLETE": 2,
+        "PRUNED": 0,
         "FAIL": 0
       },
       "objective_metric": "pr_auc",
@@ -182,7 +193,7 @@
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.37552147660112,
+      "best_objective_value": 0.3855657939843833,
       "best_params": {
         "n_estimators": 160,
         "max_depth": 10,
@@ -193,8 +204,8 @@
         "reg_alpha": 2.231010801867921e-06,
         "reg_lambda": 2.962151658830348
       },
-      "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1",
-      "best_effective_device": "cuda:0"
+      "best_mlflow_run_id": null,
+      "best_effective_device": "cpu"
     },
     {
       "study_name": "optuna-study-hist_gradient_boosting",
@@ -213,7 +224,7 @@
       "pruning_enabled": false,
       "pruning_strategy": "unsupported",
       "search_space": {
-        "n_estimators": {
+        "max_iter": {
           "type": "int",
           "low": 80,
           "high": 320,
@@ -225,61 +236,68 @@
           "high": 0.2,
           "log": true
         },
-        "max_leaves": {
+        "max_leaf_nodes": {
           "type": "int",
           "low": 15,
           "high": 63,
           "step": 4
         },
-        "min_child_weight": {
-          "type": "float",
-          "low": 1.0,
-          "high": 8.0
+        "max_depth": {
+          "type": "int",
+          "low": 3,
+          "high": 16
         },
-        "reg_lambda": {
+        "min_samples_leaf": {
+          "type": "int",
+          "low": 10,
+          "high": 80,
+          "step": 10
+        },
+        "l2_regularization": {
           "type": "float",
-          "low": 0.1,
+          "low": 1e-06,
           "high": 5.0,
           "log": true
         }
       },
       "best_trial_number": 0,
-      "best_objective_value": 0.23494826381908424,
+      "best_objective_value": 0.4365676509538364,
       "best_params": {
-        "n_estimators": 160,
+        "max_iter": 160,
         "learning_rate": 0.1785436060870726,
-        "max_leaves": 51,
-        "min_child_weight": 5.190609389379256,
-        "reg_lambda": 0.18410729205738682
+        "max_leaf_nodes": 51,
+        "max_depth": 11,
+        "min_samples_leaf": 20,
+        "l2_regularization": 1.1091814877139725e-05
       },
-      "best_mlflow_run_id": "faa11c75dfd041df9306ba4e832b90d1",
-      "best_effective_device": "cuda:0"
+      "best_mlflow_run_id": null,
+      "best_effective_device": null
     }
   ],
   "validation_only_comparison": [
     {
-      "model_family": "xgboost",
-      "best_objective_value": 0.37552147660112,
+      "model_family": "hist_gradient_boosting",
+      "best_objective_value": 0.4365676509538364,
       "best_trial_number": 0,
-      "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1"
+      "best_mlflow_run_id": null
+    },
+    {
+      "model_family": "xgboost",
+      "best_objective_value": 0.3855657939843833,
+      "best_trial_number": 0,
+      "best_mlflow_run_id": null
     },
     {
       "model_family": "random_forest",
-      "best_objective_value": 0.25703090144531415,
+      "best_objective_value": 0.1026471967388535,
       "best_trial_number": 0,
-      "best_mlflow_run_id": "eaff289d144e4699b26165df735d0c29"
-    },
-    {
-      "model_family": "hist_gradient_boosting",
-      "best_objective_value": 0.23494826381908424,
-      "best_trial_number": 0,
-      "best_mlflow_run_id": "faa11c75dfd041df9306ba4e832b90d1"
+      "best_mlflow_run_id": null
     },
     {
       "model_family": "logistic_regression",
-      "best_objective_value": 0.02688239884984493,
-      "best_trial_number": 0,
-      "best_mlflow_run_id": "db287fea6bfc4c51941b593045ea873a"
+      "best_objective_value": 0.01829970128901302,
+      "best_trial_number": 1,
+      "best_mlflow_run_id": null
     }
   ],
   "data_usage": {

@@ -2,25 +2,19 @@ random_seed: 42
 
 baseline:
   logistic_regression:
-    booster: gblinear
-    n_estimators: 120
-    learning_rate: 0.1
-    reg_alpha: 0.0
-    reg_lambda: 1.0
-    tree_method: hist
-    device: cuda
-    n_jobs: 1
+    C: 1.0
+    penalty: l2
+    solver: lbfgs
+    class_weight: balanced
+    max_iter: 500
 
   random_forest:
-    n_estimators: 1
-    num_parallel_tree: 80
+    n_estimators: 80
     max_depth: 18
-    learning_rate: 1.0
-    subsample: 0.8
-    colsample_bynode: 0.8
-    min_child_weight: 2.0
-    tree_method: hist
-    device: cuda
+    min_samples_split: 2
+    min_samples_leaf: 2
+    max_features: sqrt
+    class_weight: balanced_subsample
     n_jobs: 1
 
   xgboost:
@@ -30,17 +24,14 @@ baseline:
     subsample: 0.8
     colsample_bytree: 0.8
     tree_method: hist
-    device: cuda
+    device: cpu
     n_jobs: 1
 
   hist_gradient_boosting:
-    n_estimators: 200
+    max_iter: 200
     learning_rate: 0.1
-    grow_policy: lossguide
-    max_leaves: 31
-    max_depth: 0
-    min_child_weight: 1.0
-    reg_lambda: 1.0
-    tree_method: hist
-    device: cuda
-    n_jobs: 1
+    max_leaf_nodes: 31
+    max_depth: null
+    min_samples_leaf: 20
+    l2_regularization: 0.0
+    class_weight: balanced

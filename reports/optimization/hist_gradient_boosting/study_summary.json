@@ -15,7 +15,7 @@
   "pruning_enabled": false,
   "pruning_strategy": "unsupported",
   "search_space": {
-    "n_estimators": {
+    "max_iter": {
       "type": "int",
       "low": 80,
       "high": 320,
@@ -27,33 +27,40 @@
       "high": 0.2,
       "log": true
     },
-    "max_leaves": {
+    "max_leaf_nodes": {
       "type": "int",
       "low": 15,
       "high": 63,
       "step": 4
     },
-    "min_child_weight": {
-      "type": "float",
-      "low": 1.0,
-      "high": 8.0
+    "max_depth": {
+      "type": "int",
+      "low": 3,
+      "high": 16
     },
-    "reg_lambda": {
+    "min_samples_leaf": {
+      "type": "int",
+      "low": 10,
+      "high": 80,
+      "step": 10
+    },
+    "l2_regularization": {
       "type": "float",
-      "low": 0.1,
+      "low": 1e-06,
       "high": 5.0,
       "log": true
     }
   },
   "best_trial_number": 0,
-  "best_objective_value": 0.23494826381908424,
+  "best_objective_value": 0.4365676509538364,
   "best_params": {
-    "n_estimators": 160,
+    "max_iter": 160,
     "learning_rate": 0.1785436060870726,
-    "max_leaves": 51,
-    "min_child_weight": 5.190609389379256,
-    "reg_lambda": 0.18410729205738682
+    "max_leaf_nodes": 51,
+    "max_depth": 11,
+    "min_samples_leaf": 20,
+    "l2_regularization": 1.1091814877139725e-05
   },
-  "best_mlflow_run_id": "faa11c75dfd041df9306ba4e832b90d1",
-  "best_effective_device": "cuda:0"
+  "best_mlflow_run_id": null,
+  "best_effective_device": null
 }

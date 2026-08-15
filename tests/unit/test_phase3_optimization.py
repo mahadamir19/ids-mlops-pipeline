@@ -52,6 +52,10 @@ class FakeTrial:
         self.params[name] = low
         return low
 
+    def suggest_categorical(self, name: str, choices: list[object]) -> object:
+        self.params[name] = choices[0]
+        return choices[0]
+
     def set_user_attr(self, key: str, value: object) -> None:
         self.user_attrs[key] = value
 
@@ -67,7 +71,10 @@ class Phase3OptimizationTests(unittest.TestCase):
         self.assertIn("xgboost", enabled_model_families(config))
         self.assertEqual(
             mode_sample_sizes(config, "smoke"),
-            {"train": 2000, "validation": 1000},
+            {
+                "train": config["modes"]["smoke"]["train_sample_size"],
+                "validation": config["modes"]["smoke"]["validation_sample_size"],
+            },
         )
         self.assertTrue(config["models"]["xgboost"]["pruning_enabled"])
         self.assertFalse(config["models"]["random_forest"]["pruning_enabled"])
@@ -79,24 +86,24 @@ class Phase3OptimizationTests(unittest.TestCase):
             for model in enabled_model_families(config)
         }
 
-        self.assertLessEqual(spaces["logistic_regression"]["reg_lambda"]["low"], 1.0)
+        self.assertLessEqual(spaces["logistic_regression"]["C"]["low"], 1.0)
         self.assertGreaterEqual(
-            spaces["logistic_regression"]["reg_lambda"]["high"],
+            spaces["logistic_regression"]["C"]["high"],
             1.0,
         )
-        self.assertLessEqual(spaces["random_forest"]["num_parallel_tree"]["low"], 80)
+        self.assertLessEqual(spaces["random_forest"]["n_estimators"]["low"], 80)
         self.assertGreaterEqual(
-            spaces["random_forest"]["num_parallel_tree"]["high"],
+            spaces["random_forest"]["n_estimators"]["high"],
             80,
         )
         self.assertLessEqual(spaces["xgboost"]["max_depth"]["low"], 6)
         self.assertGreaterEqual(spaces["xgboost"]["max_depth"]["high"], 6)
         self.assertLessEqual(
-            spaces["hist_gradient_boosting"]["n_estimators"]["low"],
+            spaces["hist_gradient_boosting"]["max_iter"]["low"],
             200,
         )
         self.assertGreaterEqual(
-            spaces["hist_gradient_boosting"]["n_estimators"]["high"],
+            spaces["hist_gradient_boosting"]["max_iter"]["high"],
             200,
         )
 
@@ -106,18 +113,18 @@ class Phase3OptimizationTests(unittest.TestCase):
             trial,
             "random_forest",
             {
-                "num_parallel_tree": {
+                "n_estimators": {
                     "type": "int",
                     "low": 40,
                     "high": 80,
                     "step": 20,
                 },
-                "max_features": {"type": "float", "low": 0.4, "high": 1.0},
+                "max_features": {"type": "categorical", "choices": ["sqrt", "log2"]},
             },
         )
 
-        self.assertEqual(params, {"num_parallel_tree": 40, "max_features": 0.4})
-        self.assertEqual(trial.params["num_parallel_tree"], 40)
+        self.assertEqual(params, {"n_estimators": 40, "max_features": "sqrt"})
+        self.assertEqual(trial.params["n_estimators"], 40)
 
     def test_objective_metric_value_uses_project_metrics(self) -> None:
         metrics = {"pr_auc": 0.42, "confusion_matrix": {"tp": 3}}

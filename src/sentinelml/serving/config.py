@@ -31,6 +31,7 @@ class ServingConfig:
     reload_notification_timeout_seconds: float
     mlflow_tracking_uri: str | None
     config_path: Path
+    cors_allowed_origins: tuple[str, ...] = ("http://localhost:5173",)
 
     @property
     def database_url(self) -> str | None:
@@ -48,6 +49,11 @@ def load_serving_config(path: Path = DEFAULT_SERVING_CONFIG_PATH) -> ServingConf
     database = raw.get("database", {})
     reload = raw.get("reload", {})
     mlflow = raw.get("mlflow", {})
+    cors = raw.get("cors", {})
+    allowed_origins = os.environ.get(
+        "SENTINELML_CORS_ALLOWED_ORIGINS",
+        str(cors.get("allowed_origins", "http://localhost:5173")),
+    )
 
     config = ServingConfig(
         model_name=str(model.get("registered_model_name", "sentinelml-ids")),
@@ -71,6 +77,9 @@ def load_serving_config(path: Path = DEFAULT_SERVING_CONFIG_PATH) -> ServingConf
         reload_endpoint_enabled=bool(reload.get("internal_endpoint_enabled", True)),
         reload_notification_timeout_seconds=float(
             reload.get("notification_timeout_seconds", 2)
+        ),
+        cors_allowed_origins=tuple(
+            origin.strip() for origin in allowed_origins.split(",") if origin.strip()
         ),
         mlflow_tracking_uri=os.environ.get(
             "MLFLOW_TRACKING_URI",
@@ -107,5 +116,6 @@ def as_public_config(config: ServingConfig) -> dict[str, Any]:
         "database_url_env": config.database_url_env,
         "database_configured": config.database_url is not None,
         "reload_endpoint_enabled": config.reload_endpoint_enabled,
+        "cors_allowed_origins": list(config.cors_allowed_origins),
         "mlflow_tracking_uri": config.mlflow_tracking_uri,
     }

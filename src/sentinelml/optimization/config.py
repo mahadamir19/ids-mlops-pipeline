@@ -6,6 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from sentinelml.config import load_yaml_mapping
 from sentinelml.data.config import PROJECT_ROOT
 from sentinelml.training.models import MODEL_FAMILIES
 
@@ -15,54 +16,12 @@ DEFAULT_OPTIMIZATION_CONFIG_PATH = (
 VALID_DIRECTIONS = {"maximize", "minimize"}
 
 
-def _parse_scalar(value: str) -> int | float | bool | None | str:
-    value = value.strip()
-    lowered = value.lower()
-    if lowered == "":
-        raise ValueError("empty scalar values are not supported")
-    if lowered in {"true", "false"}:
-        return lowered == "true"
-    if lowered in {"null", "none"}:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        try:
-            return float(value)
-        except ValueError:
-            return value
-
-
 def load_optimization_config(
     path: Path = DEFAULT_OPTIMIZATION_CONFIG_PATH,
 ) -> dict[str, Any]:
-    """Load the simple nested YAML optimization configuration."""
+    """Load the nested YAML optimization configuration."""
 
-    config: dict[str, Any] = {}
-    stack: list[tuple[int, dict[str, Any]]] = [(-1, config)]
-    lines = path.read_text(encoding="utf-8").splitlines()
-    for line_number, raw_line in enumerate(lines, 1):
-        content = raw_line.split("#", 1)[0].rstrip()
-        if not content:
-            continue
-        indent = len(content) - len(content.lstrip(" "))
-        if indent % 2:
-            raise ValueError(f"invalid indentation on line {line_number}")
-        stripped = content.strip()
-        if ":" not in stripped:
-            raise ValueError(f"expected key/value pair on line {line_number}")
-        key, raw_value = stripped.split(":", 1)
-        key = key.strip()
-        while stack and indent <= stack[-1][0]:
-            stack.pop()
-        parent = stack[-1][1]
-        if raw_value.strip():
-            parent[key] = _parse_scalar(raw_value)
-        else:
-            child: dict[str, Any] = {}
-            parent[key] = child
-            stack.append((indent, child))
-
+    config = load_yaml_mapping(path, label="optimization config")
     validate_optimization_config(config)
     return config
 

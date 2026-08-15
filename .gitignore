@@ -6,11 +6,15 @@ pytest-cache-files-*/
 tmp_tests/
 .tmp/
 .tmp/serving/
+mlflow.db
+mlruns/
 
 .venv/
 venv/
 
 .env
+.env.*
+!.env.example
 
 data/**/*.csv
 data/**/*.parquet
@@ -19,6 +23,20 @@ data/**/*.jsonl
 
 SPEC.md
 *.egg-info/
+build/
+dist/
+frontend/dist/
+frontend/node_modules/
+frontend/coverage/
+frontend/.vite/
+frontend/.vitest/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 docker/.env
 setup.ps1
@@ -26,6 +44,17 @@ setup.ps1
 reports/monitoring/*.json
 reports/monitoring/*.json.tmp
 reports/monitoring/*.html
+reports/simulation/*.json
+!reports/simulation/example*.json
+reports/retraining/*.json
+reports/retraining/decisions/*.json
+reports/retraining/*/
+reports/resilience/latest.json
+reports/resilience/status/*.json
+reports/lifecycle/registereds/
+reports/lifecycle/rejecteds/
+reports/lifecycle/faileds/
+reports/lifecycle/promoteds/
 
 *.jsonl
 *.malformed.*

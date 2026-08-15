@@ -1,3 +1,3 @@
-number,state,value,mlflow_run_id,param.colsample_bynode,param.max_depth,param.min_child_weight,param.num_parallel_tree,param.subsample,user_attr.effective_device,user_attr.objective_metric,user_attr.objective_value
-0,COMPLETE,0.25703090144531415,eaff289d144e4699b26165df735d0c29,0.759195090518222,28,2.0921304830970557,80,0.839196365086843,cuda:0,pr_auc,0.25703090144531415
-1,COMPLETE,0.11454322991925256,0a69432e5fd0456cba54fd354ea90e09,0.7606690070459252,8,5.956508044572319,60,0.9197056874649611,cuda:0,pr_auc,0.11454322991925256
+number,state,value,mlflow_run_id,param.class_weight,param.max_depth,param.max_features,param.min_samples_leaf,param.min_samples_split,param.n_estimators,user_attr.effective_device,user_attr.objective_metric,user_attr.objective_value
+0,COMPLETE,0.1026471967388535,,balanced_subsample,28,sqrt,4,8,80,,pr_auc,0.1026471967388535
+1,COMPLETE,0.08329398959763039,,balanced_subsample,22,sqrt,6,2,120,,pr_auc,0.08329398959763039

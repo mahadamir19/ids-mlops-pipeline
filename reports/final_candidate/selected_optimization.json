@@ -1,23 +1,21 @@
 {
   "source_summary_path": "C:\\MLOps-Project\\project\\reports\\optimization\\optimization_summary.json",
-  "source_study_path": "C:\\MLOps-Project\\project\\reports\\optimization\\xgboost\\study_summary.json",
-  "source_best_params_path": "C:\\MLOps-Project\\project\\reports\\optimization\\xgboost\\best_params.json",
-  "study_name": "optuna-study-xgboost",
-  "model_family": "xgboost",
+  "source_study_path": "C:\\MLOps-Project\\project\\reports\\optimization\\hist_gradient_boosting\\study_summary.json",
+  "source_best_params_path": "C:\\MLOps-Project\\project\\reports\\optimization\\hist_gradient_boosting\\best_params.json",
+  "study_name": "optuna-study-hist_gradient_boosting",
+  "model_family": "hist_gradient_boosting",
   "execution_mode": "smoke",
   "best_trial_number": 0,
-  "best_objective_value": 0.37552147660112,
-  "best_mlflow_run_id": "9b19e0606f0547f1843c42024b44f4b1",
+  "best_objective_value": 0.4365676509538364,
+  "best_mlflow_run_id": null,
   "objective_metric": "pr_auc",
   "direction": "maximize",
   "best_params": {
-    "n_estimators": 160,
-    "max_depth": 10,
-    "learning_rate": 0.10790061933340454,
-    "subsample": 0.8394633936788146,
-    "colsample_bytree": 0.6624074561769746,
-    "min_child_weight": 2.0919616423534184,
-    "reg_alpha": 2.231010801867921e-06,
-    "reg_lambda": 2.962151658830348
+    "max_iter": 160,
+    "learning_rate": 0.1785436060870726,
+    "max_leaf_nodes": 51,
+    "max_depth": 11,
+    "min_samples_leaf": 20,
+    "l2_regularization": 1.1091814877139725e-05
   }
 }

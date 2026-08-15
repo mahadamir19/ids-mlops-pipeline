@@ -27,26 +27,22 @@ models:
     pruning_enabled: false
     pruning_strategy: unsupported
     search_space:
-      n_estimators:
-        type: int
-        low: 60
-        high: 240
-        step: 30
-      learning_rate:
+      C:
         type: float
-        low: 0.02
-        high: 0.3
-        log: true
-      reg_alpha:
-        type: float
-        low: 0.000001
-        high: 1.0
-        log: true
-      reg_lambda:
-        type: float
-        low: 0.1
+        low: 0.001
         high: 10.0
         log: true
+      penalty:
+        type: categorical
+        choices: [l2]
+      solver:
+        type: categorical
+        choices: [lbfgs, liblinear]
+      max_iter:
+        type: int
+        low: 300
+        high: 800
+        step: 100
 
   random_forest:
     enabled: true
@@ -55,7 +51,7 @@ models:
     pruning_enabled: false
     pruning_strategy: unsupported
     search_space:
-      num_parallel_tree:
+      n_estimators:
         type: int
         low: 40
         high: 160
@@ -65,18 +61,20 @@ models:
         low: 8
         high: 28
         step: 2
-      subsample:
-        type: float
-        low: 0.4
-        high: 1.0
-      colsample_bynode:
-        type: float
-        low: 0.4
-        high: 1.0
-      min_child_weight:
-        type: float
-        low: 1.0
-        high: 8.0
+      min_samples_split:
+        type: int
+        low: 2
+        high: 10
+      min_samples_leaf:
+        type: int
+        low: 1
+        high: 6
+      max_features:
+        type: categorical
+        choices: [sqrt, log2]
+      class_weight:
+        type: categorical
+        choices: [balanced, balanced_subsample]
 
   xgboost:
     enabled: true
@@ -129,7 +127,7 @@ models:
     pruning_enabled: false
     pruning_strategy: unsupported
     search_space:
-      n_estimators:
+      max_iter:
         type: int
         low: 80
         high: 320
@@ -139,17 +137,22 @@ models:
         low: 0.02
         high: 0.2
         log: true
-      max_leaves:
+      max_leaf_nodes:
         type: int
         low: 15
         high: 63
         step: 4
-      min_child_weight:
+      max_depth:
+        type: int
+        low: 3
+        high: 16
+      min_samples_leaf:
+        type: int
+        low: 10
+        high: 80
+        step: 10
+      l2_regularization:
         type: float
-        low: 1.0
-        high: 8.0
-      reg_lambda:
-        type: float
-        low: 0.1
+        low: 0.000001
         high: 5.0
         log: true
