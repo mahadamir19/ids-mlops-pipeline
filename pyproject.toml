@@ -13,6 +13,7 @@ dependencies = []
 [project.optional-dependencies]
 dev = [
     "black>=24.0",
+    "httpx>=0.28",
     "mypy>=1.8",
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -37,6 +38,18 @@ tracking = [
     "optuna>=4.0",
     "optuna-integration[xgboost]>=4.0",
     "psycopg2-binary>=2.9",
+]
+serving = [
+    "fastapi>=0.141",
+    "pydantic>=2.13",
+    "PyYAML>=6.0",
+    "sqlalchemy>=2.0",
+    "uvicorn>=0.52",
+]
+simulation = [
+    "pandas>=2.2",
+    "pyarrow>=15.0",
+    "PyYAML>=6.0",
 ]
 
 [tool.setuptools]

@@ -11,7 +11,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ENV_PATH = PROJECT_ROOT / "infra" / "mlflow" / ".env"
+ENV_PATH = PROJECT_ROOT / "docker" / ".env"
+ENV_EXAMPLE_PATH = PROJECT_ROOT / "docker" / ".env.example"
 
 
 def load_env_file(path: Path) -> dict[str, str]:
@@ -43,7 +44,7 @@ def ensure_minio_bucket(*, bucket: str, endpoint_url: str) -> None:
 
 
 def main() -> None:
-    env_values = load_env_file(ENV_PATH)
+    env_values = load_env_file(ENV_PATH if ENV_PATH.exists() else ENV_EXAMPLE_PATH)
     endpoint_url = os.environ.get("MLFLOW_S3_ENDPOINT_URL", "http://127.0.0.1:9000")
     bucket = env_values["MINIO_BUCKET"]
     temp_dir = PROJECT_ROOT / ".tmp" / "mlflow-server-temp"

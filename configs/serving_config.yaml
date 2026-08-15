@@ -1,0 +1,30 @@
+model:
+  registered_model_name: sentinelml-ids
+  champion_alias: champion
+
+mlflow:
+  tracking_uri: http://127.0.0.1:5000
+
+api:
+  host: 127.0.0.1
+  port: 8000
+
+request:
+  max_batch_size: 128
+
+paths:
+  feature_schema: reports/data/feature_schema.json
+  rejection_log: .tmp/serving/rejections.jsonl
+
+database:
+  url_env: SENTINELML_DATABASE_URL
+  connect_timeout_seconds: 5
+  statement_timeout_ms: 5000
+
+queue:
+  path: .tmp/serving/prediction_queue.jsonl
+  flush_interval_seconds: 10
+
+reload:
+  internal_endpoint_enabled: true
+  notification_timeout_seconds: 2

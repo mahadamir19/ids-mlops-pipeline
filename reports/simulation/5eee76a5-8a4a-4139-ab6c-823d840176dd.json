@@ -1,0 +1,44 @@
+{
+  "affected_features": [],
+  "errors_summary": [],
+  "failed_labels": [],
+  "finished_at": "2026-08-15T08:07:41.160519+00:00",
+  "label_delivery_mode": "randomized",
+  "labels_delivered": 50,
+  "labels_failed": 0,
+  "labels_pending": 0,
+  "model_versions_observed": {
+    "2": 50
+  },
+  "prediction_class_distribution": {
+    "ATTACK": 38,
+    "BENIGN": 12
+  },
+  "request_count_attempted": 50,
+  "requests_failed": 0,
+  "requests_succeeded": 50,
+  "scenario": "attack_rate_spike",
+  "scenario_category": "class_prevalence_change",
+  "scenario_parameters": {
+    "target_attack_fraction": 0.75
+  },
+  "seed": 203,
+  "simulation_fingerprint": "5809f292b535ce0ab047685aefddac48fe18ac3aff16f04c83d6d111f760d188",
+  "simulation_run_id": "5eee76a5-8a4a-4139-ab6c-823d840176dd",
+  "source": {
+    "fingerprint": "31d629138332bb736c19a44b0549c10638ec6d5c250339c03d9e0f3e1a87e168",
+    "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
+    "provenance": "Phase 1 reference partition derived from non-test train days (Monday, Tuesday, Wednesday).",
+    "row_count": 152695,
+    "target_distribution": {
+      "0": 132459,
+      "1": 20236
+    }
+  },
+  "started_at": "2026-08-15T08:07:38.208710+00:00",
+  "true_class_distribution": {
+    "0": 12,
+    "1": 38
+  },
+  "undelivered_labels": []
+}

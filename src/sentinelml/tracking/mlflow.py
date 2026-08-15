@@ -37,7 +37,9 @@ def configure_mlflow_runtime_environment(repo_root: Path = PROJECT_ROOT) -> str:
     os.environ["TMP"] = str(mlflow_temp_dir)
     os.environ["TEMP"] = str(mlflow_temp_dir)
 
-    env_values = load_env_file(repo_root / "infra" / "mlflow" / ".env")
+    env_path = repo_root / "docker" / ".env"
+    env_example_path = repo_root / "docker" / ".env.example"
+    env_values = load_env_file(env_path if env_path.exists() else env_example_path)
     if "MINIO_ROOT_USER" in env_values:
         os.environ.setdefault("AWS_ACCESS_KEY_ID", env_values["MINIO_ROOT_USER"])
     if "MINIO_ROOT_PASSWORD" in env_values:

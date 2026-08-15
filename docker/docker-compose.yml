@@ -1,0 +1,170 @@
+name: mlflow
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: sentinelml-mlflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mlflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mlflow123}
+      POSTGRES_DB: ${POSTGRES_DB:-mlflow}
+    ports:
+      - "5433:5432"
+    volumes:
+      - mlflow_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
+    container_name: sentinelml-mlflow-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-sentinelml}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - mlflow_minio_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:9000/minio/health/live",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  minio-create-bucket:
+    image: quay.io/minio/mc:RELEASE.2025-05-21T01-59-54Z
+    container_name: sentinelml-minio-create-bucket
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000
+      ${MINIO_ROOT_USER:-sentinelml} ${MINIO_ROOT_PASSWORD:-minio123}; do sleep 2; done;
+      mc mb --ignore-existing local/${MINIO_BUCKET:-mlflow-artifacts};
+      "
+
+  mlflow-server:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: sentinelml-mlflow-server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-create-bucket:
+        condition: service_completed_successfully
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-sentinelml}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      AWS_DEFAULT_REGION: us-east-1
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+    command:
+      - mlflow
+      - server
+      - --backend-store-uri
+      - postgresql+psycopg2://${POSTGRES_USER:-mlflow}:${POSTGRES_PASSWORD:-mlflow123}@postgres:5432/${POSTGRES_DB:-mlflow}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --allowed-hosts
+      - ${MLFLOW_ALLOWED_HOSTS:-localhost,localhost:5000,127.0.0.1,127.0.0.1:5000,mlflow-server,mlflow-server:5000,sentinelml-mlflow-server,sentinelml-mlflow-server:5000}
+      - --cors-allowed-origins
+      - ${MLFLOW_CORS_ALLOWED_ORIGINS:-http://localhost:*,http://127.0.0.1:*}
+      - --workers
+      - "1"
+      - --serve-artifacts
+      - --artifacts-destination
+      - s3://${MINIO_BUCKET:-mlflow-artifacts}
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=2).read()",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+  app-postgres:
+    image: postgres:17
+    container_name: sentinelml-app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}
+      POSTGRES_PASSWORD: ${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+    ports:
+      - "5434:5432"
+    volumes:
+      - app_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    container_name: sentinelml-api
+    restart: unless-stopped
+    depends_on:
+      mlflow-server:
+        condition: service_healthy
+      app-postgres:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow-server:5000
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-sentinelml}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      AWS_DEFAULT_REGION: us-east-1
+      SENTINELML_DATABASE_URL: postgresql+psycopg2://${SENTINELML_APP_POSTGRES_USER:-sentinelml_app}:${SENTINELML_APP_POSTGRES_PASSWORD:-change-me}@app-postgres:5432/${SENTINELML_APP_POSTGRES_DB:-sentinelml_app}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../src:/app/src:ro
+      - ../configs:/app/configs:ro
+      - ../reports/data/feature_schema.json:/app/reports/data/feature_schema.json:ro
+      - ../.tmp/serving:/app/.tmp/serving
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
+volumes:
+  mlflow_postgres_data:
+    name: mlflow_mlflow_postgres_data
+  mlflow_minio_data:
+    name: mlflow_mlflow_minio_data
+  app_postgres_data:
+    name: sentinelml_app_postgres_data

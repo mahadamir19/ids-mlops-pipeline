@@ -1,0 +1,54 @@
+api:
+  base_url: http://127.0.0.1:8000
+
+simulation:
+  default_seed: 42
+  default_request_count: 100
+  request_interval_seconds: 0.0
+  timeout_seconds: 5.0
+  source_data: data/reference/reference.parquet
+
+paths:
+  feature_schema: reports/data/feature_schema.json
+  reports_dir: reports/simulation
+
+labels:
+  randomized_delay:
+    min_delay_seconds: 0.1
+    max_delay_seconds: 1.0
+  batch_delivery:
+    batch_size: 10
+  retry:
+    max_attempts: 3
+    retry_delay_seconds: 1.0
+
+scenarios:
+  normal: {}
+  gradual_drift:
+    affected_features:
+      - flow_duration
+      - packet_length_mean
+    additive_shift: 50.0
+    multiplicative_scale: 1.25
+    change_point_fraction: 0.5
+  sudden_drift:
+    affected_features:
+      - flow_duration
+      - flow_iat_mean
+    additive_shift: 5000.0
+    multiplicative_scale: 1.2
+    change_point_fraction: 0.5
+  attack_rate_spike:
+    target_attack_fraction: 0.75
+  packet_size_shift: {}
+  flow_duration_shift: {}
+  multi_feature_shift: {}
+
+custom:
+  schedule: gradual
+  affected_features:
+    - flow_duration
+  additive_shift: 1000.0
+  multiplicative_scale: 1.1
+  change_point_fraction: 0.5
+  target_attack_fraction:

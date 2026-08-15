@@ -42,7 +42,7 @@ class Phase2LineageTests(unittest.TestCase):
 
     def test_configure_mlflow_runtime_environment_sets_server_defaults(self) -> None:
         root = Path.cwd() / "tmp_tests" / "phase2_mlflow_runtime"
-        env_path = root / "infra" / "mlflow" / ".env"
+        env_path = root / "docker" / ".env"
         try:
             env_path.parent.mkdir(parents=True, exist_ok=True)
             env_path.write_text(

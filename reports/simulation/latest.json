@@ -1,0 +1,55 @@
+{
+  "affected_features": [
+    "flow_duration",
+    "flow_iat_mean"
+  ],
+  "errors_summary": [],
+  "failed_labels": [],
+  "finished_at": "2026-08-15T08:14:42.457425+00:00",
+  "label_delivery_mode": "randomized",
+  "labels_delivered": 30,
+  "labels_failed": 0,
+  "labels_pending": 0,
+  "model_versions_observed": {
+    "2": 30
+  },
+  "prediction_class_distribution": {
+    "ATTACK": 9,
+    "BENIGN": 21
+  },
+  "request_count_attempted": 30,
+  "requests_failed": 0,
+  "requests_succeeded": 30,
+  "scenario": "custom",
+  "scenario_category": "custom",
+  "scenario_parameters": {
+    "additive_shift": 2500,
+    "affected_features": [
+      "flow_duration",
+      "flow_iat_mean"
+    ],
+    "change_point_fraction": 0.4,
+    "multiplicative_scale": 1.1,
+    "schedule": "sudden",
+    "target_attack_fraction": 0.3
+  },
+  "seed": 301,
+  "simulation_fingerprint": "d1c6424389dcbaceda23aa00644c45f523177e3acf88553c8b2d7d7d1c74ede6",
+  "simulation_run_id": "e562e2a4-637d-4a56-bca9-0dc0965513ae",
+  "source": {
+    "fingerprint": "31d629138332bb736c19a44b0549c10638ec6d5c250339c03d9e0f3e1a87e168",
+    "path": "C:\\MLOps-Project\\project\\data\\reference\\reference.parquet",
+    "provenance": "Phase 1 reference partition derived from non-test train days (Monday, Tuesday, Wednesday).",
+    "row_count": 152695,
+    "target_distribution": {
+      "0": 132459,
+      "1": 20236
+    }
+  },
+  "started_at": "2026-08-15T08:14:40.785414+00:00",
+  "true_class_distribution": {
+    "0": 21,
+    "1": 9
+  },
+  "undelivered_labels": []
+}

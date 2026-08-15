@@ -62,3 +62,7 @@ composite_score:
     f1: 0.20
     false_positive_rate: 0.10
     inference_latency_ms_per_row: 0.10
+
+serving_reload:
+  url_env: SENTINELML_SERVING_RELOAD_URL
+  timeout_seconds_env: SENTINELML_SERVING_RELOAD_TIMEOUT_SECONDS
