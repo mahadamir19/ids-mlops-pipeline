@@ -6,7 +6,7 @@
 
 SentinelML is a local-first, production-style MLOps platform that uses binary network intrusion detection as the production ML use case. The classifier maps CICIDS2017 flow records into `BENIGN -> 0` and `ATTACK -> 1`, but the main point is the lifecycle around the model: data versioning, experiment tracking, governed promotion, inference, observability, retraining, and rollback.
 
-It is intentionally not a cybersecurity benchmark-optimization project. The committed metrics are useful for demonstrating the system, not for claiming a best possible intrusion detector.
+SentinelML is not primarily an ML-modeling project. The intrusion-detection task and conventional model families provide a realistic workload, while the main engineering focus is reproducibility, experiment tracking, model governance, production serving, monitoring, continuous retraining, resilience, and rollback.
 
 ## What SentinelML Demonstrates
 
@@ -281,6 +281,6 @@ A fresh empty MLflow Registry cannot serve predictions until a champion exists. 
 
 ### Intentional Scope & Omitted Features
 
-SentinelML focuses on traditional production ML/MLOps rather than recreating unrelated portfolio features. Rich product frontend is intentionally omitted: SentinelML includes a minimal read-only operations dashboard rather than a full product UI. JWT authentication, RBAC, and account/user management are omitted because the project assumes a trusted local environment. Cloud deployment and Kubernetes are omitted because Docker Compose is used to demonstrate the complete local lifecycle. LLM, agentic AI, RAG, and MCP features are deliberately outside scope.
+SentinelML focuses on traditional production ML/MLOps rather than recreating unrelated portfolio features. Advanced model research, architecture experimentation, extensive feature engineering, and benchmark chasing were deliberately not prioritized because the project focuses on MLOps systems engineering rather than maximizing classifier performance. Rich product frontend is intentionally omitted: SentinelML includes a minimal read-only operations dashboard rather than a full product UI. JWT authentication, RBAC, and account/user management are omitted because the project assumes a trusted local environment. Cloud deployment and Kubernetes are omitted because Docker Compose is used to demonstrate the complete local lifecycle. LLM, agentic AI, RAG, and MCP features are deliberately outside scope.
 
 Natural SentinelML-specific extensions would include raw PCAP ingestion, multiclass attacks, Kafka/Redpanda, Feast, SHAP, analyst-review workflows, or distributed training.
