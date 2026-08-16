@@ -23,9 +23,53 @@ def run_cli(argv: list[str]) -> tuple[int, str, str]:
 
 
 class UnifiedCliTests(unittest.TestCase):
+    def test_data_prepare_dispatches_phase1_preprocessing_with_options(self) -> None:
+        with patch(
+            "sentinelml.data.preprocess.generate_phase1_datasets",
+            return_value={"partitions": {}},
+        ) as generate:
+            code, stdout, stderr = run_cli(
+                [
+                    "data",
+                    "prepare",
+                    "--config",
+                    "configs/custom_data.json",
+                    "--label-mapping",
+                    "configs/custom_labels.json",
+                ]
+            )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(stderr, "")
+        self.assertEqual(json.loads(stdout), {"partitions": {}})
+        generate.assert_called_once_with(
+            config_path=Path("configs/custom_data.json"),
+            label_mapping_path=Path("configs/custom_labels.json"),
+        )
+
+    def test_data_prepare_defaults_dispatch_to_phase1_preprocessing(self) -> None:
+        with patch(
+            "sentinelml.data.preprocess.generate_phase1_datasets",
+            return_value={"partitions": {}},
+        ) as generate:
+            code, stdout, stderr = run_cli(["data", "prepare"])
+
+        self.assertEqual(code, 0)
+        self.assertEqual(stderr, "")
+        self.assertEqual(json.loads(stdout), {"partitions": {}})
+        generate.assert_called_once_with(config_path=None, label_mapping_path=None)
+
+    def test_data_eda_dispatches_existing_phase1_eda_entrypoint(self) -> None:
+        with patch("scripts.phase1_eda.main") as eda_main:
+            code, stdout, stderr = run_cli(["data", "eda"])
+
+        self.assertEqual(code, 0)
+        self.assertEqual(stdout, "")
+        self.assertEqual(stderr, "")
+        eda_main.assert_called_once_with()
+
     def test_phase_commands_dispatch_and_print_json(self) -> None:
         commands = [
-            (["data", "prepare"], "_run_phase1", {}),
             (
                 ["train", "baselines", "--mode", "full", "--mlflow"],
                 "_run_phase2",
@@ -213,6 +257,9 @@ class UnifiedCliTests(unittest.TestCase):
     def test_help_smoke_and_invalid_options_use_argparse(self) -> None:
         for argv in [
             ["--help"],
+            ["data", "--help"],
+            ["data", "prepare", "--help"],
+            ["data", "eda", "--help"],
             ["model", "--help"],
             ["retrain", "--help"],
             ["resilience", "--help"],

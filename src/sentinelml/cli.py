@@ -32,7 +32,13 @@ def _add_data(subparsers: Any) -> None:
     data = subparsers.add_parser("data")
     data_sub = data.add_subparsers(dest="data_command", required=True)
     prepare = data_sub.add_parser("prepare")
-    prepare.set_defaults(func=lambda _args: _run_phase1())
+    prepare.add_argument("--config", type=Path, default=None)
+    prepare.add_argument("--label-mapping", type=Path, default=None)
+    prepare.set_defaults(
+        func=lambda args: _run_phase1_prepare(args.config, args.label_mapping)
+    )
+    eda = data_sub.add_parser("eda")
+    eda.set_defaults(func=lambda _args: _run_phase1_eda())
 
 
 def _add_train(subparsers: Any) -> None:
@@ -136,7 +142,19 @@ def _add_resilience(subparsers: Any) -> None:
     rollback.set_defaults(func=lambda args: _resilience("rollback", args))
 
 
-def _run_phase1() -> None:
+def _run_phase1_prepare(
+    config_path: Path | None = None,
+    label_mapping_path: Path | None = None,
+) -> dict[str, Any]:
+    from sentinelml.data.preprocess import generate_phase1_datasets
+
+    return generate_phase1_datasets(
+        config_path=config_path,
+        label_mapping_path=label_mapping_path,
+    )
+
+
+def _run_phase1_eda() -> None:
     from scripts.phase1_eda import main as phase1_main
 
     phase1_main()
