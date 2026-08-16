@@ -2,7 +2,7 @@ export function StatusBadge({ value }: { value?: string | null }) {
   const normalized = (value || "unavailable").toLowerCase();
   const label = statusLabel(normalized);
   const tone =
-    ["healthy", "available"].includes(normalized)
+    ["healthy", "available", "champion"].includes(normalized)
       ? "good"
       : ["degraded", "pending", "promotion_pending", "stale", "warming_up"].some(
           (status) => normalized.includes(status)
