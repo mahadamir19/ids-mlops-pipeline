@@ -12,6 +12,8 @@ SentinelML is not primarily an ML-modeling project. The intrusion-detection task
 
 SentinelML implements reproducible data preparation and DVC pipelines, four conventional model families, Optuna hyperparameter optimization, MLflow experiment tracking, MLflow Model Registry governance, candidate/champion lifecycle management, gated automatic promotion, FastAPI inference, prediction persistence, delayed ground truth, production traffic simulation, Evidently monitoring, Prometheus and Grafana, continuous retraining, cooldown and locking, probation and automatic rollback, failure tolerance, GitHub Actions CI, and a minimal read-only React operations dashboard.
 
+![SentinelML architecture](assets/readme/dashboard.png)
+
 ## Architecture
 
 ![SentinelML architecture](assets/readme/mermaid-diagram.png)
@@ -99,6 +101,8 @@ MLflow provides three roles: experiment tracking, artifact storage, and registry
 
 SentinelML uses MLflow for experiments, hyperparameters, metrics, candidate training runs, artifacts, model versions, lifecycle metadata, and reload decisions. A fresh empty registry does not contain a champion until the initial lifecycle bootstrap creates and promotes one.
 
+![SentinelML architecture](assets/readme/registry.png)
+
 ## Model Lifecycle & Governance
 
 The lifecycle states are compact but deliberate:
@@ -135,6 +139,8 @@ Monitoring compares a reference sample against a production window using Evident
 
 Prometheus scrapes API, monitoring, retraining, and resilience metrics; Grafana visualizes the operational dashboard from the Docker provisioning files. Monitoring inputs are fingerprinted so unchanged inputs can skip expensive report generation. Monitoring failures are isolated from inference availability.
 
+![SentinelML architecture](assets/readme/monitoring.png)
+
 ## Continuous Retraining
 
 The retraining flow is:
@@ -168,6 +174,8 @@ New champions enter post-promotion probation. The resilience service can evaluat
 | Model reload failure | Previous loaded model remains active. |
 | Candidate gate failure | Candidate is rejected with metadata. |
 | Severe probation failure | Automatic rollback can restore an earlier champion. |
+
+![SentinelML architecture](assets/readme/operations.png)
 
 ## Unified CLI
 
