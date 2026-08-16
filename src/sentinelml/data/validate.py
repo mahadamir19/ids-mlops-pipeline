@@ -10,7 +10,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-
 FEATURES_FILENAME = "feature_schema.json"
 RAW_VALIDATION_FILENAME = "validation_raw.json"
 PROCESSED_VALIDATION_FILENAME = "validation_processed.json"

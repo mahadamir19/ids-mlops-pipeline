@@ -6,10 +6,12 @@ import sys
 import types
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from sentinelml.lifecycle.evaluation import canonical_promotion_slice
+from sentinelml.lifecycle.registration import CandidateRegistrar
 from sentinelml.lifecycle.service import (
     LifecycleError,
     LifecycleService,
@@ -852,6 +854,79 @@ class Phase4LifecycleTests(unittest.TestCase):
         self.assertNotIn("gpu_id", params)
         self.assertEqual(params["max_depth"], 4)
         self.assertEqual(training_config["baseline"]["xgboost"]["device"], "cuda")
+
+    def test_registration_worker_uses_explicit_dependencies(self) -> None:
+        worker = CandidateRegistrar(
+            client=self.client,
+            mlflow=self.mlflow,
+            model_name="sentinelml-ids",
+            report_root=self.root / "worker_lifecycle",
+            load_manifest=lambda **_kwargs: manifest(),
+            validate_model_uri=lambda _uri: None,
+            execution_mode_from_manifest=lambda _manifest: "smoke",
+            demo_model_for_mode=lambda mode: "true" if mode == "smoke" else "false",
+        )
+
+        result = worker.register_candidate(mode="smoke")
+
+        self.assertEqual(result["event"], "registered")
+        self.assertEqual(result["model_version"], "1")
+        self.assertEqual(
+            self.client.get_model_version("sentinelml-ids", "1").tags[
+                "lifecycle_state"
+            ],
+            "candidate",
+        )
+        self.assertTrue(
+            list((self.root / "worker_lifecycle" / "registereds").glob("*.json"))
+        )
+
+    def test_facade_public_methods_delegate_to_workers(self) -> None:
+        self.service.registrar = types.SimpleNamespace(
+            register_candidate=Mock(return_value={"registered": True})
+        )
+        self.service.candidate_evaluator = types.SimpleNamespace(
+            evaluate_candidate=Mock(return_value={"event": "evaluated"})
+        )
+        self.service.promotion_manager = types.SimpleNamespace(
+            promote_or_reject=Mock(return_value={"event": "promoted"}),
+            retry_pending=Mock(return_value=[]),
+            mark_candidate_failed=Mock(return_value={"event": "failed"}),
+        )
+        self.service.rollback_manager = types.SimpleNamespace(
+            rollback=Mock(return_value={"event": "rollback"})
+        )
+
+        self.assertEqual(self.service.register_candidate(), {"registered": True})
+        self.assertEqual(
+            self.service.evaluate_candidate(version="1"),
+            {"event": "evaluated"},
+        )
+        self.assertEqual(
+            self.service.promote_or_reject(version="1"),
+            {"event": "promoted"},
+        )
+        self.assertEqual(self.service.retry_pending(), [])
+        self.assertEqual(
+            self.service.mark_candidate_failed(version="1", error="boom"),
+            {"event": "failed"},
+        )
+        self.assertEqual(
+            self.service.rollback(version="1"),
+            {"event": "rollback"},
+        )
+
+    def test_lifecycle_workers_no_longer_need_private_service_callbacks(self) -> None:
+        for name in [
+            "_register_candidate",
+            "_evaluate_candidate",
+            "_promote_or_reject",
+            "_retry_pending",
+            "_rollback",
+            "_notify_serving_reload_impl",
+        ]:
+            with self.subTest(name=name):
+                self.assertFalse(hasattr(self.service, name))
 
 
 class Phase4OptionalIntegrationTests(unittest.TestCase):

@@ -39,6 +39,7 @@ from sentinelml.training.gpu import (
 from sentinelml.training.models import build_baseline_model_spec, load_training_config
 
 MLFLOW_EXPERIMENT_NAME = "sentinelml-retraining"
+LOGISTIC_REUSABLE_PARAMS = {"C", "penalty", "solver", "max_iter", "class_weight"}
 
 
 class RetrainingTrainer:
@@ -166,7 +167,13 @@ class RetrainingTrainer:
                 }
             )
             mlflow.log_params(
-                {f"candidate.{k}": v for k, v in model_spec.parameters.items()}
+                {
+                    f"candidate.{k}": v
+                    for k, v in _reusable_hyperparameters(
+                        model_family,
+                        model_spec.parameters,
+                    ).items()
+                }
             )
             mlflow.log_metrics(flatten_mlflow_metrics("train", training_metrics))
             mlflow.log_metrics(flatten_mlflow_metrics("validation", validation_metrics))
@@ -226,8 +233,9 @@ class RetrainingTrainer:
                     ),
                 },
                 "execution_runtime": execution_config,
-                "winning_hyperparameters": _effective_hyperparameters(
-                    model_spec.parameters
+                "winning_hyperparameters": _reusable_hyperparameters(
+                    model_family,
+                    model_spec.parameters,
                 ),
                 "git": {
                     "commit": lineage["git_commit"],
@@ -311,7 +319,7 @@ class RetrainingTrainer:
         model_family: str,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         training_config = load_training_config(self.config.training_config_path)
-        recovered = self._recover_champion_hyperparameters(champion)
+        recovered = self._recover_champion_hyperparameters(champion, model_family)
         if recovered:
             if model_family != "xgboost":
                 known_keys = set(training_config["baseline"][model_family])
@@ -341,6 +349,7 @@ class RetrainingTrainer:
     def _recover_champion_hyperparameters(
         self,
         champion: ModelVersionInfo,
+        model_family: str,
     ) -> dict[str, Any]:
         source_run_id = champion.tags.get("source_run_id") or champion.run_id
         if not source_run_id:
@@ -357,7 +366,7 @@ class RetrainingTrainer:
                 recovered[key.removeprefix("winning.")] = _parse_mlflow_param(value)
             elif key.startswith("candidate."):
                 recovered[key.removeprefix("candidate.")] = _parse_mlflow_param(value)
-        return recovered
+        return _canonical_recovered_hyperparameters(model_family, recovered)
 
 
 def _champion_family(champion: ModelVersionInfo) -> str:
@@ -388,6 +397,37 @@ def _effective_hyperparameters(parameters: dict[str, Any]) -> dict[str, Any]:
         if isinstance(value, str | int | float | bool) or value is None:
             keep[key] = value
     return keep
+
+
+def _reusable_hyperparameters(
+    model_family: str,
+    parameters: dict[str, Any],
+) -> dict[str, Any]:
+    if model_family == "logistic_regression":
+        classifier = parameters.get("classifier")
+        source = classifier if isinstance(classifier, dict) else parameters
+        return {
+            key: value
+            for key, value in source.items()
+            if key in LOGISTIC_REUSABLE_PARAMS
+            and (isinstance(value, str | int | float | bool) or value is None)
+        }
+    return _effective_hyperparameters(parameters)
+
+
+def _canonical_recovered_hyperparameters(
+    model_family: str,
+    recovered: dict[str, Any],
+) -> dict[str, Any]:
+    if model_family != "logistic_regression":
+        return recovered
+    canonical: dict[str, Any] = {}
+    for key, value in recovered.items():
+        if key.startswith("classifier__"):
+            key = key.removeprefix("classifier__")
+        if key in LOGISTIC_REUSABLE_PARAMS:
+            canonical[key] = value
+    return canonical
 
 
 def _force_cpu_training_config(

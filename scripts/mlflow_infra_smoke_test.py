@@ -1,14 +1,13 @@
-# ruff: noqa: I001
 import sys
 from pathlib import Path
 
-import mlflow
-
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from sentinelml.training.baselines import configure_mlflow_runtime_environment  # noqa: E402
+import mlflow
 
+from sentinelml.training.baselines import (
+    configure_mlflow_runtime_environment,  # noqa: E402
+)
 
 EXPERIMENT_NAME = "sentinelml-infra-smoke-test"
 

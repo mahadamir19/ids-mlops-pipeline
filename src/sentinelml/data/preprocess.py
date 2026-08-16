@@ -15,11 +15,15 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from sentinelml.data.config import load_label_mapping, load_phase1_config, resolve_project_path
+from sentinelml.data.config import (
+    load_label_mapping,
+    load_phase1_config,
+    resolve_project_path,
+)
 from sentinelml.data.validate import (
+    FEATURES_FILENAME,
     PROCESSED_VALIDATION_FILENAME,
     RAW_VALIDATION_FILENAME,
-    FEATURES_FILENAME,
     fail_if_needed,
     validate_processed_partitions,
     validate_raw_report,

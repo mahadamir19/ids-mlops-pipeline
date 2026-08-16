@@ -27,6 +27,7 @@ from sentinelml.retraining.trainer import (
     RetrainingTrainer,
     _apply_xgboost_execution_policy,
     _force_cpu_training_config,
+    _reusable_hyperparameters,
 )
 from sentinelml.retraining.triggers import (
     PerformanceThresholds,
@@ -544,6 +545,204 @@ class Phase8CandidateLifecycleTests(unittest.TestCase):
         self.assertEqual(runtime["removed_gpu_params"], ["gpu_id", "predictor"])
         client.set_model_version_tag.assert_not_called()
 
+    def test_logistic_retraining_params_survive_second_recovery_cycle(self) -> None:
+        write_training_config(self.root)
+        first_params = {
+            "winning.C": "0.25",
+            "winning.penalty": "l2",
+            "winning.solver": "liblinear",
+            "winning.max_iter": "777",
+            "winning.class_weight": "balanced",
+        }
+        second_params = {
+            "candidate.C": "0.25",
+            "candidate.penalty": "l2",
+            "candidate.solver": "liblinear",
+            "candidate.max_iter": "777",
+            "candidate.class_weight": "balanced",
+        }
+        lifecycle = types.SimpleNamespace(
+            client=FakeRunClient(
+                {"champion-a-run": first_params, "candidate-b-run": second_params}
+            )
+        )
+        trainer = RetrainingTrainer(
+            config=config(self.root),
+            lifecycle_service=lifecycle,
+        )
+        champion_a = types.SimpleNamespace(
+            version="1",
+            run_id="champion-a-run",
+            tags={"source_run_id": "champion-a-run"},
+        )
+        champion_b = types.SimpleNamespace(
+            version="2",
+            run_id="candidate-b-run",
+            tags={"source_run_id": "candidate-b-run"},
+        )
+
+        first_config, first_runtime = trainer._candidate_training_config(
+            champion_a,
+            "logistic_regression",
+        )
+        second_config, second_runtime = trainer._candidate_training_config(
+            champion_b,
+            "logistic_regression",
+        )
+
+        expected = {
+            "C": 0.25,
+            "penalty": "l2",
+            "solver": "liblinear",
+            "max_iter": 777,
+            "class_weight": "balanced",
+        }
+        self.assertEqual(first_config["baseline"]["logistic_regression"], expected)
+        self.assertEqual(second_config["baseline"]["logistic_regression"], expected)
+        self.assertEqual(first_runtime["effective_tree_method"], None)
+        self.assertEqual(second_runtime["effective_tree_method"], None)
+
+    def test_logistic_candidate_logs_canonical_flat_reusable_params(self) -> None:
+        parameters = {
+            "pipeline": ["StandardScaler", "LogisticRegression"],
+            "scaler": {"with_mean": True},
+            "classifier": {
+                "C": 0.5,
+                "penalty": "l2",
+                "solver": "lbfgs",
+                "max_iter": 321,
+                "class_weight": "balanced",
+                "random_state": 42,
+            },
+            "flat": {"classifier__C": 0.5},
+        }
+
+        reusable = _reusable_hyperparameters("logistic_regression", parameters)
+
+        self.assertEqual(
+            reusable,
+            {
+                "C": 0.5,
+                "penalty": "l2",
+                "solver": "lbfgs",
+                "max_iter": 321,
+                "class_weight": "balanced",
+            },
+        )
+
+    def test_random_forest_champion_params_recover_without_xgboost_runtime_leak(
+        self,
+    ) -> None:
+        write_training_config(self.root)
+        lifecycle = types.SimpleNamespace(
+            client=FakeRunClient(
+                {
+                    "rf-run": {
+                        "candidate.n_estimators": "33",
+                        "candidate.max_depth": "12",
+                        "candidate.min_samples_leaf": "4",
+                        "candidate.device": "cuda",
+                        "candidate.tree_method": "gpu_hist",
+                    }
+                }
+            )
+        )
+        trainer = RetrainingTrainer(
+            config=config(self.root),
+            lifecycle_service=lifecycle,
+        )
+        champion = types.SimpleNamespace(
+            version="3",
+            run_id="rf-run",
+            tags={"source_run_id": "rf-run"},
+        )
+
+        updated, _runtime = trainer._candidate_training_config(
+            champion,
+            "random_forest",
+        )
+
+        params = updated["baseline"]["random_forest"]
+        self.assertEqual(params["n_estimators"], 33)
+        self.assertEqual(params["max_depth"], 12)
+        self.assertEqual(params["min_samples_leaf"], 4)
+        self.assertNotIn("device", params)
+        self.assertNotIn("tree_method", params)
+
+    def test_xgboost_champion_params_recover_and_runtime_is_normalized(self) -> None:
+        write_training_config(self.root)
+        lifecycle = types.SimpleNamespace(
+            client=FakeRunClient(
+                {
+                    "xgb-run": {
+                        "candidate.max_depth": "8",
+                        "candidate.learning_rate": "0.03",
+                        "candidate.n_estimators": "44",
+                        "candidate.device": "cuda",
+                        "candidate.tree_method": "gpu_hist",
+                        "candidate.predictor": "gpu_predictor",
+                    }
+                }
+            )
+        )
+        trainer = RetrainingTrainer(
+            config=config(self.root),
+            lifecycle_service=lifecycle,
+        )
+        champion = types.SimpleNamespace(
+            version="4",
+            run_id="xgb-run",
+            tags={"source_run_id": "xgb-run"},
+        )
+
+        updated, runtime = trainer._candidate_training_config(champion, "xgboost")
+
+        params = updated["baseline"]["xgboost"]
+        self.assertEqual(params["max_depth"], 8)
+        self.assertEqual(params["learning_rate"], 0.03)
+        self.assertEqual(params["n_estimators"], 44)
+        self.assertEqual(params["device"], "cpu")
+        self.assertEqual(params["tree_method"], "hist")
+        self.assertNotIn("predictor", params)
+        self.assertEqual(runtime["removed_gpu_params"], ["predictor"])
+
+    def test_hist_gradient_boosting_champion_params_recover_without_xgboost_leak(
+        self,
+    ) -> None:
+        write_training_config(self.root)
+        lifecycle = types.SimpleNamespace(
+            client=FakeRunClient(
+                {
+                    "hgb-run": {
+                        "candidate.max_iter": "66",
+                        "candidate.learning_rate": "0.02",
+                        "candidate.max_leaf_nodes": "15",
+                        "candidate.device": "cuda",
+                    }
+                }
+            )
+        )
+        trainer = RetrainingTrainer(
+            config=config(self.root),
+            lifecycle_service=lifecycle,
+        )
+        champion = types.SimpleNamespace(
+            version="5",
+            run_id="hgb-run",
+            tags={"source_run_id": "hgb-run"},
+        )
+
+        updated, _runtime = trainer._candidate_training_config(
+            champion,
+            "hist_gradient_boosting",
+        )
+
+        params = updated["baseline"]["hist_gradient_boosting"]
+        self.assertEqual(params["max_iter"], 66)
+        self.assertEqual(params["learning_rate"], 0.02)
+        self.assertEqual(params["max_leaf_nodes"], 15)
+        self.assertNotIn("device", params)
+
     def test_cpu_xgboost_candidate_fits_serializes_reloads_and_predicts(self) -> None:
         try:
             from xgboost import XGBClassifier
@@ -817,6 +1016,57 @@ def fake_retraining_dataset(root: Path) -> Any:
             "dataset_fingerprint": "dataset-fp",
         },
     )
+
+
+def write_training_config(root: Path) -> None:
+    (root / "training.yaml").write_text(
+        "\n".join(
+            [
+                "random_seed: 42",
+                "baseline:",
+                "  logistic_regression:",
+                "    C: 1.0",
+                "    penalty: l2",
+                "    solver: lbfgs",
+                "    class_weight: balanced",
+                "    max_iter: 500",
+                "  random_forest:",
+                "    n_estimators: 80",
+                "    max_depth: 18",
+                "    min_samples_leaf: 2",
+                "    class_weight: balanced_subsample",
+                "    n_jobs: 1",
+                "  xgboost:",
+                "    n_estimators: 200",
+                "    max_depth: 6",
+                "    learning_rate: 0.1",
+                "    subsample: 0.8",
+                "    colsample_bytree: 0.8",
+                "    tree_method: hist",
+                "    device: cpu",
+                "    n_jobs: 1",
+                "  hist_gradient_boosting:",
+                "    max_iter: 200",
+                "    learning_rate: 0.1",
+                "    max_leaf_nodes: 31",
+                "    max_depth: null",
+                "    min_samples_leaf: 20",
+                "    l2_regularization: 0.0",
+                "    class_weight: balanced",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+class FakeRunClient:
+    def __init__(self, params_by_run_id: dict[str, dict[str, str]]) -> None:
+        self.params_by_run_id = params_by_run_id
+
+    def get_run(self, run_id: str) -> Any:
+        return types.SimpleNamespace(
+            data=types.SimpleNamespace(params=self.params_by_run_id[run_id])
+        )
 
 
 def processed_count(repository: RetrainingRepository) -> int:

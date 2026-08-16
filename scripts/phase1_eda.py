@@ -348,7 +348,7 @@ def scan_dominant_counts(result: dict[str, Any], paths: list[Path]) -> None:
         (c["majority_candidate"] or "").encode() for c in result["overall"]["columns"]
     ]
     overall_counts = [0 for _ in overall_candidates]
-    for file_stats, path in zip(result["files"], paths):
+    for file_stats, path in zip(result["files"], paths, strict=True):
         candidates = [(c["majority_candidate"] or "").encode() for c in file_stats["columns"]]
         counts = [0 for _ in candidates]
         with path.open("rb") as handle:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 from typing import Any
 
 
@@ -83,7 +84,20 @@ def _add_simulate(subparsers: Any) -> None:
     simulate = subparsers.add_parser("simulate")
     simulate.add_argument("--scenario", default="normal")
     simulate.add_argument("--requests", type=int, default=10)
-    simulate.set_defaults(func=lambda args: _simulate(args.scenario, args.requests))
+    simulate.add_argument("--seed", type=int, default=None)
+    simulate.add_argument(
+        "--label-mode",
+        choices=["randomized", "batch", "none"],
+        default="randomized",
+    )
+    simulate.set_defaults(
+        func=lambda args: _simulate(
+            args.scenario,
+            args.requests,
+            seed=args.seed,
+            label_mode=args.label_mode,
+        )
+    )
 
 
 def _add_monitor(subparsers: Any) -> None:
@@ -98,7 +112,12 @@ def _add_monitor(subparsers: Any) -> None:
 def _add_retrain(subparsers: Any) -> None:
     retrain = subparsers.add_parser("retrain")
     retrain_sub = retrain.add_subparsers(dest="retrain_command", required=True)
-    for name in ["status", "evaluate-trigger", "once"]:
+    status = retrain_sub.add_parser("status")
+    status.set_defaults(func=lambda args: _retrain("status", args))
+    evaluate = retrain_sub.add_parser("evaluate-trigger")
+    evaluate.add_argument("--force-recheck", action="store_true")
+    evaluate.set_defaults(func=lambda args: _retrain("evaluate-trigger", args))
+    for name in ["once"]:
         command = retrain_sub.add_parser(name)
         command.set_defaults(func=lambda args, n=name: _retrain(n, args))
 
@@ -172,10 +191,23 @@ def _serve() -> None:
     uvicorn.run("sentinelml.serving.app:app", host="0.0.0.0", port=8000)
 
 
-def _simulate(scenario: str, requests: int) -> Any:
-    from sentinelml.simulation.simulator import run_simulation
+def _simulate(
+    scenario: str,
+    requests: int,
+    *,
+    seed: int | None = None,
+    label_mode: str = "randomized",
+) -> Any:
+    from sentinelml.simulation.config import DEFAULT_SIMULATION_CONFIG_PATH
+    from sentinelml.simulation.simulator import run_simulation_from_config
 
-    return run_simulation(scenario_name=scenario, request_count=requests)
+    return run_simulation_from_config(
+        config_path=Path(DEFAULT_SIMULATION_CONFIG_PATH),
+        scenario_name=scenario,
+        request_count=requests,
+        seed=seed,
+        label_mode=label_mode,
+    )
 
 
 def _monitor_once() -> Any:
@@ -192,16 +224,18 @@ def _read_ops(name: str) -> Any:
     return {}
 
 
-def _retrain(name: str, _args: Any) -> Any:
+def _retrain(name: str, args: Any) -> Any:
     from sentinelml.retraining.service import RetrainingService
 
     service = RetrainingService()
     if name == "status":
         return service.status()
     if name == "evaluate-trigger":
-        return service.evaluate_trigger()
+        return service.evaluate_latest_trigger(
+            force_recheck=bool(getattr(args, "force_recheck", False))
+        )
     if name == "once":
-        return service.run_once()
+        return service.process_once()
     raise ValueError(name)
 
 
@@ -214,7 +248,7 @@ def _resilience(name: str, args: Any) -> Any:
     if name == "evaluate-probation":
         return service.evaluate_probation()
     if name == "rollback":
-        return service.manual_rollback(target_version=args.version)
+        return service.rollback(to_version=args.version, reason="manual_cli")
     raise ValueError(name)
 
 
